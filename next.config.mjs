@@ -7,7 +7,6 @@ const __dirname = path.dirname(__filename);
 
 const nextConfig = {
   // App directory is now stable in Next.js 15
-  outputFileTracingRoot: path.join(__dirname, '..'),
   images: {
     domains: [
       'localhost',
