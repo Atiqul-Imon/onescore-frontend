@@ -352,7 +352,8 @@
     -webkit-line-clamp: 3;
   }
 
-  /* Standardized Container */
+  /* Standardized Container Utilities */
+  /* Use Container component instead, but these utilities are available for edge cases */
   .container-standard {
     @apply w-full mx-auto px-4 sm:px-6 lg:px-8;
   }
@@ -375,6 +376,24 @@
 
   .container-2xl {
     @apply container-standard max-w-[1400px];
+  }
+
+  /* Responsive width utilities for better control */
+  .w-container {
+    @apply w-full;
+  }
+
+  /* Responsive spacing utilities */
+  .section-gap {
+    @apply space-y-8 md:space-y-12 lg:space-y-16;
+  }
+
+  .section-gap-sm {
+    @apply space-y-4 md:space-y-6 lg:space-y-8;
+  }
+
+  .section-gap-lg {
+    @apply space-y-12 md:space-y-16 lg:space-y-24;
   }
 
   /* Standardized Section Spacing */

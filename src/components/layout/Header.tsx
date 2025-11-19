@@ -13,6 +13,7 @@ import {
   Bell
 } from 'lucide-react';
 import { useSocket } from '@/contexts/SocketContext';
+import { Container } from '@/components/ui/Container';
 
 function isActivePath(pathname: string, target: string) {
   if (target === '/') return pathname === '/';
@@ -52,7 +53,7 @@ export function Header() {
 
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-screen-xl">
+      <Container size="xl">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-standard">
@@ -158,7 +159,7 @@ export function Header() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </Container>
 
       {/* Mobile Menu */}
       <AnimatePresence>
