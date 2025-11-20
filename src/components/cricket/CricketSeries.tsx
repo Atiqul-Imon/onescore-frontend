@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Calendar, Users, TrendingUp, Star } from 'lucide-react';
+import { Container } from '@/components/ui';
 
 interface CricketSeries {
   id: string;
@@ -125,35 +126,37 @@ export function CricketSeries() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
+      <section className="section-padding bg-gray-50">
+        <Container size="2xl">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-emerald-500" />
             <p className="mt-4 text-gray-600">Loading cricket series...</p>
           </div>
-        </div>
+        </Container>
       </section>
     );
   }
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4">
+    <section className="section-padding bg-gray-50">
+      <Container size="2xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="mb-12 text-center"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Cricket Series & Tournaments
-          </h2>
-          <p className="text-lg text-gray-600">
-            Follow the biggest cricket competitions around the world
+          <div className="eyebrow mx-auto w-max gap-2">
+            <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+            Series Tracker
+          </div>
+          <h2 className="heading-2 mt-5">Cricket Series & Tournaments</h2>
+          <p className="section-lede mt-3 text-gray-600">
+            Follow the biggest competitions on every continent with live ladders, fixtures, and trophy stakes.
           </p>
         </motion.div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="card-grid-3">
           {series.map((seriesItem, index) => (
             <motion.div
               key={seriesItem.id}
@@ -272,7 +275,7 @@ export function CricketSeries() {
             <p className="text-gray-600">Check back later for upcoming cricket series!</p>
           </div>
         )}
-      </div>
+      </Container>
     </section>
   );
 }

@@ -5,6 +5,7 @@ import { getAuthHeaders } from '@/lib/auth';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { MediaPicker } from '@/components/admin/MediaPicker';
 import { TagInput } from '@/components/admin/TagInput';
+import { PageLayout } from '@/components/layout/PageLayout';
 
 export default function CreateArticlePage() {
   const router = useRouter();
@@ -48,20 +49,19 @@ export default function CreateArticlePage() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Create Article</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Fill in the details to create a new news article</p>
+    <PageLayout
+      title="Create Article"
+      description="Fill in the editorial brief, attach media, and publish to the newsroom."
+      size="xl"
+      className="bg-gray-50 min-h-screen"
+    >
+      {error ? (
+        <div className="mb-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+          {error}
         </div>
+      ) : null}
 
-        {error ? (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-            <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
-          </div>
-        ) : null}
-
-        <form onSubmit={onSubmit} className="space-y-6">
+      <form onSubmit={onSubmit} className="space-y-6">
           {/* Main Content Section */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-6">
             <div>
@@ -182,9 +182,8 @@ export default function CreateArticlePage() {
               {submitting ? 'Creating...' : 'Create Article'}
             </button>
           </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </PageLayout>
   );
 }
 

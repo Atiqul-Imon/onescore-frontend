@@ -5,6 +5,7 @@ import { getAuthHeaders } from '@/lib/auth';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { MediaPicker } from '@/components/admin/MediaPicker';
 import { TagInput } from '@/components/admin/TagInput';
+import { PageLayout } from '@/components/layout/PageLayout';
 
 export default function EditArticlePage() {
   const params = useParams();
@@ -106,73 +107,67 @@ export default function EditArticlePage() {
 
   if (loading) {
     return (
-      <div className="p-6 bg-gray-50 dark:bg-gray-950 min-h-screen flex items-center justify-center">
-        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
-      </div>
+      <PageLayout title="Edit Article" size="xl" className="bg-gray-50 min-h-screen">
+        <div className="text-gray-600">Loading...</div>
+      </PageLayout>
     );
   }
 
-  if (error) {
+  if (!form && error) {
     return (
-      <div className="p-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
-        <div className="max-w-6xl mx-auto">
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-            <p className="text-red-600 dark:text-red-400">{error}</p>
-          </div>
-        </div>
-      </div>
+      <PageLayout title="Edit Article" size="xl" className="bg-gray-50 min-h-screen">
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</div>
+      </PageLayout>
     );
   }
 
   if (!form) return null;
 
   return (
-    <div className="p-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Edit Article</h1>
-            <div className="flex gap-3">
-              <button
-                onClick={save}
-                disabled={saving}
-                className="px-6 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {saving ? 'Saving...' : 'Save'}
-              </button>
-              <button
-                onClick={publish}
-                disabled={publishing || form?.state === 'published'}
-                className="px-6 py-2.5 bg-green-600 dark:bg-green-700 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {publishing ? 'Publishing...' : form?.state === 'published' ? 'Published' : 'Publish'}
-              </button>
-              <a
-                href="/admin/news"
-                className="px-6 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
-              >
-                Back
-              </a>
-            </div>
-          </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Current status: <span className="capitalize font-medium">{form.state || 'draft'}</span>
-          </p>
-          
-          {error && (
-            <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-              <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
-            </div>
-          )}
-          
-          {success && (
-            <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
-              <p className="text-green-600 dark:text-green-400 text-sm">{success}</p>
-            </div>
-          )}
+    <PageLayout
+      title="Edit Article"
+      description={`Current status: ${form.state || 'draft'}`}
+      size="xl"
+      className="bg-gray-50 min-h-screen"
+      actions={
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={save}
+            disabled={saving}
+            className="rounded-md border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            type="button"
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+          <button
+            onClick={publish}
+            disabled={publishing || form?.state === 'published'}
+            className="rounded-md bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+            type="button"
+          >
+            {publishing ? 'Publishing...' : form?.state === 'published' ? 'Published' : 'Publish'}
+          </button>
+          <a
+            href="/admin/news"
+            className="rounded-md border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            Back
+          </a>
         </div>
+      }
+    >
+      {success && (
+        <div className="mb-6 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+          {success}
+        </div>
+      )}
+      {error && (
+        <div className="mb-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+          {error}
+        </div>
+      )}
 
-        <form className="space-y-6">
+      <form className="space-y-6">
           {/* Main Content Section */}
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-6">
             <div>
@@ -276,9 +271,8 @@ export default function EditArticlePage() {
               />
             </div>
           </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </PageLayout>
   );
 }
 

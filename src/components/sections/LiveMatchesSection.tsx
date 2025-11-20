@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Users, Trophy, TrendingUp } from 'lucide-react';
-import { LoadingSpinner, LoadingMatchCard } from '@/components/ui/LoadingSpinner';
+import { ArrowUpRight, Clock, Users, Trophy, TrendingUp } from 'lucide-react';
+import { LoadingMatchCard } from '@/components/ui/LoadingSpinner';
 import { Container, Button, Card } from '@/components/ui';
 import { formatTime, formatRelativeTime } from '@/lib/utils';
 
@@ -129,19 +129,45 @@ export function LiveMatchesSection() {
     }
   };
 
+  const statusBadgeClasses: Record<Match['status'], string> = {
+    live: 'bg-red-50 text-red-600 border-red-100',
+    upcoming: 'bg-blue-50 text-blue-700 border-blue-100',
+    completed: 'bg-gray-100 text-gray-700 border-gray-200',
+  };
+
+  const statusPillLabel: Record<Match['status'], string> = {
+    live: 'Live now',
+    upcoming: 'Upcoming',
+    completed: 'Completed',
+  };
+
+  const statusAccentRing: Record<Match['status'], string> = {
+    live: 'ring-red-100',
+    upcoming: 'ring-blue-100',
+    completed: 'ring-gray-100',
+  };
+
+  const getCtaLabel = (status: Match['status']) => {
+    if (status === 'live') return 'Watch Live';
+    if (status === 'upcoming') return 'Match Center';
+    return 'View Recap';
+  };
+
   if (loading) {
     return (
-      <section className="section-padding bg-gray-100">
-        <Container>
-          <div className="text-center mb-12">
-            <h2 className="heading-2 mb-4">
-              Live Matches
-            </h2>
-            <p className="body-text-lg text-gray-600">
-              Real-time scores and updates
+      <section className="section-padding bg-gradient-to-b from-white via-gray-50 to-white">
+        <Container size="2xl">
+          <div className="mb-12 text-center">
+            <div className="eyebrow mx-auto w-max gap-2">
+              <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+              Live Tracker
+            </div>
+            <h2 className="heading-2 mt-5">Live Matches</h2>
+            <p className="section-lede mt-3 text-gray-600">
+              Real-time scores and broadcast-ready insights for cricket and football.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="card-grid-3">
             {[1, 2, 3].map((i) => (
               <LoadingMatchCard key={i} />
             ))}
@@ -153,12 +179,10 @@ export function LiveMatchesSection() {
 
   if (error) {
     return (
-      <section className="section-padding bg-gray-100">
-        <Container>
-          <div className="text-center">
-            <h2 className="heading-2 mb-4">
-              Live Matches
-            </h2>
+      <section className="section-padding bg-gradient-to-b from-white via-gray-50 to-white">
+        <Container size="2xl">
+          <div className="surface-panel text-center p-10">
+            <h2 className="heading-2 mb-4">Live Matches</h2>
             <p className="text-red-600">{error}</p>
           </div>
         </Container>
@@ -167,198 +191,145 @@ export function LiveMatchesSection() {
   }
 
   return (
-    <section className="section-padding bg-gray-100">
-      <Container>
+    <section className="section-padding bg-gradient-to-b from-white via-gray-50 to-white">
+      <Container size="2xl">
         <motion.div
-          className="text-center mb-12"
+          className="mb-12 text-center"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="heading-2 mb-4">
-            Live Matches
-          </h2>
-          <p className="body-text-lg text-gray-600">
-            Real-time scores and updates from around the world
+          <div className="eyebrow mx-auto w-max gap-2">
+            <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+            Live Tracker
+          </div>
+          <h2 className="heading-2 mt-5 text-gray-900">Live Matches</h2>
+          <p className="section-lede mt-4 text-gray-600">
+            Follow every wicket, goal, and decisive moment. Updated in near real-time from our match center.
           </p>
         </motion.div>
 
         {matches.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Clock className="w-12 h-12 text-gray-400" />
+          <div className="surface-panel text-center p-12">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+              <Clock className="h-10 w-10 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No Live Matches
-            </h3>
-            <p className="text-gray-600">
-              Check back later for live matches
+            <h3 className="heading-4 mb-2">No live matches right now</h3>
+            <p className="body-text text-gray-600">
+              Check back later or explore our fixture calendar to plan what to watch next.
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="card-grid-3">
             {matches.map((match, index) => (
               <motion.div
                 key={match._id}
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Card variant="interactive">
-                  <div>
-                  {/* Match Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      {match.status === 'live' && (
-                        <div className="live-indicator">
-                          <div className="live-dot" />
-                          LIVE
-                        </div>
-                      )}
-                      {match.status === 'upcoming' && (
-                        <span className="text-blue-600 font-medium">
-                          Upcoming
-                        </span>
-                      )}
-                      {match.status === 'completed' && (
-                        <span className="text-gray-600 font-medium">
-                          Completed
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {formatTime(match.startTime)}
-                    </div>
-                  </div>
-
-                  {/* Teams */}
-                  <div className="space-y-4">
-                    {/* Home Team */}
+                <Card
+                  variant="interactive"
+                  className={`h-full rounded-2xl border border-gray-100 bg-white/90 p-6 shadow-lg ring-1 ${statusAccentRing[match.status]}`}
+                >
+                  <div className="flex flex-col gap-5">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{match.teams.home.flag}</span>
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            {match.teams.home.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {match.teams.home.shortName}
-                          </div>
+                      <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses[match.status]}`}>
+                        {match.status === 'live' && <span className="live-dot bg-red-500" />}
+                        {statusPillLabel[match.status]}
+                      </span>
+                      <div className="text-right text-sm text-gray-500">
+                        <div>{formatTime(match.startTime)}</div>
+                        <div className="text-xs text-gray-400">
+                          {formatRelativeTime(match.startTime)}
                         </div>
                       </div>
-                      <div className="text-right">
-                        {match.currentScore ? (
-                          <div>
-                            <div className="text-2xl font-bold text-gray-900">
-                              {match.currentScore.home.runs}
+                    </div>
+
+                    <div className="space-y-4">
+                      {(['home', 'away'] as Array<'home' | 'away'>).map((side) => {
+                        const team = match.teams[side];
+                        const currentInnings = match.currentScore ? match.currentScore[side] : undefined;
+                        const finalScore = typeof match.score?.[side] === 'number' ? match.score[side] : undefined;
+                        const scoreDisplay = currentInnings
+                          ? `${currentInnings.runs}/${currentInnings.wickets}`
+                          : typeof finalScore === 'number'
+                          ? finalScore.toString()
+                          : '—';
+                        const subline = currentInnings
+                          ? `${currentInnings.overs} ov`
+                          : match.status === 'upcoming'
+                          ? 'Awaiting start'
+                          : match.status === 'completed'
+                          ? 'Full time'
+                          : 'On air';
+
+                        return (
+                          <div key={side} className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <span className="text-2xl">{team.flag}</span>
+                              <div>
+                                <div className="font-semibold text-gray-900">{team.name}</div>
+                                <div className="text-sm text-gray-500">{team.shortName}</div>
+                              </div>
                             </div>
-                            <div className="text-sm text-gray-500">
-                              {match.currentScore.home.wickets}/{match.currentScore.home.overs}
+                            <div className="text-right">
+                              <div className="text-2xl font-bold text-gray-900">{scoreDisplay}</div>
+                              <div className="text-sm text-gray-500">{subline}</div>
                             </div>
                           </div>
-                        ) : match.score ? (
-                          <div className="text-2xl font-bold text-gray-900">
-                            {match.score.home}
-                          </div>
-                        ) : (
-                          <div className="text-2xl font-bold text-gray-900">
-                            -
-                          </div>
-                        )}
+                        );
+                      })}
+                    </div>
+
+                    <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
+                      <div className="flex items-center justify-between text-gray-700">
+                        <span className="inline-flex items-center gap-2">
+                          <Trophy className="h-4 w-4 text-emerald-500" />
+                          {match.format || match.league || 'Match'}
+                        </span>
+                        <span className="inline-flex items-center gap-2 text-gray-500">
+                          <Users className="h-4 w-4 text-gray-400" />
+                          {match.venue.name}
+                        </span>
+                      </div>
+                      <div className="mt-1 text-xs uppercase tracking-wide text-gray-400">
+                        {match.venue.city}
                       </div>
                     </div>
 
-                    {/* VS Divider */}
-                    <div className="flex items-center justify-center">
-                      <div className="w-full h-px bg-gray-200" />
-                      <span className="px-3 text-gray-400 font-medium">VS</span>
-                      <div className="w-full h-px bg-gray-200" />
-                    </div>
-
-                    {/* Away Team */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{match.teams.away.flag}</span>
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            {match.teams.away.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {match.teams.away.shortName}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        {match.currentScore ? (
-                          <div>
-                            <div className="text-2xl font-bold text-gray-900">
-                              {match.currentScore.away.runs}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {match.currentScore.away.wickets}/{match.currentScore.away.overs}
-                            </div>
-                          </div>
-                        ) : match.score ? (
-                          <div className="text-2xl font-bold text-gray-900">
-                            {match.score.away}
-                          </div>
-                        ) : (
-                          <div className="text-2xl font-bold text-gray-900">
-                            -
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Match Info */}
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <Trophy className="w-4 h-4" />
-                        <span>{match.format || match.league}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        <span>{match.venue.name}</span>
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-500 mt-1">
-                      {match.venue.city}
-                    </div>
-                  </div>
-
-                  {/* Action Button */}
-                  <div className="mt-4">
-                    {match.detailUrl ? (
-                      <Link href={match.detailUrl} className="block">
-                        <Button fullWidth>
-                          {match.status === 'live' ? 'Watch Live' : 'View Details'}
+                    <div>
+                      {match.detailUrl ? (
+                        <Button fullWidth asChild>
+                          <Link href={match.detailUrl}>
+                            {getCtaLabel(match.status)}
+                          </Link>
                         </Button>
-                      </Link>
-                    ) : (
-                      <Button fullWidth disabled>
-                        Coming Soon
-                      </Button>
-                    )}
+                      ) : (
+                        <Button fullWidth disabled>
+                          Coming Soon
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
                 </Card>
               </motion.div>
             ))}
           </div>
         )}
 
-        {/* View All Button */}
         {matches.length > 0 && (
           <motion.div
-            className="text-center mt-8"
+            className="mt-10 text-center"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Button variant="outline">
-              View All Matches
+            <Button variant="outline" asChild>
+              <Link href="/fixtures" className="inline-flex items-center gap-2">
+                View All Matches
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
             </Button>
           </motion.div>
         )}

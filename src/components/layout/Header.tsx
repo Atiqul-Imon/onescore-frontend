@@ -29,9 +29,9 @@ export function Header() {
 
   const navigation = [
     { name: 'Cricket', href: '/cricket' },
+    { name: 'Teams', href: '/cricket/teams' },
     { name: 'Football', href: '/football' },
     { name: 'Future', href: '/fixtures' },
-    { name: 'Stat', href: '/stats' },
     { name: 'News', href: '/news' },
     { name: 'Crowd Thread', href: '/threads' },
     { name: 'Quiz', href: '/quiz' },

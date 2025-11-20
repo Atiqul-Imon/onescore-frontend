@@ -1,8 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, MapPin, Trophy } from 'lucide-react';
+import { ArrowUpRight, Calendar, Clock, MapPin, Trophy } from 'lucide-react';
 import { Container, Button, Card } from '@/components/ui';
 import { formatDate, formatTime } from '@/lib/utils';
 
@@ -143,26 +144,35 @@ export function UpcomingFixturesSection() {
     { id: 'football', label: 'Football' }
   ];
 
+  const filterButtonClass = (id: string) =>
+    `rounded-full border px-5 py-2 text-sm font-semibold transition-standard ${
+      selectedFilter === id
+        ? 'border-emerald-600 bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
+        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900'
+    }`;
+
   if (loading) {
     return (
-      <section className="section-padding bg-gray-100">
-        <Container>
-          <div className="text-center mb-12">
-            <h2 className="heading-2 mb-4">
-              Upcoming Fixtures
-            </h2>
-            <p className="body-text-lg text-gray-600">
-              Don't miss any action
+      <section className="section-padding bg-gradient-to-b from-gray-50 via-white to-gray-50">
+        <Container size="2xl">
+          <div className="mb-12 text-center">
+            <div className="eyebrow mx-auto w-max gap-2">
+              <Calendar className="h-3.5 w-3.5 text-emerald-600" />
+              Fixture Radar
+            </div>
+            <h2 className="heading-2 mt-5">Upcoming Fixtures</h2>
+            <p className="section-lede mt-3 text-gray-600">
+              Building the slate of must-watch games for the week ahead.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="card-grid-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="card p-6">
-                <div className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded mb-4" />
-                  <div className="h-6 bg-gray-200 rounded mb-2" />
-                  <div className="h-4 bg-gray-200 rounded mb-4" />
-                  <div className="h-4 bg-gray-200 rounded" />
+              <div key={i} className="surface-panel p-6">
+                <div className="animate-pulse space-y-4">
+                  <div className="h-4 rounded bg-gray-200" />
+                  <div className="h-6 rounded bg-gray-200" />
+                  <div className="h-4 rounded bg-gray-200" />
+                  <div className="h-12 rounded bg-gray-100" />
                 </div>
               </div>
             ))}
@@ -173,38 +183,40 @@ export function UpcomingFixturesSection() {
   }
 
   return (
-    <section className="section-padding bg-gray-100">
-      <Container>
+    <section className="section-padding bg-gradient-to-b from-gray-50 via-white to-gray-50">
+      <Container size="2xl">
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="heading-2 mb-4">
-            Upcoming Fixtures
-          </h2>
-          <p className="body-text-lg text-gray-600">
-            Don't miss any action - mark your calendar
+          <div className="eyebrow mx-auto w-max gap-2">
+            <Calendar className="h-3.5 w-3.5 text-emerald-600" />
+            Fixture Radar
+          </div>
+          <h2 className="heading-2 mt-5 text-gray-900">Upcoming Fixtures</h2>
+          <p className="section-lede mt-4 text-gray-600">
+            Plan your viewing schedule with marquee matchups curated from cricket and football calendars.
           </p>
         </motion.div>
 
-        {/* Filter Buttons */}
         <motion.div
-          className="flex flex-wrap justify-center gap-4 mb-8"
+          className="flex flex-wrap justify-center gap-3 mb-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
+          role="tablist"
+          aria-label="Filter fixtures by sport"
         >
           {filters.map((filter) => (
             <button
               key={filter.id}
+              type="button"
+              role="tab"
+              aria-selected={selectedFilter === filter.id}
+              className={filterButtonClass(filter.id)}
               onClick={() => setSelectedFilter(filter.id)}
-              className={`px-6 py-2 rounded-full font-medium transition-standard ${
-                selectedFilter === filter.id
-                  ? 'bg-emerald-600 text-white shadow-lg'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-              }`}
             >
               {filter.label}
             </button>
@@ -212,132 +224,96 @@ export function UpcomingFixturesSection() {
         </motion.div>
 
         {filteredFixtures.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Calendar className="w-12 h-12 text-gray-400" />
+          <div className="surface-panel text-center p-12">
+            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-6">
+              <Calendar className="h-10 w-10 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No Upcoming Fixtures
-            </h3>
-            <p className="text-gray-600">
-              Check back later for upcoming matches
+            <h3 className="heading-4 mb-2">No upcoming fixtures</h3>
+            <p className="body-text text-gray-600">
+              We’re refreshing the schedule. Check back soon for new match drops.
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="card-grid-3">
             {filteredFixtures.map((fixture, index) => (
               <motion.div
                 key={fixture._id}
-                className="hover:-translate-y-1 transition-standard"
+                className="transition-standard"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Card variant="interactive">
-                  <div>
-                  {/* Match Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-blue-600 font-medium text-sm">
-                        Upcoming
+                <Card variant="interactive" className="h-full rounded-2xl border border-gray-100 bg-white/90 p-6 shadow-lg">
+                  <div className="flex h-full flex-col gap-5">
+                    <div className="flex items-center justify-between text-sm font-semibold text-gray-900">
+                      <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-emerald-600">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        {fixture.series || fixture.league || 'International'}
                       </span>
-                      {fixture.format && (
-                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                          {fixture.format}
-                        </span>
-                      )}
-                      {fixture.league && (
-                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                          {fixture.league}
-                        </span>
-                      )}
+                      <span>{formatDate(fixture.startTime)}</span>
                     </div>
-                    <div className="text-sm text-gray-500">
-                      {formatDate(fixture.startTime)}
-                    </div>
-                  </div>
 
-                  {/* Teams */}
-                  <div className="space-y-4">
-                    {/* Home Team */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{fixture.teams.home.flag}</span>
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            {fixture.teams.home.name}
+                    <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                      {[fixture.teams.home, fixture.teams.away].map((team, idx) => (
+                        <div
+                          key={team.shortName}
+                          className={`flex items-center justify-between ${idx === 0 ? 'pb-4 mb-4 border-b border-dashed border-gray-200' : ''}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{team.flag}</span>
+                            <div>
+                              <div className="font-semibold text-gray-900">{team.name}</div>
+                              <div className="text-sm text-gray-500">{team.shortName}</div>
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {fixture.teams.home.shortName}
-                          </div>
+                          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+                            {idx === 0 ? 'Home' : 'Away'}
+                          </span>
                         </div>
+                      ))}
+                    </div>
+
+                    <div className="grid gap-3 text-sm text-gray-600">
+                      <div className="inline-flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-emerald-500" />
+                        {formatTime(fixture.startTime)}
                       </div>
-                    </div>
-
-                    {/* VS Divider */}
-                    <div className="flex items-center justify-center">
-                      <div className="w-full h-px bg-gray-200" />
-                      <span className="px-3 text-gray-400 font-medium">VS</span>
-                      <div className="w-full h-px bg-gray-200" />
-                    </div>
-
-                    {/* Away Team */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{fixture.teams.away.flag}</span>
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            {fixture.teams.away.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {fixture.teams.away.shortName}
-                          </div>
+                      <div className="inline-flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-blue-500" />
+                        {fixture.venue.name}, {fixture.venue.city}
+                      </div>
+                      {fixture.series && (
+                        <div className="inline-flex items-center gap-2">
+                          <Trophy className="h-4 w-4 text-amber-500" />
+                          {fixture.series}
                         </div>
-                      </div>
+                      )}
                     </div>
-                  </div>
 
-                  {/* Match Info */}
-                  <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <Clock className="w-4 h-4" />
-                      <span>{formatTime(fixture.startTime)}</span>
+                    <div className="mt-auto">
+                      <Button variant="outline" fullWidth>
+                        Set Reminder
+                      </Button>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <MapPin className="w-4 h-4" />
-                      <span>{fixture.venue.name}, {fixture.venue.city}</span>
-                    </div>
-                    {fixture.series && (
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Trophy className="w-4 h-4" />
-                        <span>{fixture.series}</span>
-                      </div>
-                    )}
                   </div>
-
-                  {/* Action Button */}
-                  <div className="mt-4">
-                    <Button variant="outline" fullWidth>
-                      Set Reminder
-                    </Button>
-                  </div>
-                </div>
                 </Card>
               </motion.div>
             ))}
           </div>
         )}
 
-        {/* View All Button */}
         {filteredFixtures.length > 0 && (
           <motion.div
-            className="text-center mt-8"
+            className="text-center mt-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Button variant="outline">
-              View All Fixtures
+            <Button variant="outline" asChild>
+              <Link href="/fixtures" className="inline-flex items-center gap-2">
+                View All Fixtures
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
             </Button>
           </motion.div>
         )}

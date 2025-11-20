@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, Trophy, Calendar, MapPin, Users } from 'lucide-react';
+import { Container } from '@/components/ui';
 
 interface CricketResult {
   id: string;
@@ -206,31 +207,33 @@ export function CricketResults() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
+      <section className="section-padding bg-gray-50">
+        <Container size="2xl">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-emerald-500" />
             <p className="mt-4 text-gray-600">Loading recent results...</p>
           </div>
-        </div>
+        </Container>
       </section>
     );
   }
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4">
+    <section className="section-padding bg-gray-50">
+      <Container size="2xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="mb-12 text-center"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Recent Cricket Results
-          </h2>
-          <p className="text-lg text-gray-600">
-            Catch up on the latest cricket action
+          <div className="eyebrow mx-auto w-max gap-2">
+            <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
+            Final Whistle
+          </div>
+          <h2 className="heading-2 mt-5">Recent Cricket Results</h2>
+          <p className="section-lede mt-3 text-gray-600">
+            Catch up on every completed fixture with concise summaries, scorecards, and award winners.
           </p>
         </motion.div>
 
@@ -251,7 +254,7 @@ export function CricketResults() {
           ))}
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="card-grid-3">
           {filteredResults.map((result, index) => (
             <motion.div
               key={result.id}
@@ -384,13 +387,17 @@ export function CricketResults() {
         </div>
 
         {filteredResults.length === 0 && (
-          <div className="text-center py-12">
-            <CheckCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Recent Results</h3>
-            <p className="text-gray-600">Check back later for cricket results!</p>
+          <div className="surface-panel text-center p-12">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+              <CheckCircle className="h-10 w-10 text-gray-400" />
+            </div>
+            <h3 className="heading-4 mb-2">No Recent Results</h3>
+            <p className="body-text text-gray-600">
+              Check back later for the latest scorecards.
+            </p>
           </div>
         )}
-      </div>
+      </Container>
     </section>
   );
 }

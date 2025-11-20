@@ -27,6 +27,12 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
+    /* Brand palette reference (align components & marketing collateral) */
+    --brand-primary: #059669; /* emerald-600 */
+    --brand-primary-hover: #047857; /* emerald-700 */
+    --brand-secondary: #1e293b; /* slate-800 */
+    --brand-accent: #22c55e; /* lime-500 */
+    --brand-surface: #f8fafc; /* slate-50 */
   }
 
   .dark {
@@ -411,35 +417,71 @@
 
   /* Standardized Typography */
   .heading-1 {
-    @apply text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900;
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight;
     font-family: var(--font-geoform), var(--font-inter), sans-serif;
   }
 
   .heading-2 {
-    @apply text-3xl md:text-4xl font-bold text-gray-900;
+    @apply text-3xl md:text-4xl font-bold text-gray-900 leading-tight tracking-tight;
     font-family: var(--font-geoform), var(--font-inter), sans-serif;
   }
 
   .heading-3 {
-    @apply text-2xl md:text-3xl font-semibold text-gray-900;
+    @apply text-2xl md:text-3xl font-semibold text-gray-900 leading-snug;
     font-family: var(--font-geoform), var(--font-inter), sans-serif;
   }
 
   .heading-4 {
-    @apply text-xl md:text-2xl font-semibold text-gray-900;
+    @apply text-xl md:text-2xl font-semibold text-gray-900 leading-snug;
     font-family: var(--font-geoform), var(--font-inter), sans-serif;
   }
 
   .body-text {
-    @apply text-base text-gray-700;
+    @apply text-base text-gray-700 leading-relaxed;
   }
 
   .body-text-sm {
-    @apply text-sm text-gray-600;
+    @apply text-sm text-gray-600 leading-relaxed;
   }
 
   .body-text-lg {
-    @apply text-lg text-gray-600;
+    @apply text-lg text-gray-600 leading-relaxed;
+  }
+
+  .body-text-muted {
+    @apply text-base text-gray-500;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-gray-600 shadow-sm;
+  }
+
+  .eyebrow-dark {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/80 backdrop-blur;
+  }
+
+  .section-lede {
+    @apply max-w-3xl text-balance text-lg text-gray-600 md:text-xl;
+  }
+
+  .glass-panel {
+    @apply rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl;
+  }
+
+  .surface-panel {
+    @apply rounded-2xl border border-gray-200 bg-white shadow-lg;
+  }
+
+  .surface-panel-muted {
+    @apply rounded-2xl border border-gray-100 bg-gray-50;
+  }
+
+  .card-grid-3 {
+    @apply grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3;
+  }
+
+  .divider-soft {
+    @apply h-px w-full bg-gray-100;
   }
 
   /* Standardized Transitions */

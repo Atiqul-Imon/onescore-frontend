@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Clock, Users, MapPin, TrendingUp } from 'lucide-react';
+import { Container } from '@/components/ui';
 
 interface CricketMatch {
   id: string;
@@ -176,35 +177,37 @@ export function LiveCricketMatches() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
+      <section className="section-padding bg-white">
+        <Container size="2xl">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-emerald-500" />
             <p className="mt-4 text-gray-600">Loading live matches...</p>
           </div>
-        </div>
+        </Container>
       </section>
     );
   }
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
+    <section className="section-padding bg-white">
+      <Container size="2xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="mb-12 text-center"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Live Cricket Matches
-          </h2>
-          <p className="text-lg text-gray-600">
-            Follow live cricket action from around the world
+          <div className="eyebrow mx-auto w-max gap-2">
+            <Activity className="h-3.5 w-3.5 text-red-500" />
+            Live Console
+          </div>
+          <h2 className="heading-2 mt-5">Live Cricket Matches</h2>
+          <p className="section-lede mt-3 text-gray-600">
+            Follow every wicket, partnership, and clutch spell with broadcast-grade data from our match center.
           </p>
         </motion.div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="card-grid-3">
           {matches.map((match, index) => (
             <motion.div
               key={match.id}
@@ -330,13 +333,17 @@ export function LiveCricketMatches() {
         </div>
 
         {matches.length === 0 && (
-          <div className="text-center py-12">
-            <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Live Matches</h3>
-            <p className="text-gray-600">Check back later for live cricket action!</p>
+          <div className="surface-panel text-center p-12">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+              <Activity className="h-10 w-10 text-gray-400" />
+            </div>
+            <h3 className="heading-4 mb-2">No Live Matches</h3>
+            <p className="body-text text-gray-600">
+              Check back later for live cricket action.
+            </p>
           </div>
         )}
-      </div>
+      </Container>
     </section>
   );
 }
