@@ -88,22 +88,83 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export const revalidate = 300;
 
+const TEAM_NAME_MAP: Record<string, string> = {
+  india: 'India',
+  australia: 'Australia',
+  england: 'England',
+  pakistan: 'Pakistan',
+  'sri-lanka': 'Sri Lanka',
+  'south-africa': 'South Africa',
+  'new-zealand': 'New Zealand',
+  'west-indies': 'West Indies',
+  bangladesh: 'Bangladesh',
+  afghanistan: 'Afghanistan',
+  ireland: 'Ireland',
+  zimbabwe: 'Zimbabwe',
+};
+
+function buildPlaceholderTeam(slug: string): TeamDetailPayload {
+  const name = TEAM_NAME_MAP[slug] || slug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+  return {
+    team: {
+      slug,
+      name,
+      shortName: name.split(' ').map((word) => word[0]).join('').slice(0, 3).toUpperCase(),
+      matchKey: slug,
+      flag: '🏏',
+      summary: `${name} team hub placeholder. Connect the backend to see live data.`,
+      board: `${name} Cricket Board`,
+      coach: 'TBD',
+      firstTestYear: 1900,
+      captains: {},
+      ranking: {},
+      fanPulse: { rating: 4.2, votes: 0 },
+      colors: {
+        primary: '#0f172a',
+        secondary: '#1e293b',
+        accent: '#22c55e',
+      },
+      iccTitles: [],
+      keyPlayers: [],
+      statLeaders: {},
+      recordLinks: [],
+      timeline: [],
+    },
+    news: {
+      featured: null,
+      items: [],
+    },
+    fixtures: {
+      upcoming: [],
+      results: [],
+    },
+    stats: {},
+    timeline: [],
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 async function fetchTeamDetail(slug: string): Promise<TeamDetailPayload> {
-  const response = await fetch(`${API_BASE}/api/cricket/teams/${slug}`, {
-    next: { revalidate },
-  });
+  try {
+    const response = await fetch(`${API_BASE}/api/cricket/teams/${slug}`, {
+      next: { revalidate },
+    });
 
-  if (response.status === 404) {
-    notFound();
+    if (response.status === 404) {
+      notFound();
+    }
+
+    const json = await response.json();
+
+    if (!json.success || !json.data) {
+      return buildPlaceholderTeam(slug);
+    }
+
+    return json.data as TeamDetailPayload;
+  } catch (error) {
+    console.warn(`Failed to load team data for ${slug}, using placeholder.`, error);
+    return buildPlaceholderTeam(slug);
   }
-
-  const json = await response.json();
-
-  if (!json.success || !json.data) {
-    throw new Error(json.message || 'Failed to load team detail');
-  }
-
-  return json.data as TeamDetailPayload;
 }
 
 export async function generateStaticParams() {
