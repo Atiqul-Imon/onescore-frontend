@@ -5,7 +5,6 @@ import { getAuthHeaders } from '@/lib/auth';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { MediaPicker } from '@/components/admin/MediaPicker';
 import { TagInput } from '@/components/admin/TagInput';
-import { PageLayout } from '@/components/layout/PageLayout';
 
 export default function EditArticlePage() {
   const params = useParams();
@@ -106,78 +105,71 @@ export default function EditArticlePage() {
   }
 
   if (loading) {
-    return (
-      <PageLayout title="Edit Article" size="xl" className="bg-gray-50 min-h-screen">
-        <div className="text-gray-600">Loading...</div>
-      </PageLayout>
-    );
+    return <div className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-600">Loading…</div>;
   }
 
   if (!form && error) {
     return (
-      <PageLayout title="Edit Article" size="xl" className="bg-gray-50 min-h-screen">
-        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</div>
-      </PageLayout>
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</div>
     );
   }
 
   if (!form) return null;
 
   return (
-    <PageLayout
-      title="Edit Article"
-      description={`Current status: ${form.state || 'draft'}`}
-      size="xl"
-      className="bg-gray-50 min-h-screen"
-      actions={
+    <div className="space-y-8">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Newsroom</p>
+          <h1 className="mt-2 text-3xl font-semibold text-slate-900">Edit article</h1>
+          <p className="text-sm text-slate-500">Current status: {form.state || 'draft'}</p>
+        </div>
         <div className="flex flex-wrap gap-3">
           <button
             onClick={save}
             disabled={saving}
-            className="rounded-md border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-medium text-slate-700 hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
             type="button"
           >
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? 'Saving…' : 'Save'}
           </button>
           <button
             onClick={publish}
             disabled={publishing || form?.state === 'published'}
-            className="rounded-md bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
             type="button"
           >
-            {publishing ? 'Publishing...' : form?.state === 'published' ? 'Published' : 'Publish'}
+            {publishing ? 'Publishing…' : form?.state === 'published' ? 'Published' : 'Publish'}
           </button>
           <a
             href="/admin/news"
-            className="rounded-md border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            className="rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-medium text-slate-700 hover:border-slate-300"
           >
             Back
           </a>
         </div>
-      }
-    >
+      </div>
+
       {success && (
-        <div className="mb-6 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
           {success}
         </div>
       )}
       {error && (
-        <div className="mb-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-          {error}
-        </div>
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</div>
       )}
 
       <form className="space-y-6">
           {/* Main Content Section */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-6">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-slate-700">
                 Title <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 required
-                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-colors"
+                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
                 value={form.title}
                 onChange={e => setForm({ ...form, title: e.target.value })}
                 placeholder="Enter article title..."
@@ -185,13 +177,13 @@ export default function EditArticlePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-slate-700">
                 Summary <span className="text-red-500">*</span>
               </label>
               <textarea
                 required
                 rows={4}
-                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-colors resize-y"
+                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
                 value={form.summary}
                 onChange={e => setForm({ ...form, summary: e.target.value })}
                 placeholder="Write a brief summary of the article..."
@@ -199,7 +191,7 @@ export default function EditArticlePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-slate-700">
                 Body <span className="text-red-500">*</span>
               </label>
               <RichTextEditor
@@ -211,15 +203,15 @@ export default function EditArticlePage() {
           </div>
 
           {/* Metadata Section */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Article Metadata</h2>
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Article metadata</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium mb-2 text-slate-700">
                   Type <span className="text-red-500">*</span>
                 </label>
                 <select
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-colors"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-emerald-500"
                   value={form.type}
                   onChange={e => setForm({ ...form, type: e.target.value })}
                 >
@@ -232,11 +224,11 @@ export default function EditArticlePage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium mb-2 text-slate-700">
                   Category <span className="text-red-500">*</span>
                 </label>
                 <select
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-colors"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-emerald-500"
                   value={form.category}
                   onChange={e => setForm({ ...form, category: e.target.value })}
                 >
@@ -246,7 +238,7 @@ export default function EditArticlePage() {
                 </select>
               </div>
               <div className="md:col-span-2 lg:col-span-1">
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium mb-2 text-slate-700">
                   Tags
                 </label>
                 <TagInput
@@ -259,10 +251,10 @@ export default function EditArticlePage() {
           </div>
 
           {/* Media Section */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Media</h2>
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Media</h2>
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-slate-700">
                 Hero Image
               </label>
               <MediaPicker
@@ -272,7 +264,7 @@ export default function EditArticlePage() {
             </div>
           </div>
       </form>
-    </PageLayout>
+    </div>
   );
 }
 

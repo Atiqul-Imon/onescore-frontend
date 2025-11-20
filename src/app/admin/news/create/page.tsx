@@ -5,7 +5,6 @@ import { getAuthHeaders } from '@/lib/auth';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { MediaPicker } from '@/components/admin/MediaPicker';
 import { TagInput } from '@/components/admin/TagInput';
-import { PageLayout } from '@/components/layout/PageLayout';
 
 export default function CreateArticlePage() {
   const router = useRouter();
@@ -49,29 +48,32 @@ export default function CreateArticlePage() {
   }
 
   return (
-    <PageLayout
-      title="Create Article"
-      description="Fill in the editorial brief, attach media, and publish to the newsroom."
-      size="xl"
-      className="bg-gray-50 min-h-screen"
-    >
+    <div className="space-y-8">
+      <div>
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Newsroom</p>
+        <h1 className="mt-2 text-3xl font-semibold text-slate-900">Create article</h1>
+        <p className="mt-2 text-sm text-slate-500">
+          Fill in the editorial brief, attach media, and hand it off to the newsroom queue.
+        </p>
+      </div>
+
       {error ? (
-        <div className="mb-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
           {error}
         </div>
       ) : null}
 
       <form onSubmit={onSubmit} className="space-y-6">
           {/* Main Content Section */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-6">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-slate-700">
                 Title <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 required
-                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-colors"
+                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
                 value={form.title}
                 onChange={e => setForm({ ...form, title: e.target.value })}
                 placeholder="Enter article title..."
@@ -79,13 +81,13 @@ export default function CreateArticlePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-slate-700">
                 Summary <span className="text-red-500">*</span>
               </label>
               <textarea
                 required
                 rows={4}
-                className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-colors resize-y"
+                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
                 value={form.summary}
                 onChange={e => setForm({ ...form, summary: e.target.value })}
                 placeholder="Write a brief summary of the article..."
@@ -93,7 +95,7 @@ export default function CreateArticlePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-slate-700">
                 Body <span className="text-red-500">*</span>
               </label>
               <RichTextEditor
@@ -105,15 +107,15 @@ export default function CreateArticlePage() {
           </div>
 
           {/* Metadata Section */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Article Metadata</h2>
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Article metadata</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium mb-2 text-slate-700">
                   Type <span className="text-red-500">*</span>
                 </label>
                 <select
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-colors"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-emerald-500"
                   value={form.type}
                   onChange={e => setForm({ ...form, type: e.target.value })}
                 >
@@ -126,11 +128,11 @@ export default function CreateArticlePage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium mb-2 text-slate-700">
                   Category <span className="text-red-500">*</span>
                 </label>
                 <select
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-colors"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-emerald-500"
                   value={form.category}
                   onChange={e => setForm({ ...form, category: e.target.value })}
                 >
@@ -140,7 +142,7 @@ export default function CreateArticlePage() {
                 </select>
               </div>
               <div className="md:col-span-2 lg:col-span-1">
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium mb-2 text-slate-700">
                   Tags
                 </label>
                 <TagInput
@@ -153,10 +155,10 @@ export default function CreateArticlePage() {
           </div>
 
           {/* Media Section */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Media</h2>
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">Media</h2>
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-slate-700">
                 Hero Image
               </label>
               <MediaPicker
@@ -167,23 +169,23 @@ export default function CreateArticlePage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between pt-4 border-t border-slate-200">
             <a
               href="/admin/news"
-              className="px-6 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
+              className="px-6 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 hover:border-slate-300"
             >
               Cancel
             </a>
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2.5 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-sm"
+              className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white shadow hover:bg-emerald-500 disabled:opacity-50"
             >
               {submitting ? 'Creating...' : 'Create Article'}
             </button>
           </div>
       </form>
-    </PageLayout>
+    </div>
   );
 }
 
