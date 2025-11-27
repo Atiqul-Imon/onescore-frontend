@@ -3,7 +3,7 @@ import { Inter, PT_Serif, Outfit } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { Toaster } from 'react-hot-toast';
-import { Header, Footer } from '@/components/layout';
+import { ConditionalLayout } from '@/components/layout/ConditionalLayout';
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -113,11 +113,11 @@ export default function RootLayout({
             Skip to content
           </a>
           <div className="flex min-h-screen flex-col bg-gray-100">
-            <Header />
-            <main id="main-content" className="flex-1">
-              {children}
-            </main>
-            <Footer />
+            <ConditionalLayout>
+              <main id="main-content" className="flex-1">
+                {children}
+              </main>
+            </ConditionalLayout>
           </div>
           <Toaster
             position="top-right"
