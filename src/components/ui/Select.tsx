@@ -4,7 +4,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   helperText?: string;
-  options: { value: string; label: string }[];
+  options?: { value: string; label: string }[];
 }
 
 /**
@@ -33,11 +33,13 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             className={`${baseClasses} ${stateClasses} ${disabledClasses} ${className}`}
             {...props}
           >
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
+            {options
+              ? options.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))
+              : props.children}
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
             <svg

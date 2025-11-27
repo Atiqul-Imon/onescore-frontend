@@ -8,4 +8,7 @@ export { Label } from './Label';
 export { Badge } from './Badge';
 export { Container } from './Container';
 export { LoadingSpinner } from './LoadingSpinner';
+export { AdminSurface } from './panels/AdminSurface';
+export { AdminToolbar } from './panels/AdminToolbar';
+export { StatMetric } from './panels/StatMetric';
 

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { getAuthHeaders } from '@/lib/auth';
+import { AdminSurface, AdminToolbar, Button, LoadingSpinner, StatMetric } from '@/components/ui';
 
 type MediaItem = { name: string; path: string; type: string };
 
@@ -51,48 +52,80 @@ export default function MediaLibraryPage() {
   }
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Media Library</h1>
-        <label className="inline-flex items-center px-3 py-2 border rounded-md cursor-pointer">
+    <div className="space-y-8">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Creative Studio</p>
+          <h1 className="mt-2 text-3xl font-semibold text-slate-900">Media library</h1>
+          <p className="mt-2 text-sm text-slate-500">
+            Manage hero art, match photos, and broadcast assets in a single vault.
+          </p>
+        </div>
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow">
           <input type="file" className="hidden" onChange={onUpload} />
-          Upload
+          Upload asset
         </label>
       </div>
 
-      <div className="flex gap-2">
-        {(['image','video','audio','document'] as const).map(t => (
-          <button key={t} onClick={() => setType(t)} className={`px-3 py-1 rounded-md border ${type===t?'bg-gray-900 text-white':'bg-white'}`}>{t[0].toUpperCase()+t.slice(1)}s</button>
-        ))}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatMetric label="Items loaded" value={items.length} trend={`Filtered: ${type}`} />
+        <StatMetric label="Images" value={items.filter((it) => it.type === 'image').length} />
+        <StatMetric label="Videos" value={items.filter((it) => it.type === 'video').length} />
+        <StatMetric label="Audio / Docs" value={items.filter((it) => it.type !== 'image' && it.type !== 'video').length} />
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-4 min-h-[200px]">
+      <AdminToolbar stackOnMobile={false}>
+        <div className="flex flex-wrap gap-2">
+          {(['image', 'video', 'audio', 'document'] as const).map((t) => (
+            <Button
+              key={t}
+              variant={type === t ? 'primary' : 'ghost'}
+              onClick={() => setType(t)}
+            >
+              {t[0].toUpperCase() + t.slice(1)}s
+            </Button>
+          ))}
+        </div>
+        <div className="text-xs uppercase tracking-[0.3em] text-slate-400">Showing latest uploads</div>
+      </AdminToolbar>
+
+      <AdminSurface>
         {loading ? (
-          <div>Loading...</div>
+          <div className="flex justify-center py-16">
+            <LoadingSpinner />
+          </div>
         ) : error ? (
-          <div className="text-red-600 text-sm">{error}</div>
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</div>
         ) : items.length === 0 ? (
-          <div className="text-gray-500">No files yet.</div>
+          <div className="flex flex-col items-center justify-center gap-3 py-16 text-center text-slate-500">
+            <p>No files yet. Upload to populate the library.</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {items.map((it) => (
-              <div key={it.path} className="border rounded-md overflow-hidden">
-                {type==='image' ? (
+              <div key={it.path} className="rounded-2xl border border-slate-200">
+                {type === 'image' ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={it.path} alt={it.name} className="w-full h-28 object-cover" />
+                  <img src={it.path} alt={it.name} className="h-32 w-full object-cover" />
                 ) : (
-                  <div className="h-28 flex items-center justify-center text-gray-500 text-xs">{it.type.toUpperCase()}</div>
+                  <div className="flex h-32 items-center justify-center text-xs uppercase text-slate-500">
+                    {it.type}
+                  </div>
                 )}
-                <div className="p-2 text-xs truncate">{it.name}</div>
-                <div className="p-2 flex items-center justify-between border-t text-xs">
-                  <a href={it.path} target="_blank" className="text-blue-600 hover:underline">Open</a>
-                  <button onClick={() => onDelete(it.path)} className="text-red-600">Delete</button>
+                <div className="px-4 py-2 text-sm font-medium text-slate-900 line-clamp-1">{it.name}</div>
+                <div className="flex items-center justify-between border-t border-slate-100 px-4 py-2 text-sm">
+                  <a href={it.path} target="_blank" className="text-emerald-600 hover:underline">
+                    Open
+                  </a>
+                  <Button variant="ghost" className="text-red-600" onClick={() => onDelete(it.path)}>
+                    Delete
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </AdminSurface>
     </div>
   );
 }
