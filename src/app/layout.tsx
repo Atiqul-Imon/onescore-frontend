@@ -5,6 +5,10 @@ import { Providers } from './providers';
 import { Toaster } from 'react-hot-toast';
 import { Header, Footer } from '@/components/layout';
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+
 const inter = Inter({ 
   subsets: ['latin'],
   variable: '--font-inter',
@@ -48,20 +52,20 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'),
+  metadataBase: new URL(siteUrl),
   alternates: {
-    canonical: '/',
+    canonical: siteUrl,
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: '/',
+    url: siteUrl,
     title: 'Sports Platform - Live Cricket & Football Scores',
     description: 'Get live cricket and football scores, fixtures, and user-generated content.',
     siteName: 'Sports Platform',
     images: [
       {
-        url: '/og-image.jpg',
+        url: `${siteUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: 'Sports Platform',
@@ -72,7 +76,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Sports Platform - Live Cricket & Football Scores',
     description: 'Get live cricket and football scores, fixtures, and user-generated content.',
-    images: ['/og-image.jpg'],
+    images: [`${siteUrl}/og-image.jpg`],
   },
   robots: {
     index: true,
