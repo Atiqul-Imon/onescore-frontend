@@ -161,13 +161,6 @@ export function ThreadList({
           />
         ))}
       </div>
-
-      {/* Load More Button */}
-      <div className="text-center py-8">
-        <button className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-          Load More Threads
-        </button>
-      </div>
     </div>
   );
 }

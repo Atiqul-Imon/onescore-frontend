@@ -99,7 +99,12 @@ export function ThreadsPage() {
       const json = await res.json();
       if (json.success && json.data) {
         const threadsData = json.data.threads || [];
-        setThreads(threadsData);
+        // Append threads if loading more pages, otherwise replace
+        if (pagination.current > 1) {
+          setThreads(prev => [...prev, ...threadsData]);
+        } else {
+          setThreads(threadsData);
+        }
         if (json.data.pagination) {
           setPagination(json.data.pagination);
         }
