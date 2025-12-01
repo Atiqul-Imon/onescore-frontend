@@ -46,86 +46,102 @@ export function UpcomingFixturesSection() {
     try {
       setLoading(true);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       
-      const mockFixtures: Fixture[] = [
-        {
-          _id: '1',
-          matchId: 'cricket-1',
-          teams: {
-            home: {
-              name: 'India',
-              shortName: 'IND',
-              flag: '🇮🇳'
-            },
-            away: {
-              name: 'Pakistan',
-              shortName: 'PAK',
-              flag: '🇵🇰'
-            }
-          },
-          venue: {
-            name: 'Melbourne Cricket Ground',
-            city: 'Melbourne',
-            country: 'Australia'
-          },
-          startTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-          format: 'T20I',
-          series: 'T20 World Cup'
-        },
-        {
-          _id: '2',
-          matchId: 'football-1',
-          teams: {
-            home: {
-              name: 'Real Madrid',
-              shortName: 'RMA',
-              flag: '🇪🇸'
-            },
-            away: {
-              name: 'Barcelona',
-              shortName: 'BAR',
-              flag: '🇪🇸'
-            }
-          },
-          venue: {
-            name: 'Santiago Bernabéu',
-            city: 'Madrid',
-            country: 'Spain'
-          },
-          startTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-          league: 'La Liga'
-        },
-        {
-          _id: '3',
-          matchId: 'cricket-2',
-          teams: {
-            home: {
-              name: 'England',
-              shortName: 'ENG',
-              flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿'
-            },
-            away: {
-              name: 'Australia',
-              shortName: 'AUS',
-              flag: '🇦🇺'
-            }
-          },
-          venue: {
-            name: 'Lord\'s Cricket Ground',
-            city: 'London',
-            country: 'England'
-          },
-          startTime: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-          format: 'Test',
-          series: 'Ashes'
+      // Fetch both cricket and football fixtures
+      const [cricketRes, footballRes] = await Promise.allSettled([
+        fetch(`${base}/api/cricket/matches/fixtures?limit=10`, { cache: 'no-store' }),
+        fetch(`${base}/api/football/matches/fixtures?limit=10`, { cache: 'no-store' }),
+      ]);
+      
+      let allFixtures: Fixture[] = [];
+      
+      // Process cricket fixtures
+      if (cricketRes.status === 'fulfilled' && cricketRes.value.ok) {
+        const cricketJson = await cricketRes.value.json();
+        if (cricketJson.success && cricketJson.data) {
+          const cricketData = Array.isArray(cricketJson.data) 
+            ? cricketJson.data 
+            : cricketJson.data.fixtures || [];
+          
+          const cricketFixtures = cricketData
+            .filter((match: any) => match.format && !match.league)
+            .map((match: any) => ({
+              _id: match._id || match.matchId,
+              matchId: match.matchId || match._id,
+              teams: {
+                home: {
+                  name: match.teams.home.name,
+                  shortName: match.teams.home.shortName,
+                  flag: match.teams.home.flag || '🏏',
+                },
+                away: {
+                  name: match.teams.away.name,
+                  shortName: match.teams.away.shortName,
+                  flag: match.teams.away.flag || '🏏',
+                },
+              },
+              venue: {
+                name: match.venue?.name || 'Unknown Venue',
+                city: match.venue?.city || 'Unknown',
+                country: match.venue?.country || match.venue?.city || 'Unknown',
+              },
+              startTime: match.startTime,
+              format: match.format,
+              series: match.series,
+            }));
+          allFixtures = [...allFixtures, ...cricketFixtures];
         }
-      ];
+      }
       
-      setFixtures(mockFixtures);
+      // Process football fixtures
+      if (footballRes.status === 'fulfilled' && footballRes.value.ok) {
+        const footballJson = await footballRes.value.json();
+        if (footballJson.success && footballJson.data) {
+          const footballData = Array.isArray(footballJson.data) 
+            ? footballJson.data 
+            : footballJson.data.fixtures || [];
+          
+          const footballFixtures = footballData
+            .filter((match: any) => match.league && !match.format)
+            .map((match: any) => ({
+              _id: match._id || match.matchId,
+              matchId: match.matchId || match._id,
+              teams: {
+                home: {
+                  name: match.teams.home.name,
+                  shortName: match.teams.home.shortName,
+                  flag: match.teams.home.flag || '⚽',
+                },
+                away: {
+                  name: match.teams.away.name,
+                  shortName: match.teams.away.shortName,
+                  flag: match.teams.away.flag || '⚽',
+                },
+              },
+              venue: {
+                name: match.venue?.name || 'Unknown Venue',
+                city: match.venue?.city || 'Unknown',
+                country: match.venue?.country || match.venue?.city || 'Unknown',
+              },
+              startTime: match.startTime,
+              league: match.league,
+            }));
+          allFixtures = [...allFixtures, ...footballFixtures];
+        }
+      }
+      
+      // Sort by start time (upcoming first)
+      allFixtures.sort((a, b) => {
+        const dateA = new Date(a.startTime).getTime();
+        const dateB = new Date(b.startTime).getTime();
+        return dateA - dateB;
+      });
+      
+      setFixtures(allFixtures);
     } catch (error) {
       console.error('Error fetching fixtures:', error);
+      setFixtures([]);
     } finally {
       setLoading(false);
     }

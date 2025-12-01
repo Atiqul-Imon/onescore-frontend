@@ -74,28 +74,53 @@ export function LiveMatchesSection() {
       
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       
-      // First, try to fetch live matches
-      const liveRes = await fetch(`${base}/api/cricket/matches/live`, {
-        cache: 'no-store',
-        next: { revalidate: 30 },
-      });
+      // Fetch both cricket and football live matches
+      const [cricketLiveRes, footballLiveRes] = await Promise.allSettled([
+        fetch(`${base}/api/cricket/matches/live`, {
+          cache: 'no-store',
+          next: { revalidate: 30 },
+        }),
+        fetch(`${base}/api/football/matches/live`, {
+          cache: 'no-store',
+          next: { revalidate: 30 },
+        }),
+      ]);
 
-      if (liveRes.ok) {
-        const liveJson = await liveRes.json();
-        
-        if (liveJson.success && liveJson.data && liveJson.data.length > 0) {
-          // Filter to show only cricket matches (exclude football)
-          const cricketMatches = liveJson.data.filter((match: Match) => 
+      let allLiveMatches: Match[] = [];
+      
+      // Process cricket live matches
+      if (cricketLiveRes.status === 'fulfilled' && cricketLiveRes.value.ok) {
+        const cricketJson = await cricketLiveRes.value.json();
+        if (cricketJson.success && cricketJson.data && cricketJson.data.length > 0) {
+          const cricketMatches = cricketJson.data.filter((match: Match) => 
             match.format && !match.league
           );
-          
-          if (cricketMatches.length > 0) {
-            setMatches(cricketMatches);
-            setShowingUpcoming(false);
-            setLoading(false);
-            return;
-          }
+          allLiveMatches = [...allLiveMatches, ...cricketMatches];
         }
+      }
+      
+      // Process football live matches
+      if (footballLiveRes.status === 'fulfilled' && footballLiveRes.value.ok) {
+        const footballJson = await footballLiveRes.value.json();
+        if (footballJson.success && footballJson.data && footballJson.data.length > 0) {
+          const footballMatches = footballJson.data.filter((match: Match) => 
+            match.league && !match.format
+          );
+          allLiveMatches = [...allLiveMatches, ...footballMatches];
+        }
+      }
+      
+      if (allLiveMatches.length > 0) {
+        // Sort by status: live first
+        allLiveMatches.sort((a, b) => {
+          if (a.status === 'live' && b.status !== 'live') return -1;
+          if (a.status !== 'live' && b.status === 'live') return 1;
+          return 0;
+        });
+        setMatches(allLiveMatches);
+        setShowingUpcoming(false);
+        setLoading(false);
+        return;
       }
 
       // If no live matches, try upcoming matches first
@@ -317,13 +342,20 @@ export function LiveMatchesSection() {
                         const team = match.teams[side];
                         const currentInnings = match.currentScore ? match.currentScore[side] : undefined;
                         const finalScore = typeof match.score?.[side] === 'number' ? match.score[side] : undefined;
+                        const isFootball = !!match.league && !match.format;
+                        
+                        // For cricket: runs/wickets, for football: goals (stored in runs field)
                         const scoreDisplay = currentInnings
-                          ? `${currentInnings.runs}/${currentInnings.wickets}`
+                          ? isFootball
+                            ? currentInnings.runs?.toString() || '0'
+                            : `${currentInnings.runs}/${currentInnings.wickets}`
                           : typeof finalScore === 'number'
                           ? finalScore.toString()
                           : '—';
                         const subline = currentInnings
-                          ? `${currentInnings.overs} ov`
+                          ? isFootball
+                            ? 'Live'
+                            : `${currentInnings.overs} ov`
                           : match.status === 'upcoming'
                           ? 'Awaiting start'
                           : match.status === 'completed'

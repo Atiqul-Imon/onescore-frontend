@@ -27,55 +27,6 @@ interface FootballMatch {
   broadcast?: string;
 }
 
-const mockMatches: FootballMatch[] = [
-  {
-    id: 'fixture-1',
-    competition: 'UEFA Champions League',
-    status: 'live',
-    kickoff: new Date().toISOString(),
-    venue: 'Etihad Stadium',
-    country: 'England',
-    teams: {
-      home: { name: 'Manchester City', short: 'MCI', crest: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg' },
-      away: { name: 'Real Madrid', short: 'RMA', crest: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
-    },
-    score: {
-      home: 2,
-      away: 1,
-      minute: "67'",
-    },
-    broadcast: 'Sony LIV',
-  },
-  {
-    id: 'fixture-2',
-    competition: 'Premier League',
-    status: 'upcoming',
-    kickoff: new Date(Date.now() + 1000 * 60 * 90).toISOString(),
-    venue: 'Anfield',
-    country: 'England',
-    teams: {
-      home: { name: 'Liverpool', short: 'LIV', crest: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg' },
-      away: { name: 'Arsenal', short: 'ARS', crest: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg' },
-    },
-    score: { home: null, away: null },
-    broadcast: 'Hotstar',
-  },
-  {
-    id: 'fixture-3',
-    competition: 'Serie A',
-    status: 'final',
-    kickoff: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-    venue: 'San Siro',
-    country: 'Italy',
-    teams: {
-      home: { name: 'Inter Milan', short: 'INT', crest: 'https://upload.wikimedia.org/wikipedia/en/0/05/FC_Internazionale_Milano_2021.svg' },
-      away: { name: 'Juventus', short: 'JUV', crest: 'https://upload.wikimedia.org/wikipedia/en/1/15/Juventus_FC_2017_logo.svg' },
-    },
-    score: { home: 3, away: 2 },
-    broadcast: 'FanCode',
-  },
-];
-
 function formatKickoff(iso: string) {
   const date = new Date(iso);
   return `${format(date, 'EEE, MMM d')} · ${format(date, 'HH:mm')} IST`;
@@ -100,12 +51,108 @@ export function FootballLiveMatches() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setMatches(mockMatches);
-      setLoading(false);
-    }, 600);
-    return () => clearTimeout(timeout);
+    fetchMatches();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchMatches();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
+
+  const fetchMatches = async () => {
+    try {
+      setLoading(true);
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      
+      // Fetch live matches first
+      const liveRes = await fetch(`${base}/api/football/matches/live`, {
+        cache: 'no-store',
+      });
+
+      if (liveRes.ok) {
+        const liveJson = await liveRes.json();
+        if (liveJson.success && liveJson.data && liveJson.data.length > 0) {
+          const transformedMatches = liveJson.data.map((match: any) => ({
+            id: match.matchId || match._id,
+            competition: match.league || 'Football Match',
+            status: match.status === 'live' ? 'live' : match.status === 'completed' ? 'final' : 'upcoming',
+            kickoff: match.startTime,
+            venue: match.venue?.name || 'Unknown Venue',
+            country: match.venue?.country || match.venue?.city || 'Unknown',
+            teams: {
+              home: {
+                name: match.teams.home.name,
+                short: match.teams.home.shortName,
+                crest: match.teams.home.logo || '',
+              },
+              away: {
+                name: match.teams.away.name,
+                short: match.teams.away.shortName,
+                crest: match.teams.away.logo || '',
+              },
+            },
+            score: {
+              home: match.currentScore?.home?.runs || match.score?.home || null,
+              away: match.currentScore?.away?.runs || match.score?.away || null,
+              minute: match.status === 'live' ? 'Live' : undefined,
+            },
+          }));
+          setMatches(transformedMatches);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // If no live matches, fetch upcoming
+      const fixturesRes = await fetch(`${base}/api/football/matches/fixtures?limit=6`, {
+        cache: 'no-store',
+      });
+
+      if (fixturesRes.ok) {
+        const fixturesJson = await fixturesRes.json();
+        if (fixturesJson.success && fixturesJson.data) {
+          const fixturesData = Array.isArray(fixturesJson.data) 
+            ? fixturesJson.data 
+            : fixturesJson.data.fixtures || [];
+          
+          const transformedMatches = fixturesData.map((match: any) => ({
+            id: match.matchId || match._id,
+            competition: match.league || 'Football Match',
+            status: 'upcoming' as const,
+            kickoff: match.startTime,
+            venue: match.venue?.name || 'Unknown Venue',
+            country: match.venue?.country || match.venue?.city || 'Unknown',
+            teams: {
+              home: {
+                name: match.teams.home.name,
+                short: match.teams.home.shortName,
+                crest: match.teams.home.logo || '',
+              },
+              away: {
+                name: match.teams.away.name,
+                short: match.teams.away.shortName,
+                crest: match.teams.away.logo || '',
+              },
+            },
+            score: { home: null, away: null },
+          }));
+          setMatches(transformedMatches);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Fallback to empty or mock data if API fails
+      setMatches([]);
+    } catch (error) {
+      console.error('Error fetching football matches:', error);
+      setMatches([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const items: (FootballMatch | { skeleton: true; id: string })[] = loading
     ? Array.from({ length: 3 }, (_, i) => ({ skeleton: true, id: `skeleton-${i}` }))

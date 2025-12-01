@@ -29,6 +29,7 @@ type LiveMatch = {
     away: { name: string; shortName: string; flag?: string };
   };
   status: 'live' | 'completed' | 'upcoming';
+  startTime?: string;
   currentScore?: {
     home: { runs: number; wickets: number; overs: number };
     away: { runs: number; wickets: number; overs: number };
@@ -119,11 +120,12 @@ export function HeroSection() {
     try {
       setLoading(true);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const [newsRes, trendingRes, liveRes] = await Promise.allSettled([
-        fetch(`${base}/api/news?limit=5&state=published`, { cache: 'no-store' }),
-        fetch(`${base}/api/news/trending?limit=4`, { cache: 'no-store' }),
-        fetch(`${base}/api/cricket/matches/live`, { cache: 'no-store' }),
-      ]);
+          const [newsRes, trendingRes, cricketLiveRes, footballLiveRes] = await Promise.allSettled([
+            fetch(`${base}/api/news?limit=5&state=published`, { cache: 'no-store' }),
+            fetch(`${base}/api/news/trending?limit=4`, { cache: 'no-store' }),
+            fetch(`${base}/api/cricket/matches/live`, { cache: 'no-store' }),
+            fetch(`${base}/api/football/matches/live`, { cache: 'no-store' }),
+          ]);
 
       let articles: Article[] = [];
       if (newsRes.status === 'fulfilled' && newsRes.value.ok) {
@@ -143,49 +145,82 @@ export function HeroSection() {
         setSecondaryArticles([]);
       }
 
-      if (liveRes.status === 'fulfilled' && liveRes.value.ok) {
-        const liveData = await liveRes.value.json();
-        const liveMatchesData = Array.isArray(liveData?.data) ? liveData.data : [];
+      // Combine cricket and football live matches
+      let allLiveMatches: LiveMatch[] = [];
+      
+      // Fetch cricket live matches
+      if (cricketLiveRes.status === 'fulfilled' && cricketLiveRes.value.ok) {
+        const cricketData = await cricketLiveRes.value.json();
+        const cricketMatches = Array.isArray(cricketData?.data) ? cricketData.data : [];
         // Filter to show only cricket matches (exclude football)
-        const cricketLiveMatches = liveMatchesData.filter((match: LiveMatch) => 
+        const cricketLiveMatches = cricketMatches.filter((match: LiveMatch) => 
           match.format && !match.league
         );
-        
-        if (cricketLiveMatches.length > 0) {
-          setLiveMatches(cricketLiveMatches);
-        } else {
-          // If no live matches, try to fetch completed matches
-          try {
-            const completedRes = await fetch(`${base}/api/cricket/matches/results?limit=4`, { cache: 'no-store' });
-            if (completedRes.ok) {
-              const completedData = await completedRes.json();
-              const completedMatches = completedData?.data?.results || [];
-              const cricketCompletedMatches = completedMatches.filter((match: LiveMatch) => 
-                match.format && !match.league
-              );
-              setLiveMatches(cricketCompletedMatches.slice(0, 4));
-            } else {
-              setLiveMatches([]);
-            }
-          } catch (error) {
-            setLiveMatches([]);
-          }
-        }
+        allLiveMatches = [...allLiveMatches, ...cricketLiveMatches];
+      }
+      
+      // Fetch football live matches
+      if (footballLiveRes.status === 'fulfilled' && footballLiveRes.value.ok) {
+        const footballData = await footballLiveRes.value.json();
+        const footballMatches = Array.isArray(footballData?.data) ? footballData.data : [];
+        // Filter to show only football matches (has league, no format)
+        const footballLiveMatches = footballMatches.filter((match: LiveMatch) => 
+          match.league && !match.format
+        );
+        allLiveMatches = [...allLiveMatches, ...footballLiveMatches];
+      }
+      
+      if (allLiveMatches.length > 0) {
+        // Sort by status: live first, then by start time
+        allLiveMatches.sort((a, b) => {
+          if (a.status === 'live' && b.status !== 'live') return -1;
+          if (a.status !== 'live' && b.status === 'live') return 1;
+          return 0;
+        });
+        setLiveMatches(allLiveMatches.slice(0, 4));
       } else {
-        // If live matches fetch failed, try completed matches
+        // If no live matches, fetch last completed matches (most recent first)
         try {
-          const completedRes = await fetch(`${base}/api/cricket/matches/results?limit=4`, { cache: 'no-store' });
-          if (completedRes.ok) {
-            const completedData = await completedRes.json();
-            const completedMatches = completedData?.data?.results || [];
-            const cricketCompletedMatches = completedMatches.filter((match: LiveMatch) => 
-              match.format && !match.league
-            );
-            setLiveMatches(cricketCompletedMatches.slice(0, 4));
+          const [cricketCompletedRes, footballCompletedRes] = await Promise.allSettled([
+            fetch(`${base}/api/cricket/matches/results?limit=4&page=1`, { cache: 'no-store' }),
+            fetch(`${base}/api/football/matches/results?limit=4&page=1`, { cache: 'no-store' }),
+          ]);
+          
+          let completedMatches: LiveMatch[] = [];
+          
+          // Fetch cricket completed matches
+          if (cricketCompletedRes.status === 'fulfilled' && cricketCompletedRes.value.ok) {
+            const cricketData = await cricketCompletedRes.value.json();
+            const cricketResults = cricketData?.data?.results || [];
+            const cricketCompleted = cricketResults
+              .filter((match: LiveMatch) => match.format && !match.league)
+              .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }));
+            completedMatches = [...completedMatches, ...cricketCompleted];
+          }
+          
+          // Fetch football completed matches
+          if (footballCompletedRes.status === 'fulfilled' && footballCompletedRes.value.ok) {
+            const footballData = await footballCompletedRes.value.json();
+            const footballResults = footballData?.data?.results || [];
+            const footballCompleted = footballResults
+              .filter((match: LiveMatch) => match.league && !match.format)
+              .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }));
+            completedMatches = [...completedMatches, ...footballCompleted];
+          }
+          
+          if (completedMatches.length > 0) {
+            // Sort by start time (most recent first) and take last 4-5 matches
+            completedMatches.sort((a, b) => {
+              const dateA = new Date(a.startTime || 0).getTime();
+              const dateB = new Date(b.startTime || 0).getTime();
+              return dateB - dateA; // Most recent first
+            });
+            setLiveMatches(completedMatches.slice(0, 4));
           } else {
             setLiveMatches([]);
           }
         } catch (error) {
+          console.error('Error fetching completed matches:', error);
           setLiveMatches([]);
         }
       }
@@ -253,20 +288,27 @@ export function HeroSection() {
                   {matchesToRender.map((match) => (
                   <Link
                     key={match._id}
-                    href={hasLiveMatches ? `/cricket/match/${match.matchId}` : '/fixtures'}
+                    href={hasLiveMatches 
+                      ? (match.league ? `/football/match/${match.matchId}` : `/cricket/match/${match.matchId}`)
+                      : '/fixtures'}
                     className="group rounded-2xl border border-white/10 bg-white/5 p-4 transition-standard hover:border-white/30 hover:bg-white/10"
                   >
                     <div className="flex items-center justify-between text-xs text-white/70">
-                      <span>{match.format || 'Match'}</span>
+                      <span>{match.format || match.league || 'Match'}</span>
                       {match.venue && <span>{match.venue.city}</span>}
                     </div>
                     <div className="mt-3 space-y-3">
                       {(['home', 'away'] as Array<'home' | 'away'>).map((side) => {
                         const team = match.teams[side];
                         const current = match.currentScore ? match.currentScore[side] : undefined;
+                        const isFootball = !!match.league && !match.format;
+                        
+                        // For cricket: runs/wickets, for football: goals
                         const score = hasLiveMatches
                           ? current
-                            ? `${current.runs}/${current.wickets}`
+                            ? isFootball
+                              ? current.runs?.toString() || '0' // Football uses runs field for goals
+                              : `${current.runs}/${current.wickets}`
                             : match.score
                             ? match.score[side]?.toString()
                             : '—'
@@ -277,13 +319,16 @@ export function HeroSection() {
                         return (
                           <div key={side} className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2">
-                              <span className="text-xl">{team.flag || '🏏'}</span>
+                              <span className="text-xl">{team.flag || (isFootball ? '⚽' : '🏏')}</span>
                               <span className="text-sm font-semibold text-white">{team.shortName}</span>
                             </div>
                             <div className="text-right">
                               <p className="text-lg font-bold text-white">{score}</p>
-                              {hasLiveMatches && current && (
+                              {hasLiveMatches && current && !isFootball && (
                                 <p className="text-xs text-white/70">{current.overs} ov</p>
+                              )}
+                              {hasLiveMatches && isFootball && (
+                                <p className="text-xs text-white/70">Live</p>
                               )}
                             </div>
                           </div>
