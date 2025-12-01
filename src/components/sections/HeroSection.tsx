@@ -38,6 +38,7 @@ type LiveMatch = {
     away: number;
   };
   format?: string;
+  league?: string;
   venue?: { name: string; city: string };
 };
 
