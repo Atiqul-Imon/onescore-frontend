@@ -54,43 +54,78 @@ export function LiveMatchesSection() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showingUpcoming, setShowingUpcoming] = useState(false);
 
   useEffect(() => {
-    fetchLiveMatches();
+    fetchMatches();
     
-    // Auto-refresh every 30 seconds for live matches
+    // Auto-refresh every 30 seconds
     const interval = setInterval(() => {
-      fetchLiveMatches();
+      fetchMatches();
     }, 30000); // 30 seconds
     
     return () => clearInterval(interval);
   }, []);
 
-  const fetchLiveMatches = async () => {
+  const fetchMatches = async () => {
     try {
       setLoading(true);
       setError(null);
       
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/cricket/matches/live`, {
+      
+      // First, try to fetch live matches
+      const liveRes = await fetch(`${base}/api/cricket/matches/live`, {
         cache: 'no-store',
-        next: { revalidate: 30 }, // Revalidate every 30 seconds
+        next: { revalidate: 30 },
       });
 
-      if (!res.ok) {
-        throw new Error('Failed to load live matches');
+      if (liveRes.ok) {
+        const liveJson = await liveRes.json();
+        
+        if (liveJson.success && liveJson.data && liveJson.data.length > 0) {
+          // Filter to show only cricket matches (exclude football)
+          const cricketMatches = liveJson.data.filter((match: Match) => 
+            match.format && !match.league
+          );
+          
+          if (cricketMatches.length > 0) {
+            setMatches(cricketMatches);
+            setShowingUpcoming(false);
+            setLoading(false);
+            return;
+          }
+        }
       }
 
-      const json = await res.json();
+      // If no live matches, fetch upcoming matches
+      const fixturesRes = await fetch(`${base}/api/cricket/matches/fixtures?limit=6`, {
+        cache: 'no-store',
+        next: { revalidate: 300 }, // Cache for 5 minutes (upcoming matches don't change as often)
+      });
+
+      if (!fixturesRes.ok) {
+        throw new Error('Failed to load matches');
+      }
+
+      const fixturesJson = await fixturesRes.json();
       
-      if (json.success && json.data) {
-        // Filter to show only cricket matches (exclude football)
-        const cricketMatches = json.data.filter((match: Match) => 
+      if (fixturesJson.success && fixturesJson.data) {
+        // Handle both direct array and nested fixtures property
+        const fixturesData = Array.isArray(fixturesJson.data) 
+          ? fixturesJson.data 
+          : fixturesJson.data.fixtures || [];
+        
+        // Filter to show only cricket matches
+        const cricketFixtures = fixturesData.filter((match: Match) => 
           match.format && !match.league
         );
-        setMatches(cricketMatches);
+        
+        setMatches(cricketFixtures);
+        setShowingUpcoming(true);
       } else {
-        throw new Error(json.message || 'Failed to load live matches');
+        setMatches([]);
+        setShowingUpcoming(false);
       }
     } catch (err: any) {
       const isConnectionError = err.message?.includes('Failed to fetch') || 
@@ -100,7 +135,7 @@ export function LiveMatchesSection() {
       // In production, log all errors for monitoring
       // In development, only log non-connection errors
       if (process.env.NODE_ENV === 'production' || !isConnectionError) {
-        console.error('Error fetching live matches:', err);
+        console.error('Error fetching matches:', err);
       }
       
       // Only set error for non-connection issues (or in production)
@@ -108,10 +143,12 @@ export function LiveMatchesSection() {
         // Backend not available in dev - show empty state silently
         setMatches([]);
         setError(null);
+        setShowingUpcoming(false);
       } else {
         // Production or real error - show error message
-        setError(err.message || 'Failed to fetch live matches');
+        setError(err.message || 'Failed to fetch matches');
         setMatches([]);
+        setShowingUpcoming(false);
       }
     } finally {
       setLoading(false);
@@ -190,25 +227,29 @@ export function LiveMatchesSection() {
         >
           <div className="eyebrow mx-auto w-max gap-2">
             <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
-            Live Tracker
+            {showingUpcoming ? 'Upcoming' : 'Live Tracker'}
           </div>
-          <h2 className="heading-2 mt-5 text-gray-900">Live Matches</h2>
+          <h2 className="heading-2 mt-5 text-gray-900">
+            {showingUpcoming ? 'Upcoming Matches' : 'Live Matches'}
+          </h2>
           <p className="section-lede mt-4 text-gray-600">
-            Follow every wicket, goal, and decisive moment. Updated in near real-time from our match center.
+            {showingUpcoming 
+              ? 'Check out the exciting matches coming up. Stay tuned for live action!'
+              : 'Follow every wicket, goal, and decisive moment. Updated in near real-time from our match center.'}
           </p>
         </motion.div>
 
-        {matches.length === 0 ? (
+        {matches.length === 0 && !loading ? (
           <div className="surface-panel text-center p-12">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
               <Clock className="h-10 w-10 text-gray-400" />
             </div>
-            <h3 className="heading-4 mb-2">No live matches right now</h3>
+            <h3 className="heading-4 mb-2">No matches available right now</h3>
             <p className="body-text text-gray-600">
               Check back later or explore our fixture calendar to plan what to watch next.
             </p>
           </div>
-        ) : (
+        ) : matches.length > 0 ? (
           <div className="card-grid-3">
             {matches.map((match, index) => (
               <motion.div
@@ -223,9 +264,9 @@ export function LiveMatchesSection() {
                 >
                   <div className="flex flex-col gap-5">
                     <div className="flex items-center justify-between">
-                      <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses[match.status]}`}>
+                      <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses[match.status] || statusBadgeClasses['upcoming']}`}>
                         {match.status === 'live' && <span className="live-dot bg-red-500" />}
-                        {statusPillLabel[match.status]}
+                        {statusPillLabel[match.status] || statusPillLabel['upcoming']}
                       </span>
                       <div className="text-right text-sm text-gray-500">
                         <div>{formatTime(match.startTime)}</div>
