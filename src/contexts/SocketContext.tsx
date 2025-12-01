@@ -59,9 +59,13 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     }
     
     const newSocket = io(wsUrl, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'], // Try polling first, then upgrade to websocket
       timeout: 20000,
       forceNew: true,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5,
+      reconnectionDelayMax: 5000,
     });
 
     newSocket.on('connect', () => {
