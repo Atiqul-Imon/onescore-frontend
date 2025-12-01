@@ -346,7 +346,7 @@ export function LiveMatchesSection() {
               </motion.div>
             ))}
           </div>
-        )}
+        ) : null}
 
         {matches.length > 0 && (
           <motion.div
