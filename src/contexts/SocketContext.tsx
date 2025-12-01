@@ -36,7 +36,27 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:5000';
+    // Determine WebSocket URL - use wss:// for production, ws:// for development
+    let wsUrl = process.env.NEXT_PUBLIC_WS_URL;
+    
+    if (!wsUrl) {
+      // Auto-detect protocol based on environment
+      if (typeof window !== 'undefined') {
+        const isProduction = window.location.protocol === 'https:';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        
+        if (isProduction) {
+          // Production: use wss:// (secure WebSocket)
+          wsUrl = apiUrl.replace('https://', 'wss://').replace('http://', 'wss://');
+        } else {
+          // Development: use ws://
+          wsUrl = apiUrl.replace('https://', 'ws://').replace('http://', 'ws://');
+        }
+      } else {
+        // Server-side: default to development
+        wsUrl = 'ws://localhost:5000';
+      }
+    }
     
     const newSocket = io(wsUrl, {
       transports: ['websocket', 'polling'],

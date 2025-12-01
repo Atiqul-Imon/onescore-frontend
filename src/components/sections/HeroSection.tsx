@@ -121,7 +121,7 @@ export function HeroSection() {
       const [newsRes, trendingRes, liveRes] = await Promise.allSettled([
         fetch(`${base}/api/news?limit=5&state=published`, { cache: 'no-store' }),
         fetch(`${base}/api/news/trending?limit=4`, { cache: 'no-store' }),
-        fetch(`${base}/api/cricket/matches/live`, { cache: 'no-store' }),
+        fetch(`${base}/api/cricket/live`, { cache: 'no-store' }),
       ]);
 
       let articles: Article[] = [];

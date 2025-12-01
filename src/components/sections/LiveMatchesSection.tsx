@@ -57,73 +57,62 @@ export function LiveMatchesSection() {
 
   useEffect(() => {
     fetchLiveMatches();
+    
+    // Auto-refresh every 30 seconds for live matches
+    const interval = setInterval(() => {
+      fetchLiveMatches();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(interval);
   }, []);
 
   const fetchLiveMatches = async () => {
     try {
       setLoading(true);
-      // This would be replaced with actual API calls
-      const mockMatches: Match[] = [
-        {
-          _id: '1',
-          matchId: 'cricket-1',
-          detailUrl: '/cricket/leagues/world-test-championship',
-          teams: {
-            home: {
-              name: 'India',
-              shortName: 'IND',
-              flag: '🇮🇳'
-            },
-            away: {
-              name: 'Australia',
-              shortName: 'AUS',
-              flag: '🇦🇺'
-            }
-          },
-          venue: {
-            name: 'Melbourne Cricket Ground',
-            city: 'Melbourne'
-          },
-          status: 'live',
-          startTime: new Date().toISOString(),
-          currentScore: {
-            home: { runs: 245, wickets: 3, overs: 45.2 },
-            away: { runs: 198, wickets: 7, overs: 40.0 }
-          },
-          format: 'ODI'
-        },
-        {
-          _id: '2',
-          matchId: 'football-1',
-          detailUrl: '/football/leagues/premier-league',
-          teams: {
-            home: {
-              name: 'Manchester United',
-              shortName: 'MUN',
-              flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿'
-            },
-            away: {
-              name: 'Liverpool',
-              shortName: 'LIV',
-              flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿'
-            }
-          },
-          venue: {
-            name: 'Old Trafford',
-            city: 'Manchester'
-          },
-          status: 'live',
-          startTime: new Date().toISOString(),
-          score: { home: 2, away: 1 },
-          league: 'Premier League'
-        }
-      ];
+      setError(null);
+      
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${base}/api/cricket/matches/live`, {
+        cache: 'no-store',
+        next: { revalidate: 30 }, // Revalidate every 30 seconds
+      });
 
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setMatches(mockMatches);
-    } catch (err) {
-      setError('Failed to fetch live matches');
+      if (!res.ok) {
+        throw new Error('Failed to load live matches');
+      }
+
+      const json = await res.json();
+      
+      if (json.success && json.data) {
+        // Filter to show only cricket matches (exclude football)
+        const cricketMatches = json.data.filter((match: Match) => 
+          match.format && !match.league
+        );
+        setMatches(cricketMatches);
+      } else {
+        throw new Error(json.message || 'Failed to load live matches');
+      }
+    } catch (err: any) {
+      const isConnectionError = err.message?.includes('Failed to fetch') || 
+                               err.message?.includes('ERR_CONNECTION_REFUSED') ||
+                               err.message?.includes('NetworkError');
+      
+      // In production, log all errors for monitoring
+      // In development, only log non-connection errors
+      if (process.env.NODE_ENV === 'production' || !isConnectionError) {
+        console.error('Error fetching live matches:', err);
+      }
+      
+      // Only set error for non-connection issues (or in production)
+      if (isConnectionError && process.env.NODE_ENV === 'development') {
+        // Backend not available in dev - show empty state silently
+        setMatches([]);
+        setError(null);
+      } else {
+        // Production or real error - show error message
+        setError(err.message || 'Failed to fetch live matches');
+        setMatches([]);
+      }
     } finally {
       setLoading(false);
     }
