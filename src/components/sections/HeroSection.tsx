@@ -144,9 +144,49 @@ export function HeroSection() {
 
       if (liveRes.status === 'fulfilled' && liveRes.value.ok) {
         const liveData = await liveRes.value.json();
-        setLiveMatches(Array.isArray(liveData?.data) ? liveData.data : []);
+        const liveMatchesData = Array.isArray(liveData?.data) ? liveData.data : [];
+        // Filter to show only cricket matches (exclude football)
+        const cricketLiveMatches = liveMatchesData.filter((match: LiveMatch) => 
+          match.format && !match.league
+        );
+        
+        if (cricketLiveMatches.length > 0) {
+          setLiveMatches(cricketLiveMatches);
+        } else {
+          // If no live matches, try to fetch completed matches
+          try {
+            const completedRes = await fetch(`${base}/api/cricket/matches/results?limit=4`, { cache: 'no-store' });
+            if (completedRes.ok) {
+              const completedData = await completedRes.json();
+              const completedMatches = completedData?.data?.results || [];
+              const cricketCompletedMatches = completedMatches.filter((match: LiveMatch) => 
+                match.format && !match.league
+              );
+              setLiveMatches(cricketCompletedMatches.slice(0, 4));
+            } else {
+              setLiveMatches([]);
+            }
+          } catch (error) {
+            setLiveMatches([]);
+          }
+        }
       } else {
-        setLiveMatches([]);
+        // If live matches fetch failed, try completed matches
+        try {
+          const completedRes = await fetch(`${base}/api/cricket/matches/results?limit=4`, { cache: 'no-store' });
+          if (completedRes.ok) {
+            const completedData = await completedRes.json();
+            const completedMatches = completedData?.data?.results || [];
+            const cricketCompletedMatches = completedMatches.filter((match: LiveMatch) => 
+              match.format && !match.league
+            );
+            setLiveMatches(cricketCompletedMatches.slice(0, 4));
+          } else {
+            setLiveMatches([]);
+          }
+        } catch (error) {
+          setLiveMatches([]);
+        }
       }
     } catch (error) {
       console.error('Error fetching hero data:', error);
@@ -159,8 +199,9 @@ export function HeroSection() {
   }
   const liveHighlights = liveMatches.slice(0, 4);
   const trendingArticles = secondaryArticles.slice(0, 4);
-  const hasLiveMatches = liveHighlights.length > 0;
-  const matchesToRender = hasLiveMatches ? liveHighlights : placeholderLiveMatches;
+  const hasLiveMatches = liveHighlights.length > 0 && liveHighlights[0]?.status === 'live';
+  const hasCompletedMatches = liveHighlights.length > 0 && liveHighlights[0]?.status === 'completed';
+  const matchesToRender = hasLiveMatches || hasCompletedMatches ? liveHighlights : placeholderLiveMatches;
 
   if (loading) {
     return (
@@ -196,8 +237,8 @@ export function HeroSection() {
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-white/70">
-                  <span className={`live-dot ${hasLiveMatches ? 'bg-red-500' : 'bg-emerald-400'}`} />
-                  {hasLiveMatches ? 'Live Matches' : 'Coming Up'}
+                  <span className={`live-dot ${hasLiveMatches ? 'bg-red-500' : hasCompletedMatches ? 'bg-gray-400' : 'bg-emerald-400'}`} />
+                  {hasLiveMatches ? 'Live Matches' : hasCompletedMatches ? 'Recent Results' : 'Coming Up'}
                 </div>
                 <Link href="/fixtures" className="inline-flex items-center gap-1 text-sm font-semibold text-white/80 transition-standard hover:text-white">
                   {hasLiveMatches ? 'View schedule' : 'See full calendar'}
@@ -226,6 +267,8 @@ export function HeroSection() {
                             : match.score
                             ? match.score[side]?.toString()
                             : '—'
+                          : hasCompletedMatches && match.score
+                          ? match.score[side]?.toString()
                           : '—';
 
                         return (
@@ -245,7 +288,7 @@ export function HeroSection() {
                       })}
                     </div>
                     <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-emerald-200">
-                      {hasLiveMatches ? 'See breakdown' : 'Match preview'}
+                      {hasLiveMatches ? 'See breakdown' : hasCompletedMatches ? 'View recap' : 'Match preview'}
                       <ArrowRight className="h-3.5 w-3.5" />
                     </div>
                   </Link>

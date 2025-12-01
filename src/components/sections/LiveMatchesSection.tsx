@@ -98,35 +98,64 @@ export function LiveMatchesSection() {
         }
       }
 
-      // If no live matches, fetch upcoming matches
+      // If no live matches, try upcoming matches first
       const fixturesRes = await fetch(`${base}/api/cricket/matches/fixtures?limit=6`, {
         cache: 'no-store',
-        next: { revalidate: 300 }, // Cache for 5 minutes (upcoming matches don't change as often)
+        next: { revalidate: 300 }, // Cache for 5 minutes
       });
 
-      if (!fixturesRes.ok) {
-        throw new Error('Failed to load matches');
+      if (fixturesRes.ok) {
+        const fixturesJson = await fixturesRes.json();
+        
+        if (fixturesJson.success && fixturesJson.data) {
+          // Handle both direct array and nested fixtures property
+          const fixturesData = Array.isArray(fixturesJson.data) 
+            ? fixturesJson.data 
+            : fixturesJson.data.fixtures || [];
+          
+          // Filter to show only cricket matches
+          const cricketFixtures = fixturesData.filter((match: Match) => 
+            match.format && !match.league
+          );
+          
+          if (cricketFixtures.length > 0) {
+            setMatches(cricketFixtures);
+            setShowingUpcoming(true);
+            setLoading(false);
+            return;
+          }
+        }
       }
 
-      const fixturesJson = await fixturesRes.json();
-      
-      if (fixturesJson.success && fixturesJson.data) {
-        // Handle both direct array and nested fixtures property
-        const fixturesData = Array.isArray(fixturesJson.data) 
-          ? fixturesJson.data 
-          : fixturesJson.data.fixtures || [];
+      // If no upcoming matches, fetch completed matches
+      const resultsRes = await fetch(`${base}/api/cricket/matches/results?limit=6`, {
+        cache: 'no-store',
+        next: { revalidate: 3600 }, // Cache for 1 hour (completed matches don't change)
+      });
+
+      if (resultsRes.ok) {
+        const resultsJson = await resultsRes.json();
         
-        // Filter to show only cricket matches
-        const cricketFixtures = fixturesData.filter((match: Match) => 
-          match.format && !match.league
-        );
-        
-        setMatches(cricketFixtures);
-        setShowingUpcoming(true);
-      } else {
-        setMatches([]);
-        setShowingUpcoming(false);
+        if (resultsJson.success && resultsJson.data) {
+          const resultsData = resultsJson.data.results || [];
+          
+          // Filter to show only cricket matches
+          const cricketResults = resultsData.filter((match: Match) => 
+            match.format && !match.league
+          );
+          
+          if (cricketResults.length > 0) {
+            setMatches(cricketResults);
+            setShowingUpcoming(false); // Not upcoming, but completed
+            setLoading(false);
+            return;
+          }
+        }
       }
+
+      // If all fetches failed or returned no data
+      setMatches([]);
+      setShowingUpcoming(false);
     } catch (err: any) {
       const isConnectionError = err.message?.includes('Failed to fetch') || 
                                err.message?.includes('ERR_CONNECTION_REFUSED') ||
@@ -173,11 +202,12 @@ export function LiveMatchesSection() {
     completed: 'ring-gray-100',
   };
 
-  const getCtaLabel = (status: Match['status']) => {
-    if (status === 'live') return 'Watch Live';
-    if (status === 'upcoming') return 'Match Center';
-    return 'View Recap';
-  };
+      const getCtaLabel = (status: Match['status']) => {
+        if (status === 'live') return 'Watch Live';
+        if (status === 'upcoming') return 'Match Center';
+        if (status === 'completed') return 'View Recap';
+        return 'View Details';
+      };
 
   if (loading) {
     return (
@@ -229,14 +259,20 @@ export function LiveMatchesSection() {
             <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
             {showingUpcoming ? 'Upcoming' : 'Live Tracker'}
           </div>
-          <h2 className="heading-2 mt-5 text-gray-900">
-            {showingUpcoming ? 'Upcoming Matches' : 'Live Matches'}
-          </h2>
-          <p className="section-lede mt-4 text-gray-600">
-            {showingUpcoming 
-              ? 'Check out the exciting matches coming up. Stay tuned for live action!'
-              : 'Follow every wicket, goal, and decisive moment. Updated in near real-time from our match center.'}
-          </p>
+              <h2 className="heading-2 mt-5 text-gray-900">
+                {showingUpcoming 
+                  ? 'Upcoming Matches' 
+                  : matches.length > 0 && matches[0]?.status === 'completed'
+                  ? 'Recent Results'
+                  : 'Live Matches'}
+              </h2>
+              <p className="section-lede mt-4 text-gray-600">
+                {showingUpcoming 
+                  ? 'Check out the exciting matches coming up. Stay tuned for live action!'
+                  : matches.length > 0 && matches[0]?.status === 'completed'
+                  ? 'Catch up on the latest match results and highlights from recent games.'
+                  : 'Follow every wicket, goal, and decisive moment. Updated in near real-time from our match center.'}
+              </p>
         </motion.div>
 
         {matches.length === 0 && !loading ? (
