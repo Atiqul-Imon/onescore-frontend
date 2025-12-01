@@ -202,7 +202,8 @@ export function HeroSection() {
   const trendingArticles = secondaryArticles.slice(0, 4);
   const hasLiveMatches = liveHighlights.length > 0 && liveHighlights[0]?.status === 'live';
   const hasCompletedMatches = liveHighlights.length > 0 && liveHighlights[0]?.status === 'completed';
-  const matchesToRender = hasLiveMatches || hasCompletedMatches ? liveHighlights : placeholderLiveMatches;
+  const hasAnyMatches = liveHighlights.length > 0;
+  const matchesToRender = hasAnyMatches ? liveHighlights : placeholderLiveMatches;
 
   if (loading) {
     return (
@@ -239,16 +240,17 @@ export function HeroSection() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-white/70">
                   <span className={`live-dot ${hasLiveMatches ? 'bg-red-500' : hasCompletedMatches ? 'bg-gray-400' : 'bg-emerald-400'}`} />
-                  {hasLiveMatches ? 'Live Matches' : hasCompletedMatches ? 'Recent Results' : 'Coming Up'}
+                  {hasLiveMatches ? 'Live Matches' : hasCompletedMatches ? 'Recent Results' : hasAnyMatches ? 'Upcoming Matches' : 'Coming Up'}
                 </div>
                 <Link href="/fixtures" className="inline-flex items-center gap-1 text-sm font-semibold text-white/80 transition-standard hover:text-white">
-                  {hasLiveMatches ? 'View schedule' : 'See full calendar'}
+                  {hasLiveMatches ? 'View schedule' : hasAnyMatches ? 'See full calendar' : 'Browse fixtures'}
                   <ArrowUpRight className="h-4 w-4" />
                 </Link>
               </div>
 
-              <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {matchesToRender.map((match) => (
+              {hasAnyMatches ? (
+                <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  {matchesToRender.map((match) => (
                   <Link
                     key={match._id}
                     href={hasLiveMatches ? `/cricket/match/${match.matchId}` : '/fixtures'}
@@ -294,7 +296,21 @@ export function HeroSection() {
                     </div>
                   </Link>
                 ))}
-              </div>
+                </div>
+              ) : (
+                <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
+                  <p className="text-sm text-white/70">
+                    No matches available at the moment. Check back soon for live action!
+                  </p>
+                  <Link 
+                    href="/fixtures" 
+                    className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-200 transition-standard hover:text-emerald-100"
+                  >
+                    Browse upcoming fixtures
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              )}
             </motion.div>
 
           </div>
