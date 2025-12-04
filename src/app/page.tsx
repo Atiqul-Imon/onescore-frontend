@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
-import { HeroSection } from '@/components/sections/HeroSection';
+import { HeroSectionWrapper } from '@/components/sections/HeroSectionWrapper';
 import { LiveMatchesSection } from '@/components/sections/LiveMatchesSection';
 import { FeaturedContentSection } from '@/components/sections/FeaturedContentSection';
 import { UpcomingFixturesSection } from '@/components/sections/UpcomingFixturesSection';
@@ -45,7 +45,15 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Hero Section */}
-      <HeroSection />
+      <Suspense fallback={
+        <section className="section-padding bg-slate-950">
+          <div className="container mx-auto px-4">
+            <div className="glass-panel h-[420px] animate-pulse bg-white/5"></div>
+          </div>
+        </section>
+      }>
+        <HeroSectionWrapper />
+      </Suspense>
       
       {/* Live Matches Section */}
       <Suspense fallback={<LoadingSpinner />}>

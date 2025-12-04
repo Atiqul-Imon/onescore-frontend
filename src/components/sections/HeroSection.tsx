@@ -1,47 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ArrowUpRight, Clock, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Container } from '@/components/ui/Container';
 import { formatDate } from '@/lib/utils';
+import type { Article, LiveMatch } from './HeroSectionWrapper';
 
-type Article = {
-  _id: string;
-  title: string;
-  slug: string;
-  summary?: string;
-  heroImage?: string;
-  category: 'cricket' | 'football' | 'general';
-  type: 'breaking' | 'match_report' | 'analysis' | 'feature' | 'interview' | 'opinion';
-  publishedAt?: string;
-  author?: { name?: string };
-  readingTimeMinutes?: number;
-};
-
-type LiveMatch = {
-  _id: string;
-  matchId: string;
-  teams: {
-    home: { name: string; shortName: string; flag?: string };
-    away: { name: string; shortName: string; flag?: string };
-  };
-  status: 'live' | 'completed' | 'upcoming';
-  startTime?: string;
-  currentScore?: {
-    home: { runs: number; wickets: number; overs: number };
-    away: { runs: number; wickets: number; overs: number };
-  };
-  score?: {
-    home: number;
-    away: number;
-  };
-  format?: string;
-  league?: string;
-  venue?: { name: string; city: string };
-};
+interface HeroSectionProps {
+  featuredArticle: Article | null;
+  secondaryArticles: Article[];
+  liveMatches: LiveMatch[];
+}
 
 const placeholderLiveMatches: LiveMatch[] = [
   {
@@ -106,149 +77,13 @@ const placeholderLiveMatches: LiveMatch[] = [
   },
 ];
 
-export function HeroSection() {
-  const [featuredArticle, setFeaturedArticle] = useState<Article | null>(null);
-  const [secondaryArticles, setSecondaryArticles] = useState<Article[]>([]);
-  const [liveMatches, setLiveMatches] = useState<LiveMatch[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchHeroData();
-  }, []);
-
-  async function fetchHeroData() {
-    try {
-      setLoading(true);
-      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-          const [newsRes, trendingRes, cricketLiveRes, footballLiveRes] = await Promise.allSettled([
-            fetch(`${base}/api/news?limit=5&state=published`, { cache: 'no-store' }),
-            fetch(`${base}/api/news/trending?limit=4`, { cache: 'no-store' }),
-            fetch(`${base}/api/cricket/matches/live`, { cache: 'no-store' }),
-            fetch(`${base}/api/football/matches/live`, { cache: 'no-store' }),
-          ]);
-
-      let articles: Article[] = [];
-      if (newsRes.status === 'fulfilled' && newsRes.value.ok) {
-        const newsData = await newsRes.value.json();
-        articles = newsData?.data?.items || [];
-      }
-      if (articles.length === 0 && trendingRes.status === 'fulfilled' && trendingRes.value.ok) {
-        const trendingData = await trendingRes.value.json();
-        articles = trendingData?.data || [];
-      }
-
-      if (articles.length > 0) {
-        setFeaturedArticle(articles[0]);
-        setSecondaryArticles(articles.slice(1, 4));
-      } else {
-        setFeaturedArticle(null);
-        setSecondaryArticles([]);
-      }
-
-      // Combine cricket and football live matches
-      let allLiveMatches: LiveMatch[] = [];
-      
-      // Fetch cricket live matches
-      if (cricketLiveRes.status === 'fulfilled' && cricketLiveRes.value.ok) {
-        const cricketData = await cricketLiveRes.value.json();
-        const cricketMatches = Array.isArray(cricketData?.data) ? cricketData.data : [];
-        // Filter to show only cricket matches (exclude football)
-        const cricketLiveMatches = cricketMatches.filter((match: LiveMatch) => 
-          match.format && !match.league
-        );
-        allLiveMatches = [...allLiveMatches, ...cricketLiveMatches];
-      }
-      
-      // Fetch football live matches
-      if (footballLiveRes.status === 'fulfilled' && footballLiveRes.value.ok) {
-        const footballData = await footballLiveRes.value.json();
-        const footballMatches = Array.isArray(footballData?.data) ? footballData.data : [];
-        // Filter to show only football matches (has league, no format)
-        const footballLiveMatches = footballMatches.filter((match: LiveMatch) => 
-          match.league && !match.format
-        );
-        allLiveMatches = [...allLiveMatches, ...footballLiveMatches];
-      }
-      
-      if (allLiveMatches.length > 0) {
-        // Sort by status: live first, then by start time
-        allLiveMatches.sort((a, b) => {
-          if (a.status === 'live' && b.status !== 'live') return -1;
-          if (a.status !== 'live' && b.status === 'live') return 1;
-          return 0;
-        });
-        setLiveMatches(allLiveMatches.slice(0, 4));
-      } else {
-        // If no live matches, fetch last completed matches (most recent first)
-        try {
-          const [cricketCompletedRes, footballCompletedRes] = await Promise.allSettled([
-            fetch(`${base}/api/cricket/matches/results?limit=4&page=1`, { cache: 'no-store' }),
-            fetch(`${base}/api/football/matches/results?limit=4&page=1`, { cache: 'no-store' }),
-          ]);
-          
-          let completedMatches: LiveMatch[] = [];
-          
-          // Fetch cricket completed matches
-          if (cricketCompletedRes.status === 'fulfilled' && cricketCompletedRes.value.ok) {
-            const cricketData = await cricketCompletedRes.value.json();
-            const cricketResults = cricketData?.data?.results || [];
-            const cricketCompleted = cricketResults
-              .filter((match: LiveMatch) => match.format && !match.league)
-              .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }));
-            completedMatches = [...completedMatches, ...cricketCompleted];
-          }
-          
-          // Fetch football completed matches
-          if (footballCompletedRes.status === 'fulfilled' && footballCompletedRes.value.ok) {
-            const footballData = await footballCompletedRes.value.json();
-            const footballResults = footballData?.data?.results || [];
-            const footballCompleted = footballResults
-              .filter((match: LiveMatch) => match.league && !match.format)
-              .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }));
-            completedMatches = [...completedMatches, ...footballCompleted];
-          }
-          
-          if (completedMatches.length > 0) {
-            // Sort by start time (most recent first) and take last 4-5 matches
-            completedMatches.sort((a, b) => {
-              const dateA = new Date(a.startTime || 0).getTime();
-              const dateB = new Date(b.startTime || 0).getTime();
-              return dateB - dateA; // Most recent first
-            });
-            setLiveMatches(completedMatches.slice(0, 4));
-          } else {
-            setLiveMatches([]);
-          }
-        } catch (error) {
-          console.error('Error fetching completed matches:', error);
-          setLiveMatches([]);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching hero data:', error);
-      setFeaturedArticle(null);
-      setSecondaryArticles([]);
-      setLiveMatches([]);
-    } finally {
-      setLoading(false);
-    }
-  }
+export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }: HeroSectionProps) {
   const liveHighlights = liveMatches.slice(0, 4);
   const trendingArticles = secondaryArticles.slice(0, 4);
   const hasLiveMatches = liveHighlights.length > 0 && liveHighlights[0]?.status === 'live';
   const hasCompletedMatches = liveHighlights.length > 0 && liveHighlights[0]?.status === 'completed';
   const hasAnyMatches = liveHighlights.length > 0;
   const matchesToRender = hasAnyMatches ? liveHighlights : placeholderLiveMatches;
-
-  if (loading) {
-    return (
-      <section className="section-padding bg-slate-950">
-        <Container size="2xl">
-          <div className="glass-panel h-[420px] animate-pulse bg-white/5"></div>
-        </Container>
-      </section>
-    );
-  }
 
   return (
     <>
