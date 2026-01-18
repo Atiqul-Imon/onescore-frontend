@@ -14,76 +14,80 @@ interface HeroSectionProps {
   liveMatches: LiveMatch[];
 }
 
+// Realistic demo live cricket matches (Cricinfo-style)
 const placeholderLiveMatches: LiveMatch[] = [
   {
-    _id: 'placeholder-1',
-    matchId: 'placeholder-1',
+    _id: 'demo-1',
+    matchId: 'demo-1',
     teams: {
-      home: { name: 'Mumbai Titans', shortName: 'MT', flag: '🇮🇳' },
-      away: { name: 'Sydney Strikers', shortName: 'SS', flag: '🇦🇺' },
+      home: { name: 'India', shortName: 'IND', flag: '🇮🇳' },
+      away: { name: 'Australia', shortName: 'AUS', flag: '🇦🇺' },
     },
-    status: 'upcoming',
+    status: 'live',
     currentScore: {
-      home: { runs: 0, wickets: 0, overs: 0 },
-      away: { runs: 0, wickets: 0, overs: 0 },
+      home: { runs: 187, wickets: 4, overs: 18.3 },
+      away: { runs: 165, wickets: 6, overs: 20.0 },
     },
-    format: 'T20',
-    venue: { name: 'Wankhede Stadium', city: 'Mumbai' },
+    format: 'T20I',
+    venue: { name: 'Melbourne Cricket Ground', city: 'Melbourne' },
   },
   {
-    _id: 'placeholder-2',
-    matchId: 'placeholder-2',
+    _id: 'demo-2',
+    matchId: 'demo-2',
     teams: {
-      home: { name: 'London Royals', shortName: 'LR', flag: '🏴' },
-      away: { name: 'Karachi Kings', shortName: 'KK', flag: '🇵🇰' },
+      home: { name: 'England', shortName: 'ENG', flag: '🏴' },
+      away: { name: 'Pakistan', shortName: 'PAK', flag: '🇵🇰' },
     },
-    status: 'upcoming',
+    status: 'live',
     currentScore: {
-      home: { runs: 0, wickets: 0, overs: 0 },
+      home: { runs: 142, wickets: 2, overs: 15.2 },
       away: { runs: 0, wickets: 0, overs: 0 },
     },
     format: 'ODI',
-    venue: { name: 'The Oval', city: 'London' },
+    venue: { name: 'Lord\'s Cricket Ground', city: 'London' },
   },
   {
-    _id: 'placeholder-3',
-    matchId: 'placeholder-3',
+    _id: 'demo-3',
+    matchId: 'demo-3',
     teams: {
-      home: { name: 'Cape Warriors', shortName: 'CW', flag: '🇿🇦' },
-      away: { name: 'Kingston Waves', shortName: 'KW', flag: '🇯🇲' },
+      home: { name: 'New Zealand', shortName: 'NZ', flag: '🇳🇿' },
+      away: { name: 'South Africa', shortName: 'SA', flag: '🇿🇦' },
     },
-    status: 'upcoming',
+    status: 'live',
     currentScore: {
-      home: { runs: 0, wickets: 0, overs: 0 },
-      away: { runs: 0, wickets: 0, overs: 0 },
+      home: { runs: 89, wickets: 1, overs: 12.4 },
+      away: { runs: 234, wickets: 8, overs: 50.0 },
     },
-    format: 'Test',
-    venue: { name: 'Newlands', city: 'Cape Town' },
+    format: 'ODI',
+    venue: { name: 'Eden Park', city: 'Auckland' },
   },
   {
-    _id: 'placeholder-4',
-    matchId: 'placeholder-4',
+    _id: 'demo-4',
+    matchId: 'demo-4',
     teams: {
-      home: { name: 'Dhaka Sparks', shortName: 'DS', flag: '🇧🇩' },
-      away: { name: 'Melbourne Surge', shortName: 'MS', flag: '🇦🇺' },
+      home: { name: 'Bangladesh', shortName: 'BAN', flag: '🇧🇩' },
+      away: { name: 'Sri Lanka', shortName: 'SL', flag: '🇱🇰' },
     },
-    status: 'upcoming',
+    status: 'live',
     currentScore: {
-      home: { runs: 0, wickets: 0, overs: 0 },
+      home: { runs: 156, wickets: 3, overs: 16.5 },
       away: { runs: 0, wickets: 0, overs: 0 },
     },
-    format: 'T20',
-    venue: { name: 'Sher-e-Bangla', city: 'Dhaka' },
+    format: 'T20I',
+    venue: { name: 'Sher-e-Bangla National Stadium', city: 'Dhaka' },
   },
 ];
 
 export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }: HeroSectionProps) {
   const liveHighlights = liveMatches.slice(0, 4);
   const trendingArticles = secondaryArticles.slice(0, 4);
-  const hasLiveMatches = liveHighlights.length > 0 && liveHighlights[0]?.status === 'live';
-  const hasCompletedMatches = liveHighlights.length > 0 && liveHighlights[0]?.status === 'completed';
+  const hasLiveMatches = liveHighlights.length > 0 && liveHighlights.some(m => m.status === 'live');
+  const hasCompletedMatches = liveHighlights.length > 0 && liveHighlights.some(m => m.status === 'completed');
   const hasAnyMatches = liveHighlights.length > 0;
+  // Always show matches - use demo if no real matches available
   const matchesToRender = hasAnyMatches ? liveHighlights : placeholderLiveMatches;
+  // Update status indicators based on what we're showing
+  const showingLiveMatches = hasLiveMatches || (!hasAnyMatches && placeholderLiveMatches.some(m => m.status === 'live'));
 
   return (
     <>
@@ -105,92 +109,135 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="rounded-[28px] border border-white/10 bg-slate-950/50 p-6"
+              className="rounded-[28px] bg-slate-950/50 p-6"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-white/70">
-                  <span className={`live-dot ${hasLiveMatches ? 'bg-red-500' : hasCompletedMatches ? 'bg-gray-400' : 'bg-emerald-400'}`} />
-                  {hasLiveMatches ? 'Live Matches' : hasCompletedMatches ? 'Recent Results' : hasAnyMatches ? 'Upcoming Matches' : 'Coming Up'}
+                  <span className={`live-dot ${showingLiveMatches ? 'bg-red-500 animate-pulse' : hasCompletedMatches ? 'bg-gray-400' : 'bg-emerald-400'}`} />
+                  {showingLiveMatches ? 'Live Matches' : hasCompletedMatches ? 'Recent Results' : hasAnyMatches ? 'Upcoming Matches' : 'Live Cricket Scores'}
                 </div>
                 <Link href="/fixtures" className="inline-flex items-center gap-1 text-sm font-semibold text-white/80 transition-standard hover:text-white">
-                  {hasLiveMatches ? 'View schedule' : hasAnyMatches ? 'See full calendar' : 'Browse fixtures'}
+                  {showingLiveMatches ? 'View schedule' : hasAnyMatches ? 'See full calendar' : 'Browse fixtures'}
                   <ArrowUpRight className="h-4 w-4" />
                 </Link>
               </div>
 
-              {hasAnyMatches ? (
-                <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                  {matchesToRender.map((match) => (
-                  <Link
-                    key={match._id}
-                    href={hasLiveMatches 
-                      ? (match.league ? `/football/match/${match.matchId}` : `/cricket/match/${match.matchId}`)
-                      : '/fixtures'}
-                    className="group rounded-2xl border border-white/10 bg-white/5 p-4 transition-standard hover:border-white/30 hover:bg-white/10"
-                  >
-                    <div className="flex items-center justify-between text-xs text-white/70">
-                      <span>{match.format || match.league || 'Match'}</span>
-                      {match.venue && <span>{match.venue.city}</span>}
-                    </div>
-                    <div className="mt-3 space-y-3">
-                      {(['home', 'away'] as Array<'home' | 'away'>).map((side) => {
-                        const team = match.teams[side];
-                        const current = match.currentScore ? match.currentScore[side] : undefined;
-                        const isFootball = !!match.league && !match.format;
-                        
-                        // For cricket: runs/wickets, for football: goals
-                        const score = hasLiveMatches
-                          ? current
-                            ? isFootball
-                              ? current.runs?.toString() || '0' // Football uses runs field for goals
-                              : `${current.runs}/${current.wickets}`
-                            : match.score
-                            ? match.score[side]?.toString()
-                            : '—'
-                          : hasCompletedMatches && match.score
-                          ? match.score[side]?.toString()
-                          : '—';
-
-                        return (
-                          <div key={side} className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-xl">{team.flag || (isFootball ? '⚽' : '🏏')}</span>
-                              <span className="text-sm font-semibold text-white">{team.shortName}</span>
+              {/* Always show matches - use demo if no real matches */}
+              <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {matchesToRender.map((match, index) => {
+                  const isLive = match.status === 'live';
+                  const isFootball = !!match.league && !match.format;
+                  const current = match.currentScore;
+                  
+                  return (
+                    <Link
+                      key={match._id}
+                      href={isLive && !match._id.startsWith('demo')
+                        ? (isFootball ? `/football/match/${match.matchId}` : `/cricket/match/${match.matchId}`)
+                        : '/fixtures'}
+                      className="group relative rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] p-5 transition-all duration-300 hover:border hover:border-white/20 hover:bg-white/10 hover:shadow-lg hover:shadow-emerald-500/10"
+                    >
+                      {/* Live indicator badge */}
+                      {isLive && (
+                        <div className="absolute -top-2 -right-2 flex items-center gap-1.5 rounded-full bg-red-500 px-2.5 py-1 text-xs font-bold text-white shadow-lg">
+                          <span className="relative flex h-2 w-2">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+                          </span>
+                          LIVE
+                        </div>
+                      )}
+                      
+                      {/* Match format/tournament */}
+                      <div className="flex items-center justify-between text-xs font-medium text-white/60 mb-3">
+                        <span className="uppercase tracking-wider">{match.format || match.league || 'Match'}</span>
+                        {match.venue && (
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {match.venue.city}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Teams and scores */}
+                      <div className="space-y-4">
+                        {(['home', 'away'] as Array<'home' | 'away'>).map((side, teamIndex) => {
+                          const team = match.teams[side];
+                          const teamScore = current ? current[side] : undefined;
+                          const isFootball = !!match.league && !match.format;
+                          
+                          // Determine score display
+                          let scoreDisplay = '—';
+                          let oversDisplay = '';
+                          
+                          if (isLive && teamScore) {
+                            if (isFootball) {
+                              scoreDisplay = teamScore.runs?.toString() || '0';
+                            } else {
+                              scoreDisplay = `${teamScore.runs}/${teamScore.wickets}`;
+                              if (teamScore.overs > 0) {
+                                oversDisplay = `${teamScore.overs.toFixed(1)} ov`;
+                              }
+                            }
+                          } else if (match.score) {
+                            scoreDisplay = match.score[side]?.toString() || '—';
+                          }
+                          
+                          // Determine if this team is batting (for cricket)
+                          const isBatting = isLive && !isFootball && teamScore && teamScore.overs > 0;
+                          
+                          return (
+                            <div 
+                              key={side} 
+                              className={`flex items-center justify-between gap-3 rounded-lg p-2.5 transition-colors ${
+                                isBatting ? 'bg-emerald-500/10 border border-emerald-500/10' : ''
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                <span className="text-2xl flex-shrink-0">{team.flag || (isFootball ? '⚽' : '🏏')}</span>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-bold text-white truncate">{team.shortName}</p>
+                                  {team.name !== team.shortName && (
+                                    <p className="text-xs text-white/60 truncate">{team.name}</p>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-right flex-shrink-0">
+                                <p className={`text-xl font-bold ${isBatting ? 'text-emerald-300' : 'text-white'}`}>
+                                  {scoreDisplay}
+                                </p>
+                                {oversDisplay && (
+                                  <p className="text-xs text-white/60 mt-0.5">{oversDisplay}</p>
+                                )}
+                                {isLive && isFootball && (
+                                  <p className="text-xs text-red-400 font-semibold mt-0.5">Live</p>
+                                )}
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <p className="text-lg font-bold text-white">{score}</p>
-                              {hasLiveMatches && current && !isFootball && (
-                                <p className="text-xs text-white/70">{current.overs} ov</p>
-                              )}
-                              {hasLiveMatches && isFootball && (
-                                <p className="text-xs text-white/70">Live</p>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-emerald-200">
-                      {hasLiveMatches ? 'See breakdown' : hasCompletedMatches ? 'View recap' : 'Match preview'}
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </div>
-                  </Link>
-                ))}
-                </div>
-              ) : (
-                <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
-                  <p className="text-sm text-white/70">
-                    No matches available at the moment. Check back soon for live action!
-                  </p>
-                  <Link 
-                    href="/fixtures" 
-                    className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-200 transition-standard hover:text-emerald-100"
-                  >
-                    Browse upcoming fixtures
-                    <ArrowUpRight className="h-4 w-4" />
-                  </Link>
-                </div>
-              )}
+                          );
+                        })}
+                      </div>
+                      
+                      {/* Match status or action */}
+                      <div className="mt-4 pt-3 border-t border-white/5">
+                        <div className="flex items-center justify-between">
+                          {isLive ? (
+                            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                              Live Score
+                            </span>
+                          ) : match.status === 'completed' ? (
+                            <span className="text-xs font-semibold text-white/60">Match Ended</span>
+                          ) : (
+                            <span className="text-xs font-semibold text-white/60">Upcoming</span>
+                          )}
+                          <ArrowRight className="h-3.5 w-3.5 text-white/40 group-hover:text-emerald-300 group-hover:translate-x-1 transition-all" />
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </motion.div>
 
           </div>
