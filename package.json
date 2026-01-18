@@ -1,7 +1,7 @@
 {
   "name": "sports-platform-frontend",
   "version": "1.0.0",
-  "description": "Frontend for Sports Platform",
+  "description": "Frontend for ScoreNews",
   "private": true,
   "scripts": {
     "dev": "next dev",
