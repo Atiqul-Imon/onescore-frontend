@@ -60,7 +60,7 @@ export function Header() {
             <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-primary-600 rounded-lg flex items-center justify-center">
               <Activity className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">SportsLive</span>
+            <span className="text-xl font-bold text-gray-900">ScoreNews</span>
           </Link>
 
           {/* Desktop Navigation */}

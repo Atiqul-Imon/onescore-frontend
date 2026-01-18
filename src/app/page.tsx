@@ -8,7 +8,7 @@ import { NewsSection } from '@/components/sections/NewsSection';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 export const metadata: Metadata = {
-  title: 'Sports Platform - Live Cricket & Football Scores',
+  title: 'ScoreNews - Live Cricket & Football Scores',
   description: 'Get live cricket and football scores, fixtures, and user-generated content. Stay updated with real-time sports news and match updates.',
   keywords: [
     'cricket',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     'sports content'
   ],
   openGraph: {
-    title: 'Sports Platform - Live Cricket & Football Scores',
+    title: 'ScoreNews - Live Cricket & Football Scores',
     description: 'Get live cricket and football scores, fixtures, and user-generated content.',
     type: 'website',
     url: '/',
@@ -29,13 +29,13 @@ export const metadata: Metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Sports Platform',
+        alt: 'ScoreNews',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Sports Platform - Live Cricket & Football Scores',
+    title: 'ScoreNews - Live Cricket & Football Scores',
     description: 'Get live cricket and football scores, fixtures, and user-generated content.',
     images: ['/og-image.jpg'],
   },
