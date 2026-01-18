@@ -31,8 +31,8 @@ const geoformLike = Outfit({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Sports Platform - Live Cricket & Football Scores',
-    template: '%s | Sports Platform',
+    default: 'ScoreNews - Live Cricket & Football Scores',
+    template: '%s | ScoreNews',
   },
   description: 'Get live cricket and football scores, fixtures, and user-generated content. Stay updated with real-time sports news and match updates.',
   keywords: [
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'Pixel Forge Web Development Agency' }],
   creator: 'Pixel Forge Web Development Agency',
-  publisher: 'Sports Platform',
+  publisher: 'ScoreNews',
   formatDetection: {
     email: false,
     address: false,
@@ -60,21 +60,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: siteUrl,
-    title: 'Sports Platform - Live Cricket & Football Scores',
+    title: 'ScoreNews - Live Cricket & Football Scores',
     description: 'Get live cricket and football scores, fixtures, and user-generated content.',
-    siteName: 'Sports Platform',
+    siteName: 'ScoreNews',
     images: [
       {
         url: `${siteUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: 'Sports Platform',
+        alt: 'ScoreNews',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Sports Platform - Live Cricket & Football Scores',
+    title: 'ScoreNews - Live Cricket & Football Scores',
     description: 'Get live cricket and football scores, fixtures, and user-generated content.',
     images: [`${siteUrl}/og-image.jpg`],
   },

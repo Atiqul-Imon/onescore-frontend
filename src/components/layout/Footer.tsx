@@ -75,10 +75,10 @@ export function Footer() {
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary-500 to-blue-600 flex items-center justify-center">
-                <span className="text-white text-xl font-semibold">SL</span>
+                <span className="text-white text-xl font-semibold">SN</span>
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">SportsLive</h2>
+                <h2 className="text-2xl font-bold text-white">ScoreNews</h2>
                 <p className="text-sm text-gray-400">
                   Real-time sports coverage, stats, and stories delivered with accuracy.
                 </p>
@@ -175,7 +175,7 @@ export function Footer() {
       <div className="border-t border-slate-900 bg-slate-950/80">
         <Container size="xl" className="py-6">
           <div className="flex flex-col gap-4 text-xs text-gray-500 md:flex-row md:items-center md:justify-between">
-            <p>&copy; {year} SportsLive Media Pvt. Ltd. All rights reserved.</p>
+            <p>&copy; {year} ScoreNews Media Pvt. Ltd. All rights reserved.</p>
             <div className="flex flex-wrap gap-4">
               <Link href="/legal/terms" className="hover:text-primary-400 transition-standard">Terms of Use</Link>
               <Link href="/legal/privacy" className="hover:text-primary-400 transition-standard">Privacy Policy</Link>
