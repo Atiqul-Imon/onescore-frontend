@@ -287,6 +287,18 @@
     @apply -translate-x-full;
   }
 
+  /* Mobile bottom navigation safe area support */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Ensure content doesn't get hidden behind bottom nav */
+  @media (max-width: 768px) {
+    body {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+  }
+
   /* Responsive grid */
   .grid-responsive {
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
