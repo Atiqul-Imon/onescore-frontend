@@ -6,17 +6,34 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const nextConfig = {
-  // App directory is now stable in Next.js 15
+  // Next.js 16 configuration
   images: {
-    domains: [
-      'localhost',
-      'images.unsplash.com',
-      'via.placeholder.com',
-      'res.cloudinary.com',
-      'cdn.jsdelivr.net',
-      'ik.imagekit.io'
-    ],
+    // Using remotePatterns instead of domains for better security
     remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.jsdelivr.net',
+        pathname: '/**',
+      },
       {
         protocol: 'https',
         hostname: 'ik.imagekit.io',
@@ -58,6 +75,10 @@ const nextConfig = {
       },
     ];
   },
+  // Turbopack configuration (Next.js 16 default)
+  turbopack: {},
+  
+  // Webpack configuration for backward compatibility
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -88,10 +109,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
-  // SWC minification is now default in Next.js 15
+  // SWC minification is default in Next.js 16
   compress: true,
   poweredByHeader: false,
   generateEtags: false,

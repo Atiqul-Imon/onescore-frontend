@@ -84,13 +84,13 @@ export function Button({
   );
 
   if (asChild && isValidElement(children)) {
-    const child = children as ReactElement;
+    const child = children as ReactElement<{ className?: string; children?: ReactNode }>;
     return cloneElement(child, {
-      className: clsx(combinedClasses, child.props.className),
+      className: clsx(combinedClasses, child.props?.className),
       ...props,
       ...(isDisabled ? { 'aria-disabled': true } : {}),
-      children: isLoading ? renderLoadingState() : child.props.children,
-    });
+      children: isLoading ? renderLoadingState() : (child.props?.children ?? child.props.children),
+    } as any);
   }
 
   return (
