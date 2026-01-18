@@ -114,7 +114,7 @@ export default function MediaLibraryPage() {
                 )}
                 <div className="px-4 py-2 text-sm font-medium text-slate-900 line-clamp-1">{it.name}</div>
                 <div className="flex items-center justify-between border-t border-slate-100 px-4 py-2 text-sm">
-                  <a href={it.path} target="_blank" className="text-emerald-600 hover:underline">
+                  <a href={it.path} target="_blank" className="text-primary-600 hover:underline">
                     Open
                   </a>
                   <Button variant="ghost" className="text-red-600" onClick={() => onDelete(it.path)}>

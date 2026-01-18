@@ -210,7 +210,7 @@ export function CricketResults() {
       <section className="section-padding bg-gray-50">
         <Container size="2xl">
           <div className="text-center">
-            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-emerald-500" />
+            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-primary-500" />
             <p className="mt-4 text-gray-600">Loading recent results...</p>
           </div>
         </Container>
@@ -228,7 +228,7 @@ export function CricketResults() {
           className="mb-12 text-center"
         >
           <div className="eyebrow mx-auto w-max gap-2">
-            <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
+            <CheckCircle className="h-3.5 w-3.5 text-primary-600" />
             Final Whistle
           </div>
           <h2 className="heading-2 mt-5">Recent Cricket Results</h2>

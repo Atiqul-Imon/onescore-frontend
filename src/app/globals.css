@@ -29,11 +29,11 @@
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
     /* Brand palette reference (align components & marketing collateral) */
-    --brand-primary: #059669; /* emerald-600 */
-    --brand-primary-hover: #047857; /* emerald-700 */
-    --brand-secondary: #1e293b; /* slate-800 */
-    --brand-accent: #22c55e; /* lime-500 */
-    --brand-surface: #f8fafc; /* slate-50 */
+    --brand-primary: #F7C455; /* Primary golden yellow */
+    --brand-primary-hover: #d9a63c; /* Primary darker */
+    --brand-secondary: #221E1B; /* Secondary dark brown/black */
+    --brand-accent: #F7C455; /* Primary as accent */
+    --brand-surface: #f9fafb; /* gray-50 */
   }
 
   .dark {
@@ -65,7 +65,7 @@
   }
   
   body {
-    @apply bg-white text-gray-900;
+    @apply bg-gray-50 text-gray-900;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
@@ -102,11 +102,11 @@
 
   /* Selection styles */
   ::selection {
-    @apply bg-primary-500 text-white;
+    @apply bg-primary-500 text-secondary-900;
   }
 
   ::-moz-selection {
-    @apply bg-primary-500 text-white;
+    @apply bg-primary-500 text-secondary-900;
   }
 }
 
@@ -574,7 +574,7 @@
   }
 
   .skip-link:focus {
-    @apply not-sr-only absolute top-4 left-4 z-50 px-4 py-2 rounded-md bg-white text-emerald-600 shadow-lg font-medium outline-none;
+    @apply not-sr-only absolute top-4 left-4 z-50 px-4 py-2 rounded-md bg-white text-primary-600 shadow-lg font-medium outline-none;
   }
 }
 

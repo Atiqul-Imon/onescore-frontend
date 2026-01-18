@@ -171,7 +171,7 @@ export default function AdminUsersPage() {
                           type="checkbox"
                           checked={u.isVerified}
                           onChange={(e) => updateUser(u._id, { isVerified: e.target.checked })}
-                          className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                          className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
                         />
                         Verified
                       </label>

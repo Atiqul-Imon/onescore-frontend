@@ -12,7 +12,7 @@ type StatCardProps = {
 
 const toneClasses: Record<NonNullable<StatCardProps['tone']>, string> = {
   default: 'border-slate-200 bg-white text-slate-900',
-  positive: 'border-emerald-100 bg-emerald-50 text-emerald-900',
+  positive: 'border-primary-100 bg-primary-50 text-secondary-900',
   warning: 'border-amber-100 bg-amber-50 text-amber-900',
 };
 

@@ -205,7 +205,7 @@ export function FeaturedContentSection() {
               onClick={() => setSelectedType(filter.id)}
               className={`flex items-center gap-2 px-6 py-2 rounded-full font-medium transition-standard ${
                 selectedType === filter.id
-                  ? 'bg-emerald-600 text-white shadow-lg'
+                  ? 'bg-primary-600 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-50 border border-gray-200'
               }`}
             >

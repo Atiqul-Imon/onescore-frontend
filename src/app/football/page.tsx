@@ -55,11 +55,11 @@ export default function FootballPage() {
             {editorialHighlights.map((story) => (
               <Card key={story.title} variant="interactive" className="h-full">
                 <div className="space-y-3">
-                  <p className="text-xs uppercase tracking-wide text-emerald-600">Analysis</p>
+                  <p className="text-xs uppercase tracking-wide text-primary-600">Analysis</p>
                   <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{story.title}</h3>
                   <p className="text-sm text-gray-600 line-clamp-3">{story.excerpt}</p>
                   <Link href={story.href} className="inline-flex">
-                    <Button variant="ghost" className="px-0 text-emerald-600 hover:text-emerald-700">
+                    <Button variant="ghost" className="px-0 text-primary-600 hover:text-primary-700">
                       Read Story
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>

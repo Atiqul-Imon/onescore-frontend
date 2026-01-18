@@ -70,11 +70,11 @@ export function Footer() {
 
   return (
     <footer className="bg-slate-950 text-gray-300 border-t border-slate-900">
-      <div className="border-b border-slate-900 bg-gradient-to-r from-emerald-600/10 via-transparent to-blue-600/10">
+      <div className="border-b border-slate-900 bg-gradient-to-r from-primary-600/10 via-transparent to-blue-600/10">
         <Container size="xl" className="py-10">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary-500 to-blue-600 flex items-center justify-center">
                 <span className="text-white text-xl font-semibold">SL</span>
               </div>
               <div>
@@ -91,7 +91,7 @@ export function Footer() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full border border-emerald-600/40 text-gray-200 flex items-center justify-center hover:bg-emerald-600 hover:border-emerald-600 transition-standard"
+                  className="w-10 h-10 rounded-full border border-primary-600/40 text-gray-200 flex items-center justify-center hover:bg-primary-600 hover:border-primary-600 transition-standard"
                   aria-label={label}
                 >
                   <Icon className="w-5 h-5" />
@@ -112,7 +112,7 @@ export function Footer() {
                   <li key={item.label}>
                     <Link
                       href={item.href}
-                      className="flex items-center gap-2 hover:text-emerald-400 transition-standard"
+                      className="flex items-center gap-2 hover:text-primary-400 transition-standard"
                     >
                       <ArrowRight className="w-3 h-3" />
                       {item.label}
@@ -131,9 +131,9 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-3 hover:border-emerald-500 hover:bg-slate-900 transition-standard"
+                      className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-3 hover:border-primary-500 hover:bg-slate-900 transition-standard"
                     >
-                      <Smartphone className="w-5 h-5 text-emerald-400" />
+                      <Smartphone className="w-5 h-5 text-primary-400" />
                       <div>
                         <p className="text-gray-200 font-medium">{link.label}</p>
                         <p className="text-xs text-gray-400">{link.description}</p>
@@ -156,13 +156,13 @@ export function Footer() {
                     id="footer-email"
                     type="email"
                     placeholder="Enter your email"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-800 bg-slate-900 text-sm text-gray-100 placeholder:text-gray-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/60 outline-none transition-standard"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-800 bg-slate-900 text-sm text-gray-100 placeholder:text-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/60 outline-none transition-standard"
                     required
                   />
                 </div>
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500 transition-standard"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-500 transition-standard"
                 >
                   Subscribe
                 </button>
@@ -177,10 +177,10 @@ export function Footer() {
           <div className="flex flex-col gap-4 text-xs text-gray-500 md:flex-row md:items-center md:justify-between">
             <p>&copy; {year} SportsLive Media Pvt. Ltd. All rights reserved.</p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/legal/terms" className="hover:text-emerald-400 transition-standard">Terms of Use</Link>
-              <Link href="/legal/privacy" className="hover:text-emerald-400 transition-standard">Privacy Policy</Link>
-              <Link href="/legal/cookies" className="hover:text-emerald-400 transition-standard">Cookie Policy</Link>
-              <Link href="/legal/accessibility" className="hover:text-emerald-400 transition-standard">Accessibility</Link>
+              <Link href="/legal/terms" className="hover:text-primary-400 transition-standard">Terms of Use</Link>
+              <Link href="/legal/privacy" className="hover:text-primary-400 transition-standard">Privacy Policy</Link>
+              <Link href="/legal/cookies" className="hover:text-primary-400 transition-standard">Cookie Policy</Link>
+              <Link href="/legal/accessibility" className="hover:text-primary-400 transition-standard">Accessibility</Link>
             </div>
           </div>
         </Container>

@@ -16,11 +16,11 @@ export default function FootballLeaguesOverviewPage() {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <section className="bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-800 text-white">
+      <section className="bg-gradient-to-br from-slate-900 via-blue-900 to-primary-800 text-white">
         <Container size="xl" className="py-16">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur">
-              <Search className="w-4 h-4 text-emerald-300" />
+              <Search className="w-4 h-4 text-primary-300" />
               League Hubs
             </span>
             <h1 className="mt-6 text-4xl font-bold tracking-tight md:text-5xl">

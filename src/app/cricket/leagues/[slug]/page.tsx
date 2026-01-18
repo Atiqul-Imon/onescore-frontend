@@ -77,13 +77,13 @@ export default function CricketLeagueHubPage({ params }: any) {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               href="/cricket"
-              className="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-600 transition-standard"
+              className="inline-flex items-center justify-center rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-600 transition-standard"
             >
               Cricket Dashboard
             </Link>
             <Link
               href="/threads?topic=cricket"
-              className="inline-flex items-center justify-center rounded-lg border border-emerald-500 px-4 py-2 text-sm font-semibold text-emerald-600 hover:bg-emerald-50 transition-standard"
+              className="inline-flex items-center justify-center rounded-lg border border-primary-500 px-4 py-2 text-sm font-semibold text-primary-600 hover:bg-primary-50 transition-standard"
             >
               Join Crowd Threads
             </Link>

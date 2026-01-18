@@ -6,7 +6,7 @@ import { Container, Button } from '@/components/ui';
 
 export function CricketHero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-green-500 via-emerald-700 to-slate-900 text-white">
+    <section className="relative overflow-hidden bg-gradient-to-br from-green-500 via-primary-700 to-slate-900 text-white">
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-10 left-10 h-20 w-20 rounded-full border border-white/60" />
         <div className="absolute top-1/3 right-10 h-16 w-16 rounded-full border border-white/60" />
@@ -20,7 +20,7 @@ export function CricketHero() {
           transition={{ duration: 0.6 }}
           className="mx-auto flex max-w-4xl flex-col items-center gap-6 text-center"
         >
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-100 backdrop-blur">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-primary-100 backdrop-blur">
             <Radio className="h-3.5 w-3.5" />
             Live Cricket Coverage
           </span>
@@ -30,7 +30,7 @@ export function CricketHero() {
               <Button
                 size="lg"
                 variant="secondary"
-                className="bg-white text-emerald-900 hover:bg-white/90 shadow-lg"
+                className="bg-white text-primary-900 hover:bg-white/90 shadow-lg"
               >
                 Explore League Hubs
               </Button>

@@ -18,7 +18,7 @@ export function LeagueInsights({ insights }: LeagueInsightsProps) {
             <ul className="mt-2 space-y-2 text-xs leading-relaxed text-gray-600">
               {panel.items.map((item, index) => (
                 <li key={`${panel.title}-${index}`} className="flex items-start gap-2">
-                  <span className="mt-1 block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="mt-1 block h-1.5 w-1.5 rounded-full bg-primary-500" />
                   <span>{item}</span>
                 </li>
               ))}

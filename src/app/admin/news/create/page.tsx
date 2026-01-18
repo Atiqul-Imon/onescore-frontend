@@ -73,7 +73,7 @@ export default function CreateArticlePage() {
               <input
                 type="text"
                 required
-                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary-500"
                 value={form.title}
                 onChange={e => setForm({ ...form, title: e.target.value })}
                 placeholder="Enter article title..."
@@ -87,7 +87,7 @@ export default function CreateArticlePage() {
               <textarea
                 required
                 rows={4}
-                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary-500"
                 value={form.summary}
                 onChange={e => setForm({ ...form, summary: e.target.value })}
                 placeholder="Write a brief summary of the article..."
@@ -115,7 +115,7 @@ export default function CreateArticlePage() {
                   Type <span className="text-red-500">*</span>
                 </label>
                 <select
-                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-emerald-500"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-primary-500"
                   value={form.type}
                   onChange={e => setForm({ ...form, type: e.target.value })}
                 >
@@ -132,7 +132,7 @@ export default function CreateArticlePage() {
                   Category <span className="text-red-500">*</span>
                 </label>
                 <select
-                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-emerald-500"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-primary-500"
                   value={form.category}
                   onChange={e => setForm({ ...form, category: e.target.value })}
                 >
@@ -179,7 +179,7 @@ export default function CreateArticlePage() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white shadow hover:bg-emerald-500 disabled:opacity-50"
+              className="px-6 py-2.5 rounded-xl bg-primary-600 text-white shadow hover:bg-primary-500 disabled:opacity-50"
             >
               {submitting ? 'Creating...' : 'Create Article'}
             </button>

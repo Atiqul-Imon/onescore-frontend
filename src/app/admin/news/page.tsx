@@ -123,7 +123,7 @@ export default function AdminNewsList() {
           title="Published"
           value={counts.published ?? '—'}
           description="Live stories with distribution"
-          icon={<Tag className="h-5 w-5 text-emerald-500" />}
+          icon={<Tag className="h-5 w-5 text-primary-500" />}
         />
       </div>
 

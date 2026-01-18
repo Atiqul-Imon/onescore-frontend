@@ -74,7 +74,7 @@ export default function CricketTeamsPage() {
       <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 py-16 sm:py-20">
         <Container size="2xl" className="relative">
           <div className="pointer-events-none absolute inset-0 -z-10 opacity-60">
-            <div className="absolute -left-16 top-0 h-72 w-72 rounded-full bg-emerald-500/30 blur-[120px]" />
+            <div className="absolute -left-16 top-0 h-72 w-72 rounded-full bg-primary-500/30 blur-[120px]" />
             <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-blue-500/30 blur-[120px]" />
           </div>
 
@@ -90,7 +90,7 @@ export default function CricketTeamsPage() {
               Dive into Cricinfo-grade archives for each cricketing powerhouse: news streams, fixtures, fan pulse, history and stat leaders – all refreshed from our live data lake.
             </p>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80">
-              <Sparkles className="h-4 w-4 text-emerald-300" />
+              <Sparkles className="h-4 w-4 text-primary-300" />
               Select a format to reshuffle ICC rankings instantly.
             </div>
             <div className="flex flex-wrap gap-4 pt-4">
@@ -176,7 +176,7 @@ export default function CricketTeamsPage() {
                         <p className="font-semibold text-white">Coach</p>
                         <p>{team.coach ?? 'TBA'}</p>
                       </div>
-                      <div className="inline-flex items-center gap-1 rounded-full border border-white/20 px-3 py-1 font-semibold text-emerald-200">
+                      <div className="inline-flex items-center gap-1 rounded-full border border-white/20 px-3 py-1 font-semibold text-primary-200">
                         <Compass className="h-3.5 w-3.5" />
                         Explore
                       </div>

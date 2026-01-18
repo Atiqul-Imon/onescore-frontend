@@ -14,7 +14,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * Standardized Button component with consistent styling
  * 
  * Variants:
- * - primary: emerald-600 background (default)
+ * - primary: primary-600 background (default)
  * - secondary: gray background
  * - outline: border with transparent background
  * - ghost: transparent with hover effect
@@ -36,13 +36,13 @@ export function Button({
   asChild = false,
   ...props
 }: ButtonProps) {
-  const baseClasses = 'inline-flex items-center justify-center rounded-lg font-medium transition-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'inline-flex items-center justify-center rounded-lg font-medium transition-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variantClasses = {
-    primary: 'bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800',
-    secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 active:bg-gray-400',
-    outline: 'border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 active:bg-emerald-100',
-    ghost: 'text-emerald-600 hover:bg-emerald-50 active:bg-emerald-100',
+    primary: 'bg-primary-500 text-secondary-900 hover:bg-primary-600 active:bg-primary-700',
+    secondary: 'bg-secondary-700 text-white hover:bg-secondary-800 active:bg-secondary-900',
+    outline: 'border-2 border-primary-500 text-primary-600 hover:bg-primary-50 active:bg-primary-100',
+    ghost: 'text-primary-600 hover:bg-primary-50 active:bg-primary-100',
     danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800',
   };
 

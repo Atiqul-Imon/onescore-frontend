@@ -82,7 +82,7 @@ export function MobileBottomNav() {
               className={cn(
                 'flex flex-col items-center justify-center flex-1 h-full min-w-0 px-1 transition-all duration-200 relative',
                 isActive
-                  ? 'text-emerald-600'
+                  ? 'text-primary-600'
                   : 'text-gray-500 hover:text-gray-700 active:scale-95'
               )}
               aria-current={isActive ? 'page' : undefined}
@@ -95,13 +95,13 @@ export function MobileBottomNav() {
                   )} 
                 />
                 {isActive && (
-                  <span className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-emerald-600 rounded-full" />
+                  <span className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary-600 rounded-full" />
                 )}
               </div>
               <span 
                 className={cn(
                   'text-[10px] font-medium truncate max-w-full leading-tight',
-                  isActive ? 'text-emerald-600 font-semibold' : 'text-gray-600'
+                  isActive ? 'text-primary-600 font-semibold' : 'text-gray-600'
                 )}
               >
                 {item.name}

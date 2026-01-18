@@ -240,7 +240,7 @@ export function LiveMatchesSection() {
         <Container size="2xl">
           <div className="mb-12 text-center">
             <div className="eyebrow mx-auto w-max gap-2">
-              <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+              <TrendingUp className="h-3.5 w-3.5 text-primary-600" />
               Live Tracker
             </div>
             <h2 className="heading-2 mt-5">Live Matches</h2>
@@ -281,7 +281,7 @@ export function LiveMatchesSection() {
           transition={{ duration: 0.6 }}
         >
           <div className="eyebrow mx-auto w-max gap-2">
-            <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+            <TrendingUp className="h-3.5 w-3.5 text-primary-600" />
             {showingUpcoming ? 'Upcoming' : 'Live Tracker'}
           </div>
               <h2 className="heading-2 mt-5 text-gray-900">
@@ -383,7 +383,7 @@ export function LiveMatchesSection() {
                     <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
                       <div className="flex items-center justify-between text-gray-700">
                         <span className="inline-flex items-center gap-2">
-                          <Trophy className="h-4 w-4 text-emerald-500" />
+                          <Trophy className="h-4 w-4 text-primary-500" />
                           {match.format || match.league || 'Match'}
                         </span>
                         <span className="inline-flex items-center gap-2 text-gray-500">
