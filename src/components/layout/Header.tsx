@@ -10,7 +10,8 @@ import {
   Activity, 
   User, 
   Search,
-  Bell
+  Bell,
+  RefreshCw
 } from 'lucide-react';
 import { useSocket } from '@/contexts/SocketContext';
 import { Container } from '@/components/ui/Container';
@@ -43,6 +44,10 @@ export function Header() {
 
   const toggleSearch = () => {
     setIsSearchOpen((prev) => !prev);
+  };
+
+  const handleRefresh = () => {
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -82,6 +87,16 @@ export function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
+            {/* Refresh Button (Mobile only) */}
+            <button
+              onClick={handleRefresh}
+              className="md:hidden p-2 text-gray-600 hover:text-primary-600 transition-standard"
+              aria-label="Refresh page"
+              title="Refresh page"
+            >
+              <RefreshCw className="w-5 h-5" />
+            </button>
+
             {/* Search */}
             <button
               onClick={toggleSearch}
