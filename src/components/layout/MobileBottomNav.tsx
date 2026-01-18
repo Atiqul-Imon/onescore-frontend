@@ -54,8 +54,21 @@ export function MobileBottomNav() {
 
   return (
     <nav 
-      className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200/80 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] md:hidden"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      data-mobile-bottom-nav
+      className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t border-gray-200/80 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] md:hidden"
+      style={{ 
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        willChange: 'transform',
+        transform: 'translateZ(0)',
+        backfaceVisibility: 'hidden',
+        WebkitTransform: 'translateZ(0)',
+        WebkitBackfaceVisibility: 'hidden',
+        isolation: 'isolate',
+      }}
     >
       <div className="flex items-center justify-around h-14 px-1 sm:px-2 max-w-screen-sm mx-auto">
         {navigationItems.map((item) => {

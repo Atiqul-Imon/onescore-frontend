@@ -71,6 +71,15 @@
 
   html {
     scroll-behavior: smooth;
+    /* Prevent fixed position issues on mobile */
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body {
+    /* Prevent fixed position issues */
+    position: relative;
+    overflow-x: hidden;
   }
 
   /* Custom scrollbar */
@@ -292,10 +301,29 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Ensure content doesn't get hidden behind bottom nav */
+  /* Ensure mobile bottom nav is perfectly fixed and never moves */
   @media (max-width: 768px) {
+    /* Prevent any transform from affecting fixed positioning */
+    html,
     body {
-      padding-bottom: env(safe-area-inset-bottom, 0px);
+      overflow-x: hidden;
+      position: relative;
+      /* Prevent iOS bounce scroll from affecting fixed nav */
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
+
+    /* Ensure fixed positioning works correctly */
+    [data-mobile-bottom-nav] {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      transform: translateZ(0) !important;
+      -webkit-transform: translateZ(0) !important;
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
   }
 
