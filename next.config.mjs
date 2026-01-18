@@ -76,7 +76,10 @@ const nextConfig = {
     ];
   },
   // Turbopack configuration (Next.js 16 default)
-  turbopack: {},
+  // Set root directory to fix workspace root warning
+  turbopack: {
+    root: __dirname,
+  },
   
   // Webpack configuration for backward compatibility
   webpack: (config, { isServer }) => {
