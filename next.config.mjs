@@ -76,10 +76,8 @@ const nextConfig = {
     ];
   },
   // Turbopack configuration (Next.js 16 default)
-  // Set root directory to fix workspace root warning
-  turbopack: {
-    root: __dirname,
-  },
+  // Note: Vercel handles workspace root automatically, so we don't set it here
+  // Setting root can cause conflicts with Vercel's build system
   
   // Webpack configuration for backward compatibility
   webpack: (config, { isServer }) => {
