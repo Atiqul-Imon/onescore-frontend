@@ -89,7 +89,7 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
 
   return (
     <Card className="overflow-hidden">
-      <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 px-6 py-4">
+      <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4">
         <div className="flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
             <Trophy className="h-5 w-5" />

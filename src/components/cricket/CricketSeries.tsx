@@ -129,7 +129,7 @@ export function CricketSeries() {
       <section className="section-padding bg-gray-50">
         <Container size="2xl">
           <div className="text-center">
-            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-emerald-500" />
+            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-primary-500" />
             <p className="mt-4 text-gray-600">Loading cricket series...</p>
           </div>
         </Container>
@@ -147,7 +147,7 @@ export function CricketSeries() {
           className="mb-12 text-center"
         >
           <div className="eyebrow mx-auto w-max gap-2">
-            <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+            <TrendingUp className="h-3.5 w-3.5 text-primary-600" />
             Series Tracker
           </div>
           <h2 className="heading-2 mt-5">Cricket Series & Tournaments</h2>
@@ -166,7 +166,7 @@ export function CricketSeries() {
               className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden"
             >
               {/* Series Header */}
-              <div className="p-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white">
+              <div className="p-6 bg-gradient-to-r from-green-500 to-primary-600 text-white">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
                     <Trophy className="w-6 h-6" />

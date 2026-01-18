@@ -37,7 +37,7 @@ function getStatusPill(status: MatchStatus, minute?: string) {
     case 'live':
       return <span className="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-500">Live {minute && <span className="text-red-300">{minute}</span>}</span>;
     case 'upcoming':
-      return <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">Upcoming</span>;
+      return <span className="inline-flex items-center gap-2 rounded-full bg-primary-500/10 px-3 py-1 text-xs font-semibold text-primary-400">Upcoming</span>;
     case 'final':
       return <span className="inline-flex items-center gap-2 rounded-full bg-slate-500/10 px-3 py-1 text-xs font-semibold text-slate-300">Full Time</span>;
     default:
@@ -198,7 +198,7 @@ export function FootballLiveMatches() {
                   ) : (
                     <>
                       <div className="flex items-center justify-between text-sm text-gray-500">
-                        <span className="font-semibold text-emerald-600">{fixture.competition}</span>
+                        <span className="font-semibold text-primary-600">{fixture.competition}</span>
                         {getStatusPill(fixture.status, fixture.score.minute)}
                       </div>
 
@@ -222,15 +222,15 @@ export function FootballLiveMatches() {
 
                       <div className="mt-4 space-y-2 text-xs text-gray-500">
                         <div className="flex items-center gap-2">
-                          <CalendarDays className="w-4 h-4 text-emerald-500" />
+                          <CalendarDays className="w-4 h-4 text-primary-500" />
                           {formatKickoff(fixture.kickoff)}
                         </div>
                         <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-emerald-500" />
+                          <MapPin className="w-4 h-4 text-primary-500" />
                           {fixture.venue}
                         </div>
                         <div className="flex items-center gap-2">
-                          <Flag className="w-4 h-4 text-emerald-500" />
+                          <Flag className="w-4 h-4 text-primary-500" />
                           {fixture.country}
                         </div>
                       </div>

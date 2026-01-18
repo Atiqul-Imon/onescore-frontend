@@ -18,7 +18,7 @@ export function CricketLeagueTeasers() {
           </div>
           <Link
             href="/cricket/leagues"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-500 transition-standard"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-500 transition-standard"
           >
             View all leagues <ArrowRight className="h-4 w-4" />
           </Link>
@@ -33,13 +33,13 @@ export function CricketLeagueTeasers() {
                     <img src={league.crest} alt={league.name} className="h-10 w-10 rounded-full bg-white p-2 shadow-inner" />
                     <div>
                       <h3 className="text-base font-semibold text-gray-900">{league.name}</h3>
-                      <p className="text-xs uppercase tracking-wide text-emerald-600">
+                      <p className="text-xs uppercase tracking-wide text-primary-600">
                         {league.nation} · {league.format}
                       </p>
                     </div>
                   </div>
                   <p className="text-sm text-gray-600 line-clamp-3">{league.description}</p>
-                  <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                  <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-primary-600">
                     Open hub <ArrowRight className="h-3.5 w-3.5" />
                   </span>
                 </div>

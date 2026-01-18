@@ -69,7 +69,7 @@ export default function AdminTeamsPage() {
         </div>
         <Link
           href="/admin/teams/create"
-          className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-500"
+          className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-500"
         >
           <ArrowUpRight className="h-4 w-4" />
           New team hub
@@ -99,7 +99,7 @@ export default function AdminTeamsPage() {
           title="Top ODI nation"
           value={topOdi ? topOdi.shortName : '—'}
           description={topOdi?.ranking?.odi ? `ICC #${topOdi.ranking.odi}` : 'Pending data'}
-          icon={<Medal className="h-5 w-5 text-emerald-500" />}
+          icon={<Medal className="h-5 w-5 text-primary-500" />}
         />
       </div>
 

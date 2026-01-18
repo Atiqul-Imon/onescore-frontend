@@ -26,7 +26,7 @@ export function LeagueStatLeaders({ leaders }: LeagueStatLeadersProps) {
               <div className="text-xs uppercase tracking-wide text-gray-500">{leader.team}</div>
             </div>
             <div className="ml-auto text-right">
-              <span className="text-xl font-bold text-emerald-600">{leader.value}</span>
+              <span className="text-xl font-bold text-primary-600">{leader.value}</span>
               <div className="text-xs text-gray-500">{metricLabels[leader.metric]}</div>
             </div>
           </div>

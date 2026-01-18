@@ -94,13 +94,13 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
       <section className="section-padding bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
       <Container size="2xl" className="relative">
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-10 top-10 h-56 w-56 rounded-full bg-emerald-500/20 blur-3xl" />
+          <div className="absolute -left-10 top-10 h-56 w-56 rounded-full bg-primary-500/20 blur-3xl" />
           <div className="absolute bottom-0 right-10 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
         </div>
 
         <div className="glass-panel relative overflow-hidden">
           <div className="absolute inset-0 opacity-60">
-            <div className="absolute -top-32 right-0 h-64 w-64 rounded-full bg-emerald-400/20 blur-3xl" />
+            <div className="absolute -top-32 right-0 h-64 w-64 rounded-full bg-primary-400/20 blur-3xl" />
             <div className="absolute bottom-0 left-[-10%] h-48 w-48 rounded-full bg-blue-500/20 blur-3xl" />
           </div>
 
@@ -113,7 +113,7 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-white/70">
-                  <span className={`live-dot ${showingLiveMatches ? 'bg-red-500 animate-pulse' : hasCompletedMatches ? 'bg-gray-400' : 'bg-emerald-400'}`} />
+                  <span className={`live-dot ${showingLiveMatches ? 'bg-red-500 animate-pulse' : hasCompletedMatches ? 'bg-gray-400' : 'bg-primary-400'}`} />
                   {showingLiveMatches ? 'Live Matches' : hasCompletedMatches ? 'Recent Results' : hasAnyMatches ? 'Upcoming Matches' : 'Live Cricket Scores'}
                 </div>
                 <Link href="/fixtures" className="inline-flex items-center gap-1 text-sm font-semibold text-white/80 transition-standard hover:text-white">
@@ -135,7 +135,7 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
                       href={isLive && !match._id.startsWith('demo')
                         ? (isFootball ? `/football/match/${match.matchId}` : `/cricket/match/${match.matchId}`)
                         : '/fixtures'}
-                      className="group relative rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] p-5 transition-all duration-300 hover:border hover:border-white/20 hover:bg-white/10 hover:shadow-lg hover:shadow-emerald-500/10"
+                      className="group relative rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] p-5 transition-all duration-300 hover:border hover:border-white/20 hover:bg-white/10 hover:shadow-lg hover:shadow-primary-500/10"
                     >
                       {/* Live indicator badge */}
                       {isLive && (
@@ -190,7 +190,7 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
                             <div 
                               key={side} 
                               className={`flex items-center justify-between gap-3 rounded-lg p-2.5 transition-colors ${
-                                isBatting ? 'bg-emerald-500/10 border border-emerald-500/10' : ''
+                                isBatting ? 'bg-primary-500/10 border border-primary-500/10' : ''
                               }`}
                             >
                               <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -203,7 +203,7 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
                                 </div>
                               </div>
                               <div className="text-right flex-shrink-0">
-                                <p className={`text-xl font-bold ${isBatting ? 'text-emerald-300' : 'text-white'}`}>
+                                <p className={`text-xl font-bold ${isBatting ? 'text-primary-300' : 'text-white'}`}>
                                   {scoreDisplay}
                                 </p>
                                 {oversDisplay && (
@@ -222,8 +222,8 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
                       <div className="mt-4 pt-3 border-t border-white/5">
                         <div className="flex items-center justify-between">
                           {isLive ? (
-                            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300">
-                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-300">
+                              <span className="h-1.5 w-1.5 rounded-full bg-primary-400 animate-pulse"></span>
                               Live Score
                             </span>
                           ) : match.status === 'completed' ? (
@@ -231,7 +231,7 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
                           ) : (
                             <span className="text-xs font-semibold text-white/60">Upcoming</span>
                           )}
-                          <ArrowRight className="h-3.5 w-3.5 text-white/40 group-hover:text-emerald-300 group-hover:translate-x-1 transition-all" />
+                          <ArrowRight className="h-3.5 w-3.5 text-white/40 group-hover:text-primary-300 group-hover:translate-x-1 transition-all" />
                         </div>
                       </div>
                     </Link>
@@ -340,10 +340,10 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-600">Newsroom</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-600">Newsroom</p>
                   <h3 className="text-lg font-semibold text-gray-900">Trending now</h3>
                 </div>
-                <Link href="/news" className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 transition-standard hover:text-emerald-700">
+                <Link href="/news" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 transition-standard hover:text-primary-700">
                   View all
                   <ArrowUpRight className="h-4 w-4" />
                 </Link>
@@ -359,7 +359,7 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
                     <Link
                       key={article._id}
                       href={`/${article.slug}`}
-                      className="group flex gap-4 rounded-2xl border border-white bg-white p-4 transition-standard hover:border-emerald-200 hover:shadow-md"
+                      className="group flex gap-4 rounded-2xl border border-white bg-white p-4 transition-standard hover:border-primary-200 hover:shadow-md"
                     >
                       {article.heroImage ? (
                         <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100">
@@ -378,10 +378,10 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <span className={`h-2 w-2 rounded-full ${article.category === 'cricket' ? 'bg-emerald-500' : article.category === 'football' ? 'bg-blue-500' : 'bg-gray-400'}`} />
+                          <span className={`h-2 w-2 rounded-full ${article.category === 'cricket' ? 'bg-primary-500' : article.category === 'football' ? 'bg-blue-500' : 'bg-gray-400'}`} />
                           <span className="uppercase tracking-[0.2em]">{article.category}</span>
                         </div>
-                        <h4 className="mt-1 text-base font-semibold text-gray-900 line-clamp-2 group-hover:text-emerald-700">
+                        <h4 className="mt-1 text-base font-semibold text-gray-900 line-clamp-2 group-hover:text-primary-700">
                           {article.title}
                         </h4>
                         {article.publishedAt && (

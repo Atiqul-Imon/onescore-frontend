@@ -21,7 +21,7 @@ export function LeagueFixtures({ fixtures }: LeagueFixturesProps) {
             <div className="flex flex-1 items-center gap-4">
               <div className="flex flex-col items-center gap-1 text-sm text-gray-500">
                 <span className="text-xs uppercase tracking-wide text-gray-400">Kick-off</span>
-                <span className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600">
+                <span className="rounded-md bg-primary-50 px-2 py-1 text-xs font-semibold text-primary-600">
                   {format(new Date(fixture.kickoff), 'EEE, MMM d')}
                 </span>
                 <span>{format(new Date(fixture.kickoff), 'HH:mm')}</span>

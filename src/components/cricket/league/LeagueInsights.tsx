@@ -16,9 +16,9 @@ export function CricketLeagueInsights({ insights }: CricketLeagueInsightsProps) 
       </div>
       <div className="grid gap-4 p-4 lg:grid-cols-2">
         {insights.map((panel) => (
-          <div key={panel.title} className="rounded-xl border border-gray-100 bg-emerald-50/40 p-4">
+          <div key={panel.title} className="rounded-xl border border-gray-100 bg-primary-50/40 p-4">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-primary-600">
                 <Lightbulb className="h-4 w-4" />
               </div>
               <h3 className="text-sm font-semibold text-gray-900">{panel.title}</h3>

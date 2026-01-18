@@ -68,7 +68,7 @@ export default function LeagueHubPage({ params }: any) {
               <Card key={story.id} variant="interactive" padding="lg" className="h-full">
                 <div className="space-y-2">
                   {story.tag && (
-                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600">
+                    <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-600">
                       {story.tag}
                     </span>
                   )}
@@ -79,7 +79,7 @@ export default function LeagueHubPage({ params }: any) {
                   </p>
                   <Link
                     href={story.href}
-                    className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-standard"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700 transition-standard"
                   >
                     Read Story →
                   </Link>

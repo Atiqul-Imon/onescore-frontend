@@ -51,7 +51,7 @@ export function FootballLeagues() {
         <div className="grid gap-6 md:grid-cols-2">
           {leagues.map((league) => (
             <Card key={league.name} padding="lg" className="flex h-full flex-col gap-4 border-slate-200/80">
-              <div className="flex items-center gap-3 text-emerald-600">
+              <div className="flex items-center gap-3 text-primary-600">
                 <league.icon className="w-6 h-6" />
                 <div>
                   <p className="text-xs uppercase tracking-wide text-gray-500">{league.nation}</p>
@@ -59,7 +59,7 @@ export function FootballLeagues() {
                 </div>
               </div>
               <p className="body-text text-gray-600">{league.description}</p>
-              <div className="rounded-lg border border-emerald-100 bg-emerald-50/60 px-4 py-3 text-sm text-emerald-700">
+              <div className="rounded-lg border border-primary-100 bg-primary-50/60 px-4 py-3 text-sm text-primary-700">
                 {league.highlight}
               </div>
               <div className="mt-auto flex items-center justify-between">

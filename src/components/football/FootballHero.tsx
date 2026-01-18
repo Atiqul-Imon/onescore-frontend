@@ -21,7 +21,7 @@ export function FootballHero() {
           className="max-w-3xl mx-auto text-center"
         >
           <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur">
-            <PlayCircle className="w-4 h-4 text-emerald-300" />
+            <PlayCircle className="w-4 h-4 text-primary-300" />
             Experience Football Differently
           </span>
           <h1 className="mt-6 text-4xl font-bold tracking-tight md:text-6xl">
@@ -38,7 +38,7 @@ export function FootballHero() {
           transition={{ delay: 0.3, duration: 0.6 }}
           className="mt-10 flex flex-col items-center gap-4"
         >
-          <Button size="lg" className="bg-emerald-500 hover:bg-emerald-400">
+          <Button size="lg" className="bg-primary-500 hover:bg-primary-400">
             Explore Live Match Centre
             <PlayCircle className="ml-2 w-5 h-5" />
           </Button>

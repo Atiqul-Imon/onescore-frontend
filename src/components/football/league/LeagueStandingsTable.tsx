@@ -13,7 +13,7 @@ export function LeagueStandingsTable({ standings, leagueName }: LeagueStandingsT
           <h2 className="text-lg font-semibold text-gray-900">Standings</h2>
           <p className="text-sm text-gray-500">Top performers in the {leagueName}</p>
         </div>
-        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-600">
+        <span className="rounded-full bg-primary-100 px-3 py-1 text-xs font-semibold text-primary-600">
           Updated 5 mins ago
         </span>
       </div>
