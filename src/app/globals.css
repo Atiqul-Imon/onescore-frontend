@@ -74,12 +74,30 @@
     /* Prevent fixed position issues on mobile */
     position: relative;
     overflow-x: hidden;
+    /* Allow pull-to-refresh on mobile */
+    overscroll-behavior-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   body {
     /* Prevent fixed position issues */
     position: relative;
     overflow-x: hidden;
+    /* Enable vertical scrolling and pull-to-refresh */
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* On mobile, allow pull-to-refresh */
+  @media (max-width: 768px) {
+    body {
+      /* Enable native pull-to-refresh */
+      overscroll-behavior-y: auto;
+      /* Prevent horizontal scroll but allow vertical */
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
   }
 
   /* Custom scrollbar */
@@ -308,9 +326,11 @@
     body {
       overflow-x: hidden;
       position: relative;
-      /* Prevent iOS bounce scroll from affecting fixed nav */
+      /* Enable pull-to-refresh on mobile while maintaining smooth scrolling */
       -webkit-overflow-scrolling: touch;
-      overscroll-behavior-y: contain;
+      overscroll-behavior-y: auto; /* Changed from 'contain' to allow pull-to-refresh */
+      /* Allow vertical scrolling */
+      overflow-y: auto;
     }
 
     /* Ensure fixed positioning works correctly */
