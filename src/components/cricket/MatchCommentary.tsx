@@ -32,7 +32,7 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
     try {
       setError(null);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${base}/api/cricket/matches/${matchId}/commentary`, {
+      const response = await fetch(`${base}/api/v1/cricket/matches/${matchId}/commentary`, {
         cache: 'no-store',
       });
 
@@ -79,7 +79,7 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
     return (
       <Card>
         <div className="p-6 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading commentary...</p>
         </div>
       </Card>
@@ -118,7 +118,7 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
             <p>{error}</p>
             <button
               onClick={fetchCommentary}
-              className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+              className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
               Retry
             </button>
@@ -149,7 +149,7 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       {entry.runs > 0 && (
-                        <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 text-xs font-semibold">
+                        <span className="px-2 py-0.5 rounded bg-primary-100 text-primary-700 text-xs font-semibold">
                           {entry.runs} {entry.runs === 1 ? 'run' : 'runs'}
                         </span>
                       )}

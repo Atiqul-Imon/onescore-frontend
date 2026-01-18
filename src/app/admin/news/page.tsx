@@ -25,7 +25,7 @@ export default function AdminNewsList() {
         if (searchParams.get('type')) qs.set('type', searchParams.get('type')!);
         if (searchParams.get('category')) qs.set('category', searchParams.get('category')!);
         qs.set('limit', '30');
-        const res = await fetch(`${base}/api/news?${qs.toString()}`, {
+        const res = await fetch(`${base}/api/v1/news?${qs.toString()}`, {
           cache: 'no-store',
           headers: getAuthHeaders(),
         });
@@ -123,7 +123,7 @@ export default function AdminNewsList() {
           title="Published"
           value={counts.published ?? '—'}
           description="Live stories with distribution"
-          icon={<Tag className="h-5 w-5 text-emerald-500" />}
+          icon={<Tag className="h-5 w-5 text-primary-500" />}
         />
       </div>
 

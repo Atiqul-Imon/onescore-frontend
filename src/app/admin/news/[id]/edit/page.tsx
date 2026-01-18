@@ -27,7 +27,7 @@ export default function EditArticlePage() {
       setLoading(true);
       setError(null);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/news?limit=100&state=all`, { cache: 'no-store', headers: getAuthHeaders() });
+      const res = await fetch(`${base}/api/v1/news?limit=100&state=all`, { cache: 'no-store', headers: getAuthHeaders() });
       const json = await res.json();
       const a = json?.data?.items?.find((x: any) => x._id === id);
       if (!a) throw new Error('Article not found');
@@ -54,7 +54,7 @@ export default function EditArticlePage() {
       setSuccess(null);
       setSaving(true);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/news/articles/${id}`, {
+      const res = await fetch(`${base}/api/v1/news/articles/${id}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -83,7 +83,7 @@ export default function EditArticlePage() {
       setSuccess(null);
       setPublishing(true);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/news/articles/${id}/publish`, { 
+      const res = await fetch(`${base}/api/v1/news/articles/${id}/publish`, { 
         method: 'POST', 
         headers: getAuthHeaders() 
       });
@@ -136,7 +136,7 @@ export default function EditArticlePage() {
           <button
             onClick={publish}
             disabled={publishing || form?.state === 'published'}
-            className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-50"
             type="button"
           >
             {publishing ? 'Publishing…' : form?.state === 'published' ? 'Published' : 'Publish'}
@@ -151,7 +151,7 @@ export default function EditArticlePage() {
       </div>
 
       {success && (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+        <div className="rounded-xl border border-primary-200 bg-primary-50 p-4 text-sm text-primary-700">
           {success}
         </div>
       )}
@@ -169,7 +169,7 @@ export default function EditArticlePage() {
               <input
                 type="text"
                 required
-                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary-500"
                 value={form.title}
                 onChange={e => setForm({ ...form, title: e.target.value })}
                 placeholder="Enter article title..."
@@ -183,7 +183,7 @@ export default function EditArticlePage() {
               <textarea
                 required
                 rows={4}
-                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-primary-500"
                 value={form.summary}
                 onChange={e => setForm({ ...form, summary: e.target.value })}
                 placeholder="Write a brief summary of the article..."
@@ -211,7 +211,7 @@ export default function EditArticlePage() {
                   Type <span className="text-red-500">*</span>
                 </label>
                 <select
-                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-emerald-500"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-primary-500"
                   value={form.type}
                   onChange={e => setForm({ ...form, type: e.target.value })}
                 >
@@ -228,7 +228,7 @@ export default function EditArticlePage() {
                   Category <span className="text-red-500">*</span>
                 </label>
                 <select
-                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-emerald-500"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:ring-2 focus:ring-primary-500"
                   value={form.category}
                   onChange={e => setForm({ ...form, category: e.target.value })}
                 >

@@ -20,15 +20,51 @@ export default function ArticlePage() {
         const year = params.year as string;
         const month = params.month as string;
         const slug = params.slug as string[];
-        const fullSlug = `news/${year}/${month}/${slug.join('/')}`;
+        const articleSlug = slug.join('/');
         const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const res = await fetch(`${base}/api/news/slug/${encodeURI(fullSlug)}`, { cache: 'no-store' });
-        if (res.ok) {
-          const data = await res.json();
-          setArticle(data?.data);
+        
+        // Try structured route first (works better with NestJS routing)
+        let res = await fetch(`${base}/api/v1/news/slug/${year}/${month}/${articleSlug}`, { 
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        // If structured route fails, try with encoded slug
+        if (!res.ok && res.status === 404) {
+          const fullSlug = `news/${year}/${month}/${articleSlug}`;
+          res = await fetch(`${base}/api/v1/news/slug/${encodeURIComponent(fullSlug)}`, { 
+            cache: 'no-store',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+        }
+        
+        if (!res.ok) {
+          if (res.status === 404) {
+            setArticle(null);
+            return;
+          }
+          throw new Error(`Failed to fetch article: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        if (data && data.data) {
+          setArticle(data.data);
+        } else if (data && !data.data && data.success) {
+          // If response has success but no data wrapper
+          setArticle(data);
+        } else if (data && !data.success) {
+          // If response is the article directly
+          setArticle(data);
+        } else {
+          setArticle(null);
         }
       } catch (e) {
-        console.error(e);
+        console.error('Error loading article:', e);
+        setArticle(null);
       } finally {
         setLoading(false);
       }

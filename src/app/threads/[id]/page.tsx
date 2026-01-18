@@ -120,7 +120,7 @@ export default function ThreadDetailPage() {
       setLoading(true);
       setError(null);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/threads/${threadId}`, {
+      const res = await fetch(`${base}/api/v1/threads/${threadId}`, {
         cache: 'no-store',
         headers: getAuthHeaders(),
       });
@@ -146,7 +146,7 @@ export default function ThreadDetailPage() {
   async function loadComments() {
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/threads/${threadId}?sort=${commentSort}`, {
+      const res = await fetch(`${base}/api/v1/threads/${threadId}?sort=${commentSort}`, {
         cache: 'no-store',
         headers: getAuthHeaders(),
       });
@@ -165,7 +165,7 @@ export default function ThreadDetailPage() {
   const handleVote = async (voteType: 'upvote' | 'downvote') => {
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/threads/${threadId}/vote`, {
+      const res = await fetch(`${base}/api/v1/threads/${threadId}/vote`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ voteType }),
@@ -190,7 +190,7 @@ export default function ThreadDetailPage() {
   const handleCommentVote = async (commentId: string, voteType: 'upvote' | 'downvote') => {
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/comments/${commentId}/vote`, {
+      const res = await fetch(`${base}/api/v1/comments/${commentId}/vote`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ voteType }),
@@ -235,7 +235,7 @@ export default function ThreadDetailPage() {
     try {
       setSubmittingComment(true);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/comments`, {
+      const res = await fetch(`${base}/api/v1/comments`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -271,7 +271,7 @@ export default function ThreadDetailPage() {
     try {
       setSubmittingReply(commentId);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/comments`, {
+      const res = await fetch(`${base}/api/v1/comments`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({

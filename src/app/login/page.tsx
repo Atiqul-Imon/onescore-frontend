@@ -19,7 +19,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/auth/login`, {
+      const res = await fetch(`${base}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -94,7 +94,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center text-sm">
             <span className="text-gray-600">Don't have an account? </span>
-            <Link href="/register" className="text-emerald-600 hover:underline font-medium">
+            <Link href="/register" className="text-primary-600 hover:underline font-medium">
               Sign up
             </Link>
           </div>
@@ -102,7 +102,7 @@ export default function LoginPage() {
           <div className="mt-8 pt-6 border-t border-gray-200">
             <p className="text-xs text-gray-500 text-center">
               Admin access: Use your admin credentials to access the admin panel at{' '}
-              <Link href="/admin" className="text-emerald-600 hover:underline">/admin</Link>
+              <Link href="/admin" className="text-primary-600 hover:underline">/admin</Link>
             </p>
           </div>
         </Card>

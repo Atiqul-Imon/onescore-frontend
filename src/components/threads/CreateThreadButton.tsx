@@ -107,7 +107,7 @@ export function CreateThreadButton() {
       }
 
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${base}/api/threads`, {
+      const response = await fetch(`${base}/api/v1/threads`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({

@@ -10,7 +10,7 @@ export function CricketLeaguesOverview() {
     <section className="section-padding bg-gray-50">
       <Container size="2xl">
         <div className="flex flex-col gap-4 text-center">
-          <span className="mx-auto inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-600">
+          <span className="mx-auto inline-flex items-center gap-2 rounded-full bg-primary-100 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-primary-600">
             <Goal className="h-3.5 w-3.5" />
             Tournament Hubs
           </span>
@@ -37,10 +37,10 @@ export function CricketLeaguesOverview() {
                 <p className="text-sm text-gray-600 flex-grow">{league.description}</p>
                 <div className="flex items-center justify-between text-xs text-gray-500">
                   {league.founded && <span>Founded {league.founded}</span>}
-                  <span className="uppercase tracking-wide text-emerald-600">Hub ready</span>
+                  <span className="uppercase tracking-wide text-primary-600">Hub ready</span>
                 </div>
                 <Link href={`/cricket/leagues/${league.slug}`} className="mt-2 inline-flex">
-                  <Button className="bg-emerald-500 hover:bg-emerald-600">
+                  <Button className="bg-primary-500 hover:bg-primary-600">
                     Open Hub <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>

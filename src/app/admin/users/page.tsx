@@ -35,7 +35,7 @@ export default function AdminUsersPage() {
       const qs = new URLSearchParams();
       if (search) qs.set('search', search);
       if (roleFilter) qs.set('role', roleFilter);
-      const res = await fetch(`${base}/api/users?${qs.toString()}`, { headers: getAuthHeaders(), cache: 'no-store' });
+      const res = await fetch(`${base}/api/v1/users?${qs.toString()}`, { headers: getAuthHeaders(), cache: 'no-store' });
       const json = await res.json();
       setItems(json?.data?.users || []);
     } catch (e: any) {
@@ -51,7 +51,7 @@ export default function AdminUsersPage() {
 
   async function updateUser(id: string, patch: Partial<User>) {
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-    const res = await fetch(`${base}/api/users/${id}`, {
+    const res = await fetch(`${base}/api/v1/users/${id}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(patch),
@@ -61,7 +61,7 @@ export default function AdminUsersPage() {
 
   async function removeUser(id: string) {
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-    const res = await fetch(`${base}/api/users/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+    const res = await fetch(`${base}/api/v1/users/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
     if (res.ok) load();
   }
 
@@ -171,7 +171,7 @@ export default function AdminUsersPage() {
                           type="checkbox"
                           checked={u.isVerified}
                           onChange={(e) => updateUser(u._id, { isVerified: e.target.checked })}
-                          className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                          className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
                         />
                         Verified
                       </label>

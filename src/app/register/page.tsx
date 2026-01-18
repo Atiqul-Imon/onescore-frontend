@@ -26,7 +26,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/auth/register`, {
+      const res = await fetch(`${base}/api/v1/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -131,7 +131,7 @@ export default function RegisterPage() {
 
           <div className="mt-6 text-center text-sm">
             <span className="text-gray-600">Already have an account? </span>
-            <Link href="/login" className="text-emerald-600 hover:underline font-medium">
+            <Link href="/login" className="text-primary-600 hover:underline font-medium">
               Sign in
             </Link>
           </div>

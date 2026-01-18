@@ -30,7 +30,7 @@ export function RelatedArticles({ articleId }: RelatedArticlesProps) {
     async function load() {
       try {
         const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const res = await fetch(`${base}/api/news/articles/${articleId}/related`);
+        const res = await fetch(`${base}/api/v1/news/articles/${articleId}/related`);
         if (res.ok) {
           const json = await res.json();
           setArticles(json?.data || []);

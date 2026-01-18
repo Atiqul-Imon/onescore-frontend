@@ -75,7 +75,7 @@ export default function AdminDashboard() {
               href="/admin/news/create"
               className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm"
             >
-              <Rocket className="h-4 w-4 text-emerald-500" />
+              <Rocket className="h-4 w-4 text-primary-500" />
               Launch Story
             </Link>
             <Link
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
           title="Articles shipped"
           value={k.publishedToday ?? '—'}
           description="Last 24 hours vs rolling avg"
-          icon={<TrendingUp className="h-5 w-5 text-emerald-500" />}
+          icon={<TrendingUp className="h-5 w-5 text-primary-500" />}
         />
         <StatCard
           title="Review queue"
@@ -126,7 +126,7 @@ export default function AdminDashboard() {
                   Combined signal from newsroom, QA queue, and publishing cadence.
                 </p>
               </div>
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-600">
+              <span className="rounded-full bg-primary-50 px-3 py-1 text-sm font-semibold text-primary-600">
                 Stable
               </span>
             </div>
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
               <h2 className="text-lg font-semibold text-slate-900">Recent activity</h2>
               <Link
                 href="/api/admin/logs"
-                className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
+                className="text-xs font-semibold text-primary-600 hover:text-primary-700"
                 target="_blank"
                 rel="noreferrer"
               >

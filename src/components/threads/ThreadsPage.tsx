@@ -87,7 +87,7 @@ export function ThreadsPage() {
       }
       if (filters.author) params.append('author', filters.author);
 
-      const res = await fetch(`${base}/api/threads?${params.toString()}`, {
+      const res = await fetch(`${base}/api/v1/threads?${params.toString()}`, {
         cache: 'no-store',
         headers: getAuthHeaders(),
       });
@@ -123,7 +123,7 @@ export function ThreadsPage() {
   const handleVote = async (threadId: string, voteType: 'upvote' | 'downvote') => {
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/threads/${threadId}/vote`, {
+      const res = await fetch(`${base}/api/v1/threads/${threadId}/vote`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ voteType }),
@@ -168,7 +168,7 @@ export function ThreadsPage() {
   const handleReport = async (threadId: string, reason: string) => {
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/threads/${threadId}/report`, {
+      const res = await fetch(`${base}/api/v1/threads/${threadId}/report`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ reason }),

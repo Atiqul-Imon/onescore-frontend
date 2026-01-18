@@ -27,7 +27,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
         }
 
         const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const res = await fetch(`${base}/api/auth/profile`, {
+        const res = await fetch(`${base}/api/v1/auth/profile`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',

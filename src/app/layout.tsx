@@ -112,7 +112,7 @@ export default function RootLayout({
           >
             Skip to content
           </a>
-          <div className="flex min-h-screen flex-col bg-gray-100">
+          <div className="flex min-h-screen flex-col bg-gray-50">
             <ConditionalLayout>
               <main id="main-content" className="flex-1">
                 {children}

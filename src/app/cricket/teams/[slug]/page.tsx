@@ -245,15 +245,15 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
               )}
               <div className="mt-6 space-y-4 text-sm text-white/80">
                 <div className="flex items-center gap-3">
-                  <Users className="h-4 w-4 text-emerald-300" />
+                  <Users className="h-4 w-4 text-primary-300" />
                   Captains: Tests {team.captains?.test ?? '—'} · ODIs {team.captains?.odi ?? '—'} · T20Is {team.captains?.t20 ?? '—'}
                 </div>
                 <div className="flex items-center gap-3">
-                  <CalendarDays className="h-4 w-4 text-emerald-300" />
+                  <CalendarDays className="h-4 w-4 text-primary-300" />
                   First Test appearance: {team.firstTestYear ?? '—'}
                 </div>
                 <div className="flex items-center gap-3">
-                  <Trophy className="h-4 w-4 text-emerald-300" />
+                  <Trophy className="h-4 w-4 text-primary-300" />
                   ICC titles: {stats.iccTitles?.length ?? 0}
                 </div>
                 <p className="text-xs text-white/60">Updated {new Date(data!.updatedAt).toLocaleString()}</p>
@@ -277,11 +277,11 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
                   <Link
                     key={article.slug}
                     href={`/${article.slug}`}
-                    className="group flex flex-col gap-4 rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition-standard hover:border-emerald-200 hover:shadow-md sm:flex-row"
+                    className="group flex flex-col gap-4 rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition-standard hover:border-primary-200 hover:shadow-md sm:flex-row"
                   >
                     <div className="flex-1">
-                      <p className="text-xs uppercase tracking-[0.3em] text-emerald-600">{article.type.replace('_', ' ')}</p>
-                      <h2 className="mt-2 text-lg font-semibold text-slate-900 group-hover:text-emerald-700">{article.title}</h2>
+                      <p className="text-xs uppercase tracking-[0.3em] text-primary-600">{article.type.replace('_', ' ')}</p>
+                      <h2 className="mt-2 text-lg font-semibold text-slate-900 group-hover:text-primary-700">{article.title}</h2>
                       <p className="mt-2 text-sm text-slate-600 line-clamp-3">{article.summary}</p>
                       <div className="mt-3 text-xs text-slate-500">
                         {article.publishedAt && new Date(article.publishedAt).toLocaleString(undefined, { dateStyle: 'medium' })}
@@ -333,7 +333,7 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
 
               <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm space-y-6">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-emerald-600">Batting leaders</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-primary-600">Batting leaders</p>
                   <div className="mt-3 space-y-3">
                 {stats.statLeaders?.batting?.length ? (
                       stats.statLeaders.batting.map((leader) => (
@@ -405,7 +405,7 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
                     <Link
                       key={record.label}
                       href={record.url ?? '/records'}
-                      className="flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-3 text-sm font-medium text-slate-700 transition-standard hover:border-emerald-200 hover:text-emerald-700"
+                      className="flex items-center justify-between rounded-2xl border border-slate-100 px-4 py-3 text-sm font-medium text-slate-700 transition-standard hover:border-primary-200 hover:text-primary-700"
                     >
                       {record.label}
                       <ArrowUpRight className="h-4 w-4" />

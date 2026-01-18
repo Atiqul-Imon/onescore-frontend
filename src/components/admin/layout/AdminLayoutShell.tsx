@@ -66,7 +66,7 @@ export function AdminLayoutShell({ children }: { children: ReactNode }) {
   const renderNav = () => (
     <div className="flex h-full flex-col gap-8 overflow-y-auto px-6 pb-10 pt-8">
       <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-white">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-lg font-bold">OS</span>
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500 text-lg font-bold">OS</span>
         Onescore Admin
       </Link>
       <div className="space-y-8">
@@ -175,7 +175,7 @@ export function AdminLayoutShell({ children }: { children: ReactNode }) {
                 <Bell className="h-5 w-5" />
               </button>
               <div className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600" />
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600" />
                 <div className="hidden text-left text-xs lg:block">
                   <p className="font-semibold text-slate-900">Admin</p>
                   <p className="text-slate-500">Superuser</p>

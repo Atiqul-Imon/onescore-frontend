@@ -16,7 +16,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     const baseClasses = 'w-full px-4 py-2.5 border rounded-lg text-sm transition-standard focus:outline-none appearance-none bg-white';
     const stateClasses = error
       ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
-      : 'border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500';
+      : 'border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500';
     const disabledClasses = props.disabled ? 'bg-gray-50 cursor-not-allowed' : '';
 
     return (

@@ -57,7 +57,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-standard">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-primary-600 rounded-lg flex items-center justify-center">
               <Activity className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">SportsLive</span>
@@ -71,7 +71,7 @@ export function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`transition-standard font-medium ${active ? 'text-emerald-600 font-semibold' : 'text-gray-700 hover:text-emerald-600'}`}
+                  className={`transition-standard font-medium ${active ? 'text-primary-600 font-semibold' : 'text-gray-700 hover:text-primary-600'}`}
                   aria-current={active ? 'page' : undefined}
                 >
                   {item.name}
@@ -85,7 +85,7 @@ export function Header() {
             {/* Search */}
             <button
               onClick={toggleSearch}
-              className="p-2 text-gray-600 hover:text-emerald-600 transition-standard"
+              className="p-2 text-gray-600 hover:text-primary-600 transition-standard"
               aria-expanded={isSearchOpen}
               aria-controls="global-search"
             >
@@ -94,7 +94,7 @@ export function Header() {
             </button>
 
             {/* Notifications */}
-            <button className="relative p-2 text-gray-600 hover:text-emerald-600 transition-standard" aria-label="Notifications">
+            <button className="relative p-2 text-gray-600 hover:text-primary-600 transition-standard" aria-label="Notifications">
               <Bell className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
                 <span className="text-xs text-white font-bold">3</span>
@@ -112,7 +112,7 @@ export function Header() {
             {/* User Profile / Login */}
             <Link
               href="/login"
-              className="flex items-center space-x-2 p-2 text-gray-600 hover:text-emerald-600 transition-colors duration-200"
+              className="flex items-center space-x-2 p-2 text-gray-600 hover:text-primary-600 transition-colors duration-200"
             >
               <div className="w-8 h-8 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
@@ -123,7 +123,7 @@ export function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMobileMenu}
-              className="md:hidden p-2 text-gray-600 hover:text-emerald-600 transition-colors duration-200"
+              className="md:hidden p-2 text-gray-600 hover:text-primary-600 transition-colors duration-200"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -146,7 +146,7 @@ export function Header() {
                     ref={searchInputRef}
                     type="text"
                     placeholder="Search matches, teams, players..."
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-standard"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-standard"
                     id="global-search"
                     onKeyDown={(event) => {
                       if (event.key === 'Escape') {
@@ -177,7 +177,7 @@ export function Header() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`block px-4 py-3 transition-standard font-medium rounded-md ${active ? 'bg-emerald-50 text-emerald-600' : 'text-gray-700 hover:bg-gray-50 hover:text-emerald-600'}`}
+                    className={`block px-4 py-3 transition-standard font-medium rounded-md ${active ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600'}`}
                     onClick={() => setIsMobileMenuOpen(false)}
                     aria-current={active ? 'page' : undefined}
                   >

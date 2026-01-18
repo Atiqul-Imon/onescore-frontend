@@ -45,13 +45,13 @@ export function FootballSpotlight() {
               key={item.title}
               variant="interactive"
               padding="lg"
-              className="h-full border border-white/10 bg-white/5 text-gray-100 backdrop-blur-sm hover:border-emerald-400/70"
+              className="h-full border border-white/10 bg-white/5 text-gray-100 backdrop-blur-sm hover:border-primary-400/70"
             >
-              <item.icon className="w-7 h-7 text-emerald-400" />
+              <item.icon className="w-7 h-7 text-primary-400" />
               <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
               <p className="mt-2 text-sm text-gray-300">{item.description}</p>
               <div className="mt-auto pt-4">
-                <Button variant="outline" className="border-emerald-500 text-emerald-300 hover:bg-emerald-500 hover:text-white">
+                <Button variant="outline" className="border-primary-500 text-primary-300 hover:bg-primary-500 hover:text-white">
                   {item.cta}
                 </Button>
               </div>

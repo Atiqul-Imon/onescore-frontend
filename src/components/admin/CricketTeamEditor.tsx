@@ -231,7 +231,7 @@ export function CricketTeamEditor({ slug, mode }: CricketTeamEditorProps) {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:opacity-50"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Save changes
@@ -239,7 +239,7 @@ export function CricketTeamEditor({ slug, mode }: CricketTeamEditorProps) {
       </div>
 
       {status && (
-        <div className={`rounded-lg border px-4 py-3 text-sm ${status.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-900' : 'border-red-200 bg-red-50 text-red-700'}`}>
+        <div className={`rounded-lg border px-4 py-3 text-sm ${status.type === 'success' ? 'border-primary-200 bg-primary-50 text-primary-900' : 'border-red-200 bg-red-50 text-red-700'}`}>
           {status.message}
         </div>
       )}

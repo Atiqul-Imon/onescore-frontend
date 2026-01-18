@@ -29,11 +29,11 @@
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
     /* Brand palette reference (align components & marketing collateral) */
-    --brand-primary: #059669; /* emerald-600 */
-    --brand-primary-hover: #047857; /* emerald-700 */
-    --brand-secondary: #1e293b; /* slate-800 */
-    --brand-accent: #22c55e; /* lime-500 */
-    --brand-surface: #f8fafc; /* slate-50 */
+    --brand-primary: #F7C455; /* Primary golden yellow */
+    --brand-primary-hover: #d9a63c; /* Primary darker */
+    --brand-secondary: #221E1B; /* Secondary dark brown/black */
+    --brand-accent: #F7C455; /* Primary as accent */
+    --brand-surface: #f9fafb; /* gray-50 */
   }
 
   .dark {
@@ -65,12 +65,21 @@
   }
   
   body {
-    @apply bg-white text-gray-900;
+    @apply bg-gray-50 text-gray-900;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
   html {
     scroll-behavior: smooth;
+    /* Prevent fixed position issues on mobile */
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body {
+    /* Prevent fixed position issues */
+    position: relative;
+    overflow-x: hidden;
   }
 
   /* Custom scrollbar */
@@ -93,11 +102,11 @@
 
   /* Selection styles */
   ::selection {
-    @apply bg-primary-500 text-white;
+    @apply bg-primary-500 text-secondary-900;
   }
 
   ::-moz-selection {
-    @apply bg-primary-500 text-white;
+    @apply bg-primary-500 text-secondary-900;
   }
 }
 
@@ -285,6 +294,37 @@
 
   .mobile-menu-closed {
     @apply -translate-x-full;
+  }
+
+  /* Mobile bottom navigation safe area support */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Ensure mobile bottom nav is perfectly fixed and never moves */
+  @media (max-width: 768px) {
+    /* Prevent any transform from affecting fixed positioning */
+    html,
+    body {
+      overflow-x: hidden;
+      position: relative;
+      /* Prevent iOS bounce scroll from affecting fixed nav */
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
+
+    /* Ensure fixed positioning works correctly */
+    [data-mobile-bottom-nav] {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      transform: translateZ(0) !important;
+      -webkit-transform: translateZ(0) !important;
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
   }
 
   /* Responsive grid */
@@ -534,7 +574,7 @@
   }
 
   .skip-link:focus {
-    @apply not-sr-only absolute top-4 left-4 z-50 px-4 py-2 rounded-md bg-white text-emerald-600 shadow-lg font-medium outline-none;
+    @apply not-sr-only absolute top-4 left-4 z-50 px-4 py-2 rounded-md bg-white text-primary-600 shadow-lg font-medium outline-none;
   }
 }
 

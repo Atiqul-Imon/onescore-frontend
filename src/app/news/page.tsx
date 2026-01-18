@@ -3,7 +3,7 @@ import { PageLayout } from '@/components/layout/PageLayout';
 
 async function getNews() {
   const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  const res = await fetch(`${base}/api/news`, { next: { revalidate: 0 } });
+  const res = await fetch(`${base}/api/v1/news`, { next: { revalidate: 0 } });
   if (!res.ok) return null;
   return res.json();
 }

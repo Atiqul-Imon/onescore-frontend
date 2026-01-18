@@ -19,7 +19,7 @@ export function CricketLeagueNews({ news }: CricketLeagueNewsProps) {
         {news.map((article) => (
           <article key={article.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
             {article.tag && (
-              <span className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-600">
+              <span className="inline-flex items-center rounded-full bg-primary-100 px-3 py-1 text-xs font-medium text-primary-600">
                 {article.tag}
               </span>
             )}
@@ -33,7 +33,7 @@ export function CricketLeagueNews({ news }: CricketLeagueNewsProps) {
                 minute: '2-digit',
               })}
             </p>
-            <Link href={article.href} className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-500">
+            <Link href={article.href} className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-500">
               Read article <ArrowRight className="h-4 w-4" />
             </Link>
           </article>

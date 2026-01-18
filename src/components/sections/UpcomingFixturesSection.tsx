@@ -50,8 +50,8 @@ export function UpcomingFixturesSection() {
       
       // Fetch both cricket and football fixtures
       const [cricketRes, footballRes] = await Promise.allSettled([
-        fetch(`${base}/api/cricket/matches/fixtures?limit=10`, { cache: 'no-store' }),
-        fetch(`${base}/api/football/matches/fixtures?limit=10`, { cache: 'no-store' }),
+        fetch(`${base}/api/v1/cricket/matches/fixtures?limit=10`, { cache: 'no-store' }),
+        fetch(`${base}/api/v1/football/matches/fixtures?limit=10`, { cache: 'no-store' }),
       ]);
       
       let allFixtures: Fixture[] = [];
@@ -163,7 +163,7 @@ export function UpcomingFixturesSection() {
   const filterButtonClass = (id: string) =>
     `rounded-full border px-5 py-2 text-sm font-semibold transition-standard ${
       selectedFilter === id
-        ? 'border-emerald-600 bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
+        ? 'border-primary-600 bg-primary-600 text-white shadow-lg shadow-primary-600/30'
         : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900'
     }`;
 
@@ -173,7 +173,7 @@ export function UpcomingFixturesSection() {
         <Container size="2xl">
           <div className="mb-12 text-center">
             <div className="eyebrow mx-auto w-max gap-2">
-              <Calendar className="h-3.5 w-3.5 text-emerald-600" />
+              <Calendar className="h-3.5 w-3.5 text-primary-600" />
               Fixture Radar
             </div>
             <h2 className="heading-2 mt-5">Upcoming Fixtures</h2>
@@ -208,7 +208,7 @@ export function UpcomingFixturesSection() {
           transition={{ duration: 0.6 }}
         >
           <div className="eyebrow mx-auto w-max gap-2">
-            <Calendar className="h-3.5 w-3.5 text-emerald-600" />
+            <Calendar className="h-3.5 w-3.5 text-primary-600" />
             Fixture Radar
           </div>
           <h2 className="heading-2 mt-5 text-gray-900">Upcoming Fixtures</h2>
@@ -262,8 +262,8 @@ export function UpcomingFixturesSection() {
                 <Card variant="interactive" className="h-full rounded-2xl border border-gray-100 bg-white/90 p-6 shadow-lg">
                   <div className="flex h-full flex-col gap-5">
                     <div className="flex items-center justify-between text-sm font-semibold text-gray-900">
-                      <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-emerald-600">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-primary-600">
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary-500" />
                         {fixture.series || fixture.league || 'International'}
                       </span>
                       <span>{formatDate(fixture.startTime)}</span>
@@ -291,7 +291,7 @@ export function UpcomingFixturesSection() {
 
                     <div className="grid gap-3 text-sm text-gray-600">
                       <div className="inline-flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-emerald-500" />
+                        <Clock className="h-4 w-4 text-primary-500" />
                         {formatTime(fixture.startTime)}
                       </div>
                       <div className="inline-flex items-center gap-2">
