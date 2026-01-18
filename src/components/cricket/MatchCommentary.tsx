@@ -32,7 +32,7 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
     try {
       setError(null);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${base}/api/cricket/matches/${matchId}/commentary`, {
+      const response = await fetch(`${base}/api/v1/cricket/matches/${matchId}/commentary`, {
         cache: 'no-store',
       });
 

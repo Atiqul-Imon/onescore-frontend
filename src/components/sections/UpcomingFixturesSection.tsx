@@ -50,8 +50,8 @@ export function UpcomingFixturesSection() {
       
       // Fetch both cricket and football fixtures
       const [cricketRes, footballRes] = await Promise.allSettled([
-        fetch(`${base}/api/cricket/matches/fixtures?limit=10`, { cache: 'no-store' }),
-        fetch(`${base}/api/football/matches/fixtures?limit=10`, { cache: 'no-store' }),
+        fetch(`${base}/api/v1/cricket/matches/fixtures?limit=10`, { cache: 'no-store' }),
+        fetch(`${base}/api/v1/football/matches/fixtures?limit=10`, { cache: 'no-store' }),
       ]);
       
       let allFixtures: Fixture[] = [];

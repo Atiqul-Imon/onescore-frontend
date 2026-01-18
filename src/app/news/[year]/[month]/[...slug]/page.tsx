@@ -22,7 +22,7 @@ export default function ArticlePage() {
         const slug = params.slug as string[];
         const fullSlug = `news/${year}/${month}/${slug.join('/')}`;
         const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const res = await fetch(`${base}/api/news/slug/${encodeURI(fullSlug)}`, { cache: 'no-store' });
+        const res = await fetch(`${base}/api/v1/news/slug/${encodeURI(fullSlug)}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           setArticle(data?.data);

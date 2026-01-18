@@ -4,7 +4,7 @@ import { Container } from '@/components/ui/Container';
 export async function NewsSection() {
   try {
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-    const res = await fetch(`${base}/api/news?limit=6`, { next: { revalidate: 0 }, cache: 'no-store' });
+    const res = await fetch(`${base}/api/v1/news?limit=6`, { next: { revalidate: 0 }, cache: 'no-store' });
     if (!res.ok) {
       return (
         <section className="section-padding bg-gray-100">

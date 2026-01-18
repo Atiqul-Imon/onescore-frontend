@@ -27,7 +27,7 @@ export default function EditArticlePage() {
       setLoading(true);
       setError(null);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/news?limit=100&state=all`, { cache: 'no-store', headers: getAuthHeaders() });
+      const res = await fetch(`${base}/api/v1/news?limit=100&state=all`, { cache: 'no-store', headers: getAuthHeaders() });
       const json = await res.json();
       const a = json?.data?.items?.find((x: any) => x._id === id);
       if (!a) throw new Error('Article not found');
@@ -54,7 +54,7 @@ export default function EditArticlePage() {
       setSuccess(null);
       setSaving(true);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/news/articles/${id}`, {
+      const res = await fetch(`${base}/api/v1/news/articles/${id}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -83,7 +83,7 @@ export default function EditArticlePage() {
       setSuccess(null);
       setPublishing(true);
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/news/articles/${id}/publish`, { 
+      const res = await fetch(`${base}/api/v1/news/articles/${id}/publish`, { 
         method: 'POST', 
         headers: getAuthHeaders() 
       });

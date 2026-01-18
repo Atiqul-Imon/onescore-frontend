@@ -25,7 +25,7 @@ export default function AdminNewsList() {
         if (searchParams.get('type')) qs.set('type', searchParams.get('type')!);
         if (searchParams.get('category')) qs.set('category', searchParams.get('category')!);
         qs.set('limit', '30');
-        const res = await fetch(`${base}/api/news?${qs.toString()}`, {
+        const res = await fetch(`${base}/api/v1/news?${qs.toString()}`, {
           cache: 'no-store',
           headers: getAuthHeaders(),
         });

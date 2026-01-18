@@ -26,7 +26,7 @@ export default function CreateArticlePage() {
     setError(null);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/news/articles`, {
+      const res = await fetch(`${base}/api/v1/news/articles`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({

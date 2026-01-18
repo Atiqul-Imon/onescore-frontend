@@ -20,7 +20,7 @@ export function ArticleReactions({ articleId, initialLikes, initialDislikes }: A
     setLoading(true);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/news/articles/${articleId}/like`, { method: 'POST' });
+      const res = await fetch(`${base}/api/v1/news/articles/${articleId}/like`, { method: 'POST' });
       if (res.ok) {
         const json = await res.json();
         setLikes(json.data.likes);
@@ -39,7 +39,7 @@ export function ArticleReactions({ articleId, initialLikes, initialDislikes }: A
     setLoading(true);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/news/articles/${articleId}/dislike`, { method: 'POST' });
+      const res = await fetch(`${base}/api/v1/news/articles/${articleId}/dislike`, { method: 'POST' });
       if (res.ok) {
         const json = await res.json();
         setLikes(json.data.likes);

@@ -13,7 +13,7 @@ export default function ModerationCommentsPage() {
     setError(null);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/comments/reports`, { headers: getAuthHeaders(), cache: 'no-store' });
+      const res = await fetch(`${base}/api/v1/comments/reports`, { headers: getAuthHeaders(), cache: 'no-store' });
       const json = await res.json();
       setItems(json?.data?.items || []);
     } catch (e: any) {
@@ -28,9 +28,9 @@ export default function ModerationCommentsPage() {
   async function action(id: string, type: 'dismiss' | 'actioned' | 'hide') {
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     if (type === 'hide') {
-      await fetch(`${base}/api/comments/${id}/hide`, { method: 'POST', headers: getAuthHeaders() });
+      await fetch(`${base}/api/v1/comments/${id}/hide`, { method: 'POST', headers: getAuthHeaders() });
     } else {
-      await fetch(`${base}/api/comments/${id}/reports/resolve`, {
+      await fetch(`${base}/api/v1/comments/${id}/reports/resolve`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ action: type })

@@ -76,11 +76,11 @@ export function LiveMatchesSection() {
       
       // Fetch both cricket and football live matches
       const [cricketLiveRes, footballLiveRes] = await Promise.allSettled([
-        fetch(`${base}/api/cricket/matches/live`, {
+        fetch(`${base}/api/v1/cricket/matches/live`, {
           cache: 'no-store',
           next: { revalidate: 30 },
         }),
-        fetch(`${base}/api/football/matches/live`, {
+        fetch(`${base}/api/v1/football/matches/live`, {
           cache: 'no-store',
           next: { revalidate: 30 },
         }),
@@ -124,7 +124,7 @@ export function LiveMatchesSection() {
       }
 
       // If no live matches, try upcoming matches first
-      const fixturesRes = await fetch(`${base}/api/cricket/matches/fixtures?limit=6`, {
+      const fixturesRes = await fetch(`${base}/api/v1/cricket/matches/fixtures?limit=6`, {
         cache: 'no-store',
         next: { revalidate: 300 }, // Cache for 5 minutes
       });
@@ -153,7 +153,7 @@ export function LiveMatchesSection() {
       }
 
       // If no upcoming matches, fetch completed matches
-      const resultsRes = await fetch(`${base}/api/cricket/matches/results?limit=6`, {
+      const resultsRes = await fetch(`${base}/api/v1/cricket/matches/results?limit=6`, {
         cache: 'no-store',
         next: { revalidate: 3600 }, // Cache for 1 hour (completed matches don't change)
       });
