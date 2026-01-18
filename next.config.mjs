@@ -76,8 +76,8 @@ const nextConfig = {
     ];
   },
   // Turbopack configuration (Next.js 16 default)
-  // Note: Vercel handles workspace root automatically, so we don't set it here
-  // Setting root can cause conflicts with Vercel's build system
+  // Empty config to silence error when webpack config is present
+  turbopack: {},
   
   // Webpack configuration for backward compatibility
   webpack: (config, { isServer }) => {
