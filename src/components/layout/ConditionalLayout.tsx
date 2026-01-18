@@ -21,6 +21,7 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
       <Header />
       <main className="pb-14 md:pb-0">{children}</main>
       <Footer />
+      {/* MobileBottomNav placed outside to ensure perfect fixed positioning */}
       <MobileBottomNav />
     </>
   );
