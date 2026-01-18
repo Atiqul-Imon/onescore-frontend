@@ -44,7 +44,7 @@ export function ArticleComments({ articleId }: ArticleCommentsProps) {
     setLoading(true);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/comments/article/${articleId}?sort=new&limit=50`);
+      const res = await fetch(`${base}/api/v1/comments/article/${articleId}?sort=new&limit=50`);
       if (res.ok) {
         const json = await res.json();
         setComments(json?.data?.comments || []);
@@ -63,7 +63,7 @@ export function ArticleComments({ articleId }: ArticleCommentsProps) {
     setSubmitting(true);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/comments`, {
+      const res = await fetch(`${base}/api/v1/comments`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({

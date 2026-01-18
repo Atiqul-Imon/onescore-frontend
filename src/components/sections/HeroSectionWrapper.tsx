@@ -39,10 +39,10 @@ async function fetchHeroData() {
   try {
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     const [newsRes, trendingRes, cricketLiveRes, footballLiveRes] = await Promise.allSettled([
-      fetch(`${base}/api/news?limit=5&state=published`, { cache: 'no-store', next: { revalidate: 0 } }),
-      fetch(`${base}/api/news/trending?limit=4`, { cache: 'no-store', next: { revalidate: 0 } }),
-      fetch(`${base}/api/cricket/matches/live`, { cache: 'no-store', next: { revalidate: 0 } }),
-      fetch(`${base}/api/football/matches/live`, { cache: 'no-store', next: { revalidate: 0 } }),
+      fetch(`${base}/api/v1/news?limit=5&state=published`, { cache: 'no-store', next: { revalidate: 0 } }),
+      fetch(`${base}/api/v1/news/trending?limit=4`, { cache: 'no-store', next: { revalidate: 0 } }),
+      fetch(`${base}/api/v1/cricket/matches/live`, { cache: 'no-store', next: { revalidate: 0 } }),
+      fetch(`${base}/api/v1/football/matches/live`, { cache: 'no-store', next: { revalidate: 0 } }),
     ]);
 
     let articles: Article[] = [];
@@ -94,8 +94,8 @@ async function fetchHeroData() {
       // If no live matches, fetch last completed matches (most recent first)
       try {
         const [cricketCompletedRes, footballCompletedRes] = await Promise.allSettled([
-          fetch(`${base}/api/cricket/matches/results?limit=4&page=1`, { cache: 'no-store', next: { revalidate: 0 } }),
-          fetch(`${base}/api/football/matches/results?limit=4&page=1`, { cache: 'no-store', next: { revalidate: 0 } }),
+          fetch(`${base}/api/v1/cricket/matches/results?limit=4&page=1`, { cache: 'no-store', next: { revalidate: 0 } }),
+          fetch(`${base}/api/v1/football/matches/results?limit=4&page=1`, { cache: 'no-store', next: { revalidate: 0 } }),
         ]);
         
         let completedMatches: LiveMatch[] = [];

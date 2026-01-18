@@ -3,6 +3,7 @@ import axios from 'axios';
 
 // API Base URL
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_VERSION = '/v1'; // API version prefix
 
 // Query Keys
 export const QUERY_KEYS = {
@@ -33,33 +34,33 @@ export const QUERY_KEYS = {
 export const cricketApi = {
   // Get live cricket matches
   getLiveMatches: async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/cricket/matches/live`);
+    const { data } = await axios.get(`${API_BASE_URL}/api${API_VERSION}/cricket/matches/live`);
     return data;
   },
 
   // Get upcoming cricket matches
   getUpcomingMatches: async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/cricket/matches/upcoming`);
+    const { data } = await axios.get(`${API_BASE_URL}/api${API_VERSION}/cricket/matches/fixtures`);
     return data;
   },
 
   // Get cricket series
   getSeries: async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/cricket/series`);
+    const { data } = await axios.get(`${API_BASE_URL}/api${API_VERSION}/cricket/series`);
     return data;
   },
 
   // Get cricket teams
   getTeams: async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/cricket/teams`);
+    const { data } = await axios.get(`${API_BASE_URL}/api${API_VERSION}/cricket/teams`);
     return data;
   },
 
   // Get cricket players
   getPlayers: async (teamId?: string) => {
     const url = teamId 
-      ? `${API_BASE_URL}/api/cricket/teams/${teamId}/players`
-      : `${API_BASE_URL}/api/cricket/players`;
+      ? `${API_BASE_URL}/api${API_VERSION}/cricket/teams/${teamId}/players`
+      : `${API_BASE_URL}/api${API_VERSION}/cricket/players`;
     const { data } = await axios.get(url);
     return data;
   },
@@ -69,33 +70,33 @@ export const cricketApi = {
 export const footballApi = {
   // Get live football matches
   getLiveMatches: async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/football/matches/live`);
+    const { data } = await axios.get(`${API_BASE_URL}/api${API_VERSION}/football/matches/live`);
     return data;
   },
 
   // Get upcoming football matches
   getUpcomingMatches: async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/football/matches/upcoming`);
+    const { data } = await axios.get(`${API_BASE_URL}/api${API_VERSION}/football/matches/fixtures`);
     return data;
   },
 
   // Get football leagues
   getLeagues: async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/football/leagues`);
+    const { data } = await axios.get(`${API_BASE_URL}/api${API_VERSION}/football/leagues`);
     return data;
   },
 
   // Get football teams
   getTeams: async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/football/teams`);
+    const { data } = await axios.get(`${API_BASE_URL}/api${API_VERSION}/football/teams`);
     return data;
   },
 
   // Get football players
   getPlayers: async (teamId?: string) => {
     const url = teamId 
-      ? `${API_BASE_URL}/api/football/teams/${teamId}/players`
-      : `${API_BASE_URL}/api/football/players`;
+      ? `${API_BASE_URL}/api${API_VERSION}/football/teams/${teamId}/players`
+      : `${API_BASE_URL}/api${API_VERSION}/football/players`;
     const { data } = await axios.get(url);
     return data;
   },
@@ -105,19 +106,19 @@ export const footballApi = {
 export const contentApi = {
   // Get featured content
   getFeatured: async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/content/featured`);
+    const { data } = await axios.get(`${API_BASE_URL}/api${API_VERSION}/content/featured`);
     return data;
   },
 
   // Get content by type
   getByType: async (type: string) => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/content?type=${type}`);
+    const { data } = await axios.get(`${API_BASE_URL}/api${API_VERSION}/content?type=${type}`);
     return data;
   },
 
   // Get all content
   getAll: async () => {
-    const { data } = await axios.get(`${API_BASE_URL}/api/content`);
+    const { data } = await axios.get(`${API_BASE_URL}/api${API_VERSION}/content`);
     return data;
   },
 };

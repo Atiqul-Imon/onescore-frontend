@@ -67,7 +67,7 @@ export function FootballLiveMatches() {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       
       // Fetch live matches first
-      const liveRes = await fetch(`${base}/api/football/matches/live`, {
+      const liveRes = await fetch(`${base}/api/v1/football/matches/live`, {
         cache: 'no-store',
       });
 
@@ -106,7 +106,7 @@ export function FootballLiveMatches() {
       }
 
       // If no live matches, fetch upcoming
-      const fixturesRes = await fetch(`${base}/api/football/matches/fixtures?limit=6`, {
+      const fixturesRes = await fetch(`${base}/api/v1/football/matches/fixtures?limit=6`, {
         cache: 'no-store',
       });
 
