@@ -41,8 +41,8 @@ async function fetchHeroData() {
     const [newsRes, trendingRes, cricketLiveRes, footballLiveRes] = await Promise.allSettled([
       fetch(`${base}/api/v1/news?limit=5&state=published`, { cache: 'no-store', next: { revalidate: 0 } }),
       fetch(`${base}/api/v1/news/trending?limit=4`, { cache: 'no-store', next: { revalidate: 0 } }),
-      fetch(`${base}/api/v1/cricket/matches/live`, { cache: 'no-store', next: { revalidate: 0 } }),
-      fetch(`${base}/api/v1/football/matches/live`, { cache: 'no-store', next: { revalidate: 0 } }),
+      fetch(`${base}/api/v1/cricket/matches/live?t=${Date.now()}`, { cache: 'no-store', next: { revalidate: 0 } }),
+      fetch(`${base}/api/v1/football/matches/live?t=${Date.now()}`, { cache: 'no-store', next: { revalidate: 0 } }),
     ]);
 
     let articles: Article[] = [];
@@ -91,11 +91,11 @@ async function fetchHeroData() {
         return 0;
       });
     } else {
-      // If no live matches, fetch last completed matches (most recent first)
+      // If no live matches, fetch completed matches first (Cricinfo style)
       try {
         const [cricketCompletedRes, footballCompletedRes] = await Promise.allSettled([
-          fetch(`${base}/api/v1/cricket/matches/results?limit=4&page=1`, { cache: 'no-store', next: { revalidate: 0 } }),
-          fetch(`${base}/api/v1/football/matches/results?limit=4&page=1`, { cache: 'no-store', next: { revalidate: 0 } }),
+          fetch(`${base}/api/v1/cricket/matches/results?limit=4`, { cache: 'no-store', next: { revalidate: 3600 } }),
+          fetch(`${base}/api/v1/football/matches/results?limit=4`, { cache: 'no-store', next: { revalidate: 3600 } }),
         ]);
         
         let completedMatches: LiveMatch[] = [];
@@ -103,7 +103,10 @@ async function fetchHeroData() {
         // Fetch cricket completed matches
         if (cricketCompletedRes.status === 'fulfilled' && cricketCompletedRes.value.ok) {
           const cricketData = await cricketCompletedRes.value.json();
-          const cricketResults = cricketData?.data?.results || [];
+          // Handle both direct array and nested results property
+          const cricketResults = Array.isArray(cricketData?.data) 
+            ? cricketData.data 
+            : cricketData?.data?.results || [];
           const cricketCompleted = cricketResults
             .filter((match: LiveMatch) => match.format && !match.league)
             .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }));
@@ -113,7 +116,9 @@ async function fetchHeroData() {
         // Fetch football completed matches
         if (footballCompletedRes.status === 'fulfilled' && footballCompletedRes.value.ok) {
           const footballData = await footballCompletedRes.value.json();
-          const footballResults = footballData?.data?.results || [];
+          const footballResults = Array.isArray(footballData?.data) 
+            ? footballData.data 
+            : footballData?.data?.results || [];
           const footballCompleted = footballResults
             .filter((match: LiveMatch) => match.league && !match.format)
             .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }));
@@ -121,7 +126,7 @@ async function fetchHeroData() {
         }
         
         if (completedMatches.length > 0) {
-          // Sort by start time (most recent first) and take last 4-5 matches
+          // Sort by start time (most recent first)
           completedMatches.sort((a, b) => {
             const dateA = new Date(a.startTime || 0).getTime();
             const dateB = new Date(b.startTime || 0).getTime();
@@ -131,6 +136,54 @@ async function fetchHeroData() {
         }
       } catch (error) {
         console.error('Error fetching completed matches:', error);
+      }
+      
+      // If no completed matches, try upcoming matches
+      if (allLiveMatches.length === 0) {
+        try {
+          const [cricketFixturesRes, footballFixturesRes] = await Promise.allSettled([
+            fetch(`${base}/api/v1/cricket/matches/fixtures?limit=4`, { cache: 'no-store', next: { revalidate: 300 } }),
+            fetch(`${base}/api/v1/football/matches/fixtures?limit=4`, { cache: 'no-store', next: { revalidate: 300 } }),
+          ]);
+          
+          let upcomingMatches: LiveMatch[] = [];
+          
+          // Fetch cricket upcoming matches
+          if (cricketFixturesRes.status === 'fulfilled' && cricketFixturesRes.value.ok) {
+            const cricketData = await cricketFixturesRes.value.json();
+            const cricketFixtures = Array.isArray(cricketData?.data) 
+              ? cricketData.data 
+              : cricketData?.data?.fixtures || [];
+            const cricketUpcoming = cricketFixtures
+              .filter((match: LiveMatch) => match.format && !match.league)
+              .map((match: LiveMatch) => ({ ...match, status: 'upcoming' as const }));
+            upcomingMatches = [...upcomingMatches, ...cricketUpcoming];
+          }
+          
+          // Fetch football upcoming matches
+          if (footballFixturesRes.status === 'fulfilled' && footballFixturesRes.value.ok) {
+            const footballData = await footballFixturesRes.value.json();
+            const footballFixtures = Array.isArray(footballData?.data) 
+              ? footballData.data 
+              : footballData?.data?.fixtures || [];
+            const footballUpcoming = footballFixtures
+              .filter((match: LiveMatch) => match.league && !match.format)
+              .map((match: LiveMatch) => ({ ...match, status: 'upcoming' as const }));
+            upcomingMatches = [...upcomingMatches, ...footballUpcoming];
+          }
+          
+          if (upcomingMatches.length > 0) {
+            // Sort by start time (soonest first)
+            upcomingMatches.sort((a, b) => {
+              const dateA = new Date(a.startTime || 0).getTime();
+              const dateB = new Date(b.startTime || 0).getTime();
+              return dateA - dateB; // Soonest first
+            });
+            allLiveMatches = upcomingMatches.slice(0, 4);
+          }
+        } catch (error) {
+          console.error('Error fetching upcoming matches:', error);
+        }
       }
     }
 

@@ -4,14 +4,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ArrowUpRight, Clock, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback } from 'react';
 import { Container } from '@/components/ui/Container';
 import { formatDate } from '@/lib/utils';
 import type { Article, LiveMatch } from './HeroSectionWrapper';
 
 interface HeroSectionProps {
-  featuredArticle: Article | null;
-  secondaryArticles: Article[];
-  liveMatches: LiveMatch[];
+  featuredArticle?: Article | null;
+  secondaryArticles?: Article[];
+  liveMatches?: LiveMatch[];
 }
 
 // Realistic demo live cricket matches (Cricinfo-style)
@@ -78,16 +79,95 @@ const placeholderLiveMatches: LiveMatch[] = [
   },
 ];
 
-export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }: HeroSectionProps) {
+export function HeroSection({ featuredArticle: initialFeaturedArticle, secondaryArticles: initialSecondaryArticles, liveMatches: initialLiveMatches }: HeroSectionProps) {
+  const [liveMatches, setLiveMatches] = useState<LiveMatch[]>(initialLiveMatches || []);
+  const [featuredArticle, setFeaturedArticle] = useState<Article | null>(initialFeaturedArticle || null);
+  const [secondaryArticles, setSecondaryArticles] = useState<Article[]>(initialSecondaryArticles || []);
+
+  const fetchHeroData = useCallback(async () => {
+    try {
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      // Use timestamp to bypass backend cache for real-time updates
+      const timestamp = Date.now();
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[HeroSection] Fetching matches at', new Date().toLocaleTimeString());
+      }
+      const [newsRes, cricketLiveRes, footballLiveRes] = await Promise.allSettled([
+        fetch(`${base}/api/v1/news?limit=5&state=published`, { cache: 'no-store', next: { revalidate: 0 } }),
+        fetch(`${base}/api/v1/cricket/matches/live?t=${timestamp}`, { cache: 'no-store', next: { revalidate: 0 } }),
+        fetch(`${base}/api/v1/football/matches/live?t=${timestamp}`, { cache: 'no-store', next: { revalidate: 0 } }),
+      ]);
+
+      // Update articles
+      if (newsRes.status === 'fulfilled' && newsRes.value.ok) {
+        const newsData = await newsRes.value.json();
+        const articles = newsData?.data?.items || [];
+        if (articles.length > 0) {
+          setFeaturedArticle(articles[0]);
+          setSecondaryArticles(articles.slice(1, 4));
+        }
+      }
+
+      // Update live matches
+      let allLiveMatches: LiveMatch[] = [];
+      
+      if (cricketLiveRes.status === 'fulfilled' && cricketLiveRes.value.ok) {
+        const cricketData = await cricketLiveRes.value.json();
+        const cricketMatches = Array.isArray(cricketData?.data) ? cricketData.data : [];
+        const cricketLiveMatches = cricketMatches.filter((match: LiveMatch) => 
+          match.format && !match.league
+        );
+        allLiveMatches = [...allLiveMatches, ...cricketLiveMatches];
+      }
+      
+      if (footballLiveRes.status === 'fulfilled' && footballLiveRes.value.ok) {
+        const footballData = await footballLiveRes.value.json();
+        const footballMatches = Array.isArray(footballData?.data) ? footballData.data : [];
+        const footballLiveMatches = footballMatches.filter((match: LiveMatch) => 
+          match.league && !match.format
+        );
+        allLiveMatches = [...allLiveMatches, ...footballLiveMatches];
+      }
+      
+      if (allLiveMatches.length > 0) {
+        allLiveMatches.sort((a, b) => {
+          if (a.status === 'live' && b.status !== 'live') return -1;
+          if (a.status !== 'live' && b.status === 'live') return 1;
+          return 0;
+        });
+        setLiveMatches(allLiveMatches.slice(0, 4));
+      }
+    } catch (error) {
+      console.error('Error fetching hero data:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Initial fetch
+    fetchHeroData();
+    
+    // Auto-refresh every 15 seconds for live matches
+    const interval = setInterval(() => {
+      fetchHeroData();
+    }, 15000);
+    
+    return () => clearInterval(interval);
+  }, [fetchHeroData]);
+
   const liveHighlights = liveMatches.slice(0, 4);
   const trendingArticles = secondaryArticles.slice(0, 4);
   const hasLiveMatches = liveHighlights.length > 0 && liveHighlights.some(m => m.status === 'live');
   const hasCompletedMatches = liveHighlights.length > 0 && liveHighlights.some(m => m.status === 'completed');
+  const hasUpcomingMatches = liveHighlights.length > 0 && liveHighlights.some(m => m.status === 'upcoming');
   const hasAnyMatches = liveHighlights.length > 0;
+  
   // Always show matches - use demo if no real matches available
   const matchesToRender = hasAnyMatches ? liveHighlights : placeholderLiveMatches;
+  
   // Update status indicators based on what we're showing
   const showingLiveMatches = hasLiveMatches || (!hasAnyMatches && placeholderLiveMatches.some(m => m.status === 'live'));
+  const showingCompletedMatches = hasCompletedMatches && !hasLiveMatches;
+  const showingUpcomingMatches = hasUpcomingMatches && !hasLiveMatches && !hasCompletedMatches;
 
   return (
     <>
@@ -113,11 +193,27 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-white/70">
-                  <span className={`live-dot ${showingLiveMatches ? 'bg-red-500 animate-pulse' : hasCompletedMatches ? 'bg-gray-400' : 'bg-primary-400'}`} />
-                  {showingLiveMatches ? 'Live Matches' : hasCompletedMatches ? 'Recent Results' : hasAnyMatches ? 'Upcoming Matches' : 'Live Cricket Scores'}
+                  <span className={`live-dot ${showingLiveMatches ? 'bg-red-500 animate-pulse' : showingCompletedMatches ? 'bg-gray-400' : showingUpcomingMatches ? 'bg-blue-400' : 'bg-primary-400'}`} />
+                  {showingLiveMatches 
+                    ? 'Live Matches' 
+                    : showingCompletedMatches 
+                    ? 'Recent Results' 
+                    : showingUpcomingMatches 
+                    ? 'Upcoming Matches' 
+                    : hasAnyMatches 
+                    ? 'Matches' 
+                    : 'Live Cricket Scores'}
                 </div>
                 <Link href="/fixtures" className="inline-flex items-center gap-1 text-sm font-semibold text-white/80 transition-standard hover:text-white">
-                  {showingLiveMatches ? 'View schedule' : hasAnyMatches ? 'See full calendar' : 'Browse fixtures'}
+                  {showingLiveMatches 
+                    ? 'View schedule' 
+                    : showingCompletedMatches 
+                    ? 'View all results' 
+                    : showingUpcomingMatches 
+                    ? 'See full calendar' 
+                    : hasAnyMatches 
+                    ? 'See full calendar' 
+                    : 'Browse fixtures'}
                   <ArrowUpRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -169,6 +265,8 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
                           // Determine score display
                           let scoreDisplay = '—';
                           let oversDisplay = '';
+                          const isCompleted = match.status === 'completed';
+                          const isUpcoming = match.status === 'upcoming';
                           
                           if (isLive && teamScore) {
                             if (isFootball) {
@@ -179,11 +277,24 @@ export function HeroSection({ featuredArticle, secondaryArticles, liveMatches }:
                                 oversDisplay = `${teamScore.overs.toFixed(1)} ov`;
                               }
                             }
+                          } else if (isCompleted && teamScore) {
+                            // For completed matches, show final score
+                            if (isFootball) {
+                              scoreDisplay = teamScore.runs?.toString() || '0';
+                            } else {
+                              scoreDisplay = `${teamScore.runs}/${teamScore.wickets}`;
+                              if (teamScore.overs > 0) {
+                                oversDisplay = `${teamScore.overs.toFixed(1)} ov`;
+                              }
+                            }
                           } else if (match.score) {
                             scoreDisplay = match.score[side]?.toString() || '—';
+                          } else if (isUpcoming) {
+                            scoreDisplay = '—';
+                            oversDisplay = 'TBD';
                           }
                           
-                          // Determine if this team is batting (for cricket)
+                          // Determine if this team is batting (for cricket) - only for live matches
                           const isBatting = isLive && !isFootball && teamScore && teamScore.overs > 0;
                           
                           return (
