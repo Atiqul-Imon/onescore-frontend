@@ -13,6 +13,8 @@ import { CompletedMatchView } from '@/components/cricket/CompletedMatchView';
 import { MatchHeader } from '@/components/cricket/MatchHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { MatchHeaderSkeleton, LiveScoreSkeleton, ScorecardSkeleton } from '@/components/ui/Skeleton';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { BarChart3, MessageSquare, Trophy } from 'lucide-react';
 import { useSocket } from '@/contexts/SocketContext';
 
@@ -261,10 +263,12 @@ export default function MatchDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <Container size="2xl">
-          <div className="flex items-center justify-center py-20">
-            <LoadingSpinner size="lg" />
+      <div className="min-h-screen bg-gray-50">
+        <MatchHeaderSkeleton />
+        <Container size="2xl" className="py-8">
+          <div className="space-y-6">
+            <LiveScoreSkeleton />
+            <ScorecardSkeleton />
           </div>
         </Container>
       </div>
@@ -275,10 +279,14 @@ export default function MatchDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <Container size="2xl">
-          <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center">
-            <h2 className="text-xl font-semibold text-red-900 mb-2">Match Not Found</h2>
-            <p className="text-red-700">{error || 'The match you are looking for does not exist.'}</p>
-          </div>
+          <ErrorState
+            title="Match Not Found"
+            message={error || 'The match you are looking for does not exist or may have been removed.'}
+            showHomeButton
+            showBackButton
+            backHref="/"
+            onRetry={() => window.location.reload()}
+          />
         </Container>
       </div>
     );

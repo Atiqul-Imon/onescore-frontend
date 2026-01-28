@@ -88,18 +88,18 @@ export function MatchStats({ batting, bowling, teams, matchId }: MatchStatsProps
       {/* Batting Statistics */}
       {validBatting.length > 0 && (
         <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-4 sm:px-6 py-3 sm:py-4">
-            <div className="flex items-center gap-2 sm:gap-3 text-white">
-              <Target className="h-4 w-4 sm:h-5 sm:w-5 text-primary-100 flex-shrink-0" />
-              <span className="font-bold text-base sm:text-lg">Batting Statistics</span>
+          <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 md:py-4">
+            <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 text-white">
+              <Target className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 text-primary-100 flex-shrink-0" />
+              <span className="font-bold text-sm sm:text-base md:text-lg">Batting Statistics</span>
             </div>
           </div>
 
-          <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+          <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 md:space-y-8">
             {/* Home Team Batting */}
             {homeBatting.length > 0 && (
               <div>
-                <h3 className="text-xs sm:text-sm font-bold text-gray-700 uppercase tracking-wide mb-3 sm:mb-4 pb-2 border-b-2 border-gray-200">
+                <h3 className="text-[11px] sm:text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide mb-2.5 sm:mb-3 md:mb-4 pb-2 border-b-2 border-gray-200">
                   {matchId ? (
                     <Link 
                       href={`/cricket/match/${matchId}/team/${encodeURIComponent(teams.home.name.toLowerCase().replace(/\s+/g, '-'))}`}
@@ -111,43 +111,43 @@ export function MatchStats({ batting, bowling, teams, matchId }: MatchStatsProps
                     <span className="break-words">{teams.home.name}</span>
                   )}
                 </h3>
-                <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <div className="overflow-x-auto -mx-4 sm:mx-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                   <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                     <table className="min-w-full divide-y divide-gray-100">
-                      <thead>
-                        <tr className="border-b border-gray-200">
-                          <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">Batter</th>
-                          <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">R</th>
-                          <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">B</th>
-                          <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">4s</th>
-                          <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">6s</th>
-                          <th className="text-right py-2 sm:py-3 px-2 sm:px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">SR</th>
+                      <thead className="bg-gray-50 sticky top-0 z-20">
+                        <tr className="border-b-2 border-gray-200">
+                          <th className="text-left py-2.5 sm:py-3 px-2.5 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 sticky left-0 z-30 min-w-[120px] sm:min-w-[140px] shadow-[2px_0_2px_rgba(0,0,0,0.05)]">Batter</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[40px] sm:min-w-[50px]">R</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[40px] sm:min-w-[50px]">B</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[35px] sm:min-w-[50px]">4s</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[35px] sm:min-w-[50px]">6s</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px] sm:min-w-[60px]">SR</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-100">
+                      <tbody className="divide-y divide-gray-100 bg-white">
                         {homeBatting.map((player, index) => (
                           <tr 
                             key={player.playerId || index} 
                             className={`hover:bg-gray-50 transition-colors ${!player.isOut ? 'bg-green-50/50' : ''}`}
                           >
-                            <td className="py-3 sm:py-4 px-3 sm:px-4 bg-white sticky left-0 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
-                              <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-                                <span className="font-semibold text-gray-900 text-xs sm:text-sm truncate">{player.playerName}</span>
+                            <td className="py-2.5 sm:py-3 px-2.5 sm:px-4 bg-inherit sticky left-0 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.08)] min-w-[120px] sm:min-w-[140px]">
+                              <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+                                <span className="font-semibold text-gray-900 text-[11px] sm:text-sm truncate flex-1">{player.playerName}</span>
                                 {!player.isOut && (
-                                  <span className="text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-green-500 text-white font-bold flex-shrink-0 animate-pulse">
+                                  <span className="text-[9px] sm:text-xs px-1 sm:px-1.5 py-0.5 rounded-full bg-green-500 text-white font-bold flex-shrink-0 animate-pulse">
                                     *
                                   </span>
                                 )}
                               </div>
                             </td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4">
-                              <span className="font-bold text-secondary-900 text-sm sm:text-base tabular-nums">{player.runs}</span>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4">
+                              <span className="font-bold text-secondary-900 text-xs sm:text-base tabular-nums">{player.runs}</span>
                             </td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.balls}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.fours}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.sixes}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4">
-                              <span className="font-semibold text-primary-700 text-xs sm:text-sm tabular-nums">{player.strikeRate.toFixed(1)}</span>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.balls}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.fours}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.sixes}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4">
+                              <span className="font-semibold text-primary-700 text-[11px] sm:text-sm tabular-nums">{player.strikeRate.toFixed(1)}</span>
                             </td>
                           </tr>
                         ))}
@@ -169,43 +169,43 @@ export function MatchStats({ batting, bowling, teams, matchId }: MatchStatsProps
                     {teams.away.name}
                   </Link>
                 </h3>
-                <div className="overflow-x-auto -mx-4 sm:mx-0 scrollbar-hide">
+                <div className="overflow-x-auto -mx-4 sm:mx-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                   <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                     <table className="min-w-full divide-y divide-gray-100">
-                      <thead className="bg-gray-50 sticky top-0 z-10">
+                      <thead className="bg-gray-50 sticky top-0 z-20">
                         <tr className="border-b-2 border-gray-200">
-                          <th className="text-left py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 sticky left-0 z-20 min-w-[140px]">Batter</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">R</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">B</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">4s</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">6s</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[60px]">SR</th>
+                          <th className="text-left py-2.5 sm:py-3 px-2.5 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 sticky left-0 z-30 min-w-[120px] sm:min-w-[140px] shadow-[2px_0_2px_rgba(0,0,0,0.05)]">Batter</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[40px] sm:min-w-[50px]">R</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[40px] sm:min-w-[50px]">B</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[35px] sm:min-w-[50px]">4s</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[35px] sm:min-w-[50px]">6s</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px] sm:min-w-[60px]">SR</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-100">
+                      <tbody className="divide-y divide-gray-100 bg-white">
                         {awayBatting.map((player, index) => (
                           <tr 
                             key={player.playerId || index} 
                             className={`hover:bg-gray-50 transition-colors ${!player.isOut ? 'bg-green-50/50' : ''}`}
                           >
-                            <td className="py-3 sm:py-4 px-3 sm:px-4 bg-white sticky left-0 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
-                              <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-                                <span className="font-semibold text-gray-900 text-xs sm:text-sm truncate">{player.playerName}</span>
+                            <td className="py-2.5 sm:py-3 px-2.5 sm:px-4 bg-inherit sticky left-0 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.08)] min-w-[120px] sm:min-w-[140px]">
+                              <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+                                <span className="font-semibold text-gray-900 text-[11px] sm:text-sm truncate flex-1">{player.playerName}</span>
                                 {!player.isOut && (
-                                  <span className="text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-green-500 text-white font-bold flex-shrink-0 animate-pulse">
+                                  <span className="text-[9px] sm:text-xs px-1 sm:px-1.5 py-0.5 rounded-full bg-green-500 text-white font-bold flex-shrink-0 animate-pulse">
                                     *
                                   </span>
                                 )}
                               </div>
                             </td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4">
-                              <span className="font-bold text-secondary-900 text-sm sm:text-base tabular-nums">{player.runs}</span>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4">
+                              <span className="font-bold text-secondary-900 text-xs sm:text-base tabular-nums">{player.runs}</span>
                             </td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.balls}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.fours}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.sixes}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4">
-                              <span className="font-semibold text-primary-700 text-xs sm:text-sm tabular-nums">{player.strikeRate.toFixed(1)}</span>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.balls}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.fours}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.sixes}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4">
+                              <span className="font-semibold text-primary-700 text-[11px] sm:text-sm tabular-nums">{player.strikeRate.toFixed(1)}</span>
                             </td>
                           </tr>
                         ))}
@@ -222,18 +222,18 @@ export function MatchStats({ batting, bowling, teams, matchId }: MatchStatsProps
       {/* Bowling Statistics */}
       {validBowling.length > 0 && (
         <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-secondary-800 via-secondary-900 to-secondary-800 px-4 sm:px-6 py-3 sm:py-4">
-            <div className="flex items-center gap-2 sm:gap-3 text-white">
-              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary-400 flex-shrink-0" />
-              <span className="font-bold text-base sm:text-lg">Bowling Statistics</span>
+          <div className="bg-gradient-to-r from-secondary-800 via-secondary-900 to-secondary-800 px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 md:py-4">
+            <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 text-white">
+              <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 text-primary-400 flex-shrink-0" />
+              <span className="font-bold text-sm sm:text-base md:text-lg">Bowling Statistics</span>
             </div>
           </div>
 
-          <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+          <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 md:space-y-8">
             {/* Home Team Bowling */}
             {homeBowling.length > 0 && (
               <div>
-                <h3 className="text-xs sm:text-sm font-bold text-gray-700 uppercase tracking-wide mb-3 sm:mb-4 pb-2 border-b-2 border-gray-200">
+                <h3 className="text-[11px] sm:text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wide mb-2.5 sm:mb-3 md:mb-4 pb-2 border-b-2 border-gray-200">
                   {matchId ? (
                     <Link 
                       href={`/cricket/match/${matchId}/team/${encodeURIComponent(teams.home.name.toLowerCase().replace(/\s+/g, '-'))}`}
@@ -245,33 +245,33 @@ export function MatchStats({ batting, bowling, teams, matchId }: MatchStatsProps
                     <span className="break-words">{teams.home.name}</span>
                   )}
                 </h3>
-                <div className="overflow-x-auto -mx-4 sm:mx-0 scrollbar-hide">
+                <div className="overflow-x-auto -mx-4 sm:mx-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                   <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                     <table className="min-w-full divide-y divide-gray-100">
-                      <thead className="bg-gray-50 sticky top-0 z-10">
+                      <thead className="bg-gray-50 sticky top-0 z-20">
                         <tr className="border-b-2 border-gray-200">
-                          <th className="text-left py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 sticky left-0 z-20 min-w-[140px]">Bowler</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">O</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">M</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">R</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">W</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[60px]">Econ</th>
+                          <th className="text-left py-2.5 sm:py-3 px-2.5 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 sticky left-0 z-30 min-w-[120px] sm:min-w-[140px] shadow-[2px_0_2px_rgba(0,0,0,0.05)]">Bowler</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[40px] sm:min-w-[50px]">O</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[35px] sm:min-w-[50px]">M</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[40px] sm:min-w-[50px]">R</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[40px] sm:min-w-[50px]">W</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[55px] sm:min-w-[60px]">Econ</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-100">
+                      <tbody className="divide-y divide-gray-100 bg-white">
                         {homeBowling.map((player, index) => (
                           <tr key={player.playerId || index} className="hover:bg-gray-50 transition-colors">
-                            <td className="py-3 sm:py-4 px-3 sm:px-4 bg-white sticky left-0 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
-                              <span className="font-semibold text-gray-900 text-xs sm:text-sm truncate block">{player.playerName}</span>
+                            <td className="py-2.5 sm:py-3 px-2.5 sm:px-4 bg-inherit sticky left-0 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.08)] min-w-[120px] sm:min-w-[140px]">
+                              <span className="font-semibold text-gray-900 text-[11px] sm:text-sm truncate block">{player.playerName}</span>
                             </td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.overs.toFixed(1)}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.maidens}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.runs}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4">
-                              <span className="font-bold text-secondary-900 text-sm sm:text-base tabular-nums">{player.wickets}</span>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.overs.toFixed(1)}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.maidens}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.runs}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4">
+                              <span className="font-bold text-secondary-900 text-xs sm:text-base tabular-nums">{player.wickets}</span>
                             </td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4">
-                              <span className="font-semibold text-primary-700 text-xs sm:text-sm tabular-nums">{player.economy.toFixed(2)}</span>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4">
+                              <span className="font-semibold text-primary-700 text-[11px] sm:text-sm tabular-nums">{player.economy.toFixed(2)}</span>
                             </td>
                           </tr>
                         ))}
@@ -293,33 +293,33 @@ export function MatchStats({ batting, bowling, teams, matchId }: MatchStatsProps
                     {teams.away.name}
                   </Link>
                 </h3>
-                <div className="overflow-x-auto -mx-4 sm:mx-0 scrollbar-hide">
+                <div className="overflow-x-auto -mx-4 sm:mx-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                   <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                     <table className="min-w-full divide-y divide-gray-100">
-                      <thead className="bg-gray-50 sticky top-0 z-10">
+                      <thead className="bg-gray-50 sticky top-0 z-20">
                         <tr className="border-b-2 border-gray-200">
-                          <th className="text-left py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 sticky left-0 z-20 min-w-[140px]">Bowler</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">O</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">M</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">R</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[50px]">W</th>
-                          <th className="text-right py-3 sm:py-4 px-3 sm:px-4 text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[60px]">Econ</th>
+                          <th className="text-left py-2.5 sm:py-3 px-2.5 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 sticky left-0 z-30 min-w-[120px] sm:min-w-[140px] shadow-[2px_0_2px_rgba(0,0,0,0.05)]">Bowler</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[40px] sm:min-w-[50px]">O</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[35px] sm:min-w-[50px]">M</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[40px] sm:min-w-[50px]">R</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[40px] sm:min-w-[50px]">W</th>
+                          <th className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-[10px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider bg-gray-50 min-w-[55px] sm:min-w-[60px]">Econ</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-100">
+                      <tbody className="divide-y divide-gray-100 bg-white">
                         {awayBowling.map((player, index) => (
                           <tr key={player.playerId || index} className="hover:bg-gray-50 transition-colors">
-                            <td className="py-3 sm:py-4 px-3 sm:px-4 bg-white sticky left-0 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
-                              <span className="font-semibold text-gray-900 text-xs sm:text-sm truncate block">{player.playerName}</span>
+                            <td className="py-2.5 sm:py-3 px-2.5 sm:px-4 bg-inherit sticky left-0 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.08)] min-w-[120px] sm:min-w-[140px]">
+                              <span className="font-semibold text-gray-900 text-[11px] sm:text-sm truncate block">{player.playerName}</span>
                             </td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.overs.toFixed(1)}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.maidens}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4 text-gray-600 text-xs sm:text-sm tabular-nums">{player.runs}</td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4">
-                              <span className="font-bold text-secondary-900 text-sm sm:text-base tabular-nums">{player.wickets}</span>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.overs.toFixed(1)}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.maidens}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4 text-gray-600 text-[11px] sm:text-sm tabular-nums">{player.runs}</td>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4">
+                              <span className="font-bold text-secondary-900 text-xs sm:text-base tabular-nums">{player.wickets}</span>
                             </td>
-                            <td className="text-right py-3 sm:py-4 px-3 sm:px-4">
-                              <span className="font-semibold text-primary-700 text-xs sm:text-sm tabular-nums">{player.economy.toFixed(2)}</span>
+                            <td className="text-right py-2.5 sm:py-3 px-2 sm:px-4">
+                              <span className="font-semibold text-primary-700 text-[11px] sm:text-sm tabular-nums">{player.economy.toFixed(2)}</span>
                             </td>
                           </tr>
                         ))}

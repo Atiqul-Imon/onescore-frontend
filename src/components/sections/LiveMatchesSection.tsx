@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Clock, Users, Trophy, TrendingUp } from 'lucide-react';
-import { LoadingMatchCard } from '@/components/ui/LoadingSpinner';
+import { LoadingMatchCard, MatchCardSkeleton } from '@/components/ui/LoadingSpinner';
+import { ErrorState, ErrorStateCompact } from '@/components/ui/ErrorState';
+import { EmptyStateNoMatches } from '@/components/ui/EmptyState';
 import { Container, Button, Card } from '@/components/ui';
 import { formatTime, formatRelativeTime } from '@/lib/utils';
 
@@ -312,6 +314,21 @@ export function LiveMatchesSection() {
         return 'View Details';
       };
 
+  if (error && !loading) {
+    return (
+      <section className="section-padding bg-gradient-to-b from-white via-gray-50 to-white">
+        <Container size="2xl">
+          <ErrorState
+            title="Failed to Load Matches"
+            message="We couldn't fetch the latest matches. Please check your connection and try again."
+            error={error}
+            onRetry={fetchMatches}
+          />
+        </Container>
+      </section>
+    );
+  }
+
   if (loading) {
     return (
       <section className="section-padding bg-gradient-to-b from-white via-gray-50 to-white">
@@ -336,18 +353,6 @@ export function LiveMatchesSection() {
     );
   }
 
-  if (error) {
-    return (
-      <section className="section-padding bg-gradient-to-b from-white via-gray-50 to-white">
-        <Container size="2xl">
-          <div className="surface-panel text-center p-10">
-            <h2 className="heading-2 mb-4">Live Matches</h2>
-            <p className="text-red-600">{error}</p>
-          </div>
-        </Container>
-      </section>
-    );
-  }
 
   return (
     <section className="section-padding bg-gradient-to-b from-white via-gray-50 to-white">
@@ -383,15 +388,7 @@ export function LiveMatchesSection() {
         </motion.div>
 
         {matches.length === 0 && !loading ? (
-          <div className="surface-panel text-center p-12">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
-              <Clock className="h-10 w-10 text-gray-400" />
-            </div>
-            <h3 className="heading-4 mb-2">No matches available right now</h3>
-            <p className="body-text text-gray-600">
-              Check back later or explore our fixture calendar to plan what to watch next.
-            </p>
-          </div>
+          <EmptyStateNoMatches />
         ) : matches.length > 0 ? (
           <div className="card-grid-3">
             {matches.map((match, index) => {
