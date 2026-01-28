@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import { HeroSectionWrapper } from '@/components/sections/HeroSectionWrapper';
 import { LiveMatchesSection } from '@/components/sections/LiveMatchesSection';
 import { FeaturedContentSection } from '@/components/sections/FeaturedContentSection';
-import { UpcomingFixturesSection } from '@/components/sections/UpcomingFixturesSection';
 import { NewsSection } from '@/components/sections/NewsSection';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
@@ -58,11 +57,6 @@ export default function HomePage() {
       {/* Live Matches Section */}
       <Suspense fallback={<LoadingSpinner />}>
         <LiveMatchesSection />
-      </Suspense>
-      
-      {/* Upcoming Fixtures Section */}
-      <Suspense fallback={<LoadingSpinner />}>
-        <UpcomingFixturesSection />
       </Suspense>
       
       {/* Featured Content Section */}

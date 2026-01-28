@@ -39,6 +39,11 @@ const nextConfig = {
         hostname: 'ik.imagekit.io',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.sportmonks.com',
+        pathname: '/**',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
   },
