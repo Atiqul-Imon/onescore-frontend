@@ -208,11 +208,8 @@ export default function MatchDetailPage() {
     // Initial fetch
     fetchMatchDetails();
 
-    // Set up WebSocket subscription for live matches
-    if (socket && isConnected) {
-      // Subscribe to match updates
-      socket.emit('subscribe:match', { matchId, sport: 'cricket' });
-      
+    // Set up WebSocket subscription for live matches (WebSocket only, no polling)
+    if (socket) {
       // Listen for match updates from WebSocket
       const handleMatchUpdate = (updatedMatch: MatchDetails) => {
         console.log('[MatchDetail] WebSocket update received:', updatedMatch);
@@ -223,19 +220,34 @@ export default function MatchDetailPage() {
 
       socket.on('match-update', handleMatchUpdate);
 
+      // Subscribe to match updates (subscribe immediately if connected, or wait for connection)
+      let connectHandler: (() => void) | null = null;
+      
+      if (isConnected) {
+        socket.emit('subscribe:match', { matchId, sport: 'cricket' });
+        console.log('[MatchDetail] Subscribed to WebSocket for match:', matchId);
+      } else {
+        // Wait for connection then subscribe
+        connectHandler = () => {
+          console.log('[MatchDetail] WebSocket connected, subscribing to match');
+          socket.emit('subscribe:match', { matchId, sport: 'cricket' });
+        };
+        socket.on('connect', connectHandler);
+      }
+
       // Cleanup on unmount
       return () => {
         socket.off('match-update', handleMatchUpdate);
-        socket.emit('unsubscribe:match', { matchId, sport: 'cricket' });
+        if (connectHandler) {
+          socket.off('connect', connectHandler);
+        }
+        if (isConnected) {
+          socket.emit('unsubscribe:match', { matchId, sport: 'cricket' });
+        }
       };
     } else {
-      // Fallback to polling if WebSocket is not available
-      console.log('[MatchDetail] WebSocket not available, using polling fallback');
-      const interval = setInterval(() => {
-        fetchMatchDetails();
-      }, 25000); // 25 seconds polling as fallback
-
-      return () => clearInterval(interval);
+      // WebSocket will be available once SocketContext initializes
+      // No action needed - SocketContext handles connection
     }
   }, [matchId, socket, isConnected]);
 

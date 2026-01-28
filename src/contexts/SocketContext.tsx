@@ -72,7 +72,16 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     }
     
     // Connect to /live namespace (matches backend WebSocketGateway namespace)
+    // Updated: WebSocket connection for real-time match updates
     const socketUrl = `${wsUrl}/live`;
+    
+    console.log('[SocketContext] Connecting to WebSocket:', {
+      url: socketUrl,
+      wsUrl,
+      apiUrl: process.env.NEXT_PUBLIC_API_URL,
+      env: process.env.NODE_ENV,
+      hostname: typeof window !== 'undefined' ? window.location.hostname : 'server',
+    });
     
     const newSocket = io(socketUrl, {
       transports: ['polling', 'websocket'], // Try polling first, then upgrade to websocket
@@ -93,8 +102,13 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     });
 
     newSocket.on('connect_error', (error) => {
-      // Silently handle connection errors - backend may not be running
+      // Log connection errors for debugging
       setIsConnected(false);
+      console.error('[SocketContext] WebSocket connection error:', {
+        message: error.message,
+        url: socketUrl,
+        timestamp: new Date().toISOString(),
+      });
       devWarn('Socket connection unavailable:', error.message);
     });
 
