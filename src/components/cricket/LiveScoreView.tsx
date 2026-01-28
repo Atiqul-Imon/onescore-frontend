@@ -1,8 +1,10 @@
 'use client';
 
 import { Card } from '@/components/ui/Card';
-import { Trophy, Clock, Users, Target } from 'lucide-react';
+import { Trophy, Clock, Users, Target, TrendingUp, TrendingDown, Zap } from 'lucide-react';
 import { formatTime } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 interface LiveScoreViewProps {
   match: {
@@ -78,6 +80,29 @@ interface LiveScoreViewProps {
 export function LiveScoreView({ match }: LiveScoreViewProps) {
   const isLive = match.status === 'live';
   const isCompleted = match.status === 'completed';
+  const [previousScore, setPreviousScore] = useState<{ home?: number; away?: number } | null>(null);
+  const [scoreChanged, setScoreChanged] = useState<{ home: boolean; away: boolean }>({ home: false, away: false });
+
+  // Track score changes for animation
+  useEffect(() => {
+    if (isLive && match.currentScore) {
+      const currentHome = match.currentScore.home?.runs;
+      const currentAway = match.currentScore.away?.runs;
+      
+      if (previousScore) {
+        if (currentHome !== previousScore.home) {
+          setScoreChanged({ ...scoreChanged, home: true });
+          setTimeout(() => setScoreChanged({ ...scoreChanged, home: false }), 1000);
+        }
+        if (currentAway !== previousScore.away) {
+          setScoreChanged({ ...scoreChanged, away: true });
+          setTimeout(() => setScoreChanged({ ...scoreChanged, away: false }), 1000);
+        }
+      }
+      
+      setPreviousScore({ home: currentHome, away: currentAway });
+    }
+  }, [match.currentScore, isLive]);
 
   if (!isLive && !isCompleted) {
     return (
@@ -118,6 +143,29 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
     ? ((awayScore.runs / ((awayScore.overs * 6) + awayScore.balls)) * 6).toFixed(2)
     : null;
 
+  // Determine if run rate is good (green) or poor (red)
+  const getRRColor = (rr: string | null, required: string | null) => {
+    if (!rr || !required) return 'text-gray-900';
+    const rrNum = parseFloat(rr);
+    const reqNum = parseFloat(required);
+    if (rrNum >= reqNum * 0.95) return 'text-green-600 font-bold';
+    if (rrNum >= reqNum * 0.85) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getRRBadge = (rr: string | null, required: string | null) => {
+    if (!rr || !required) return null;
+    const rrNum = parseFloat(rr);
+    const reqNum = parseFloat(required);
+    if (rrNum >= reqNum) {
+      return <TrendingUp className="h-3 w-3 text-green-600" />;
+    }
+    if (rrNum < reqNum * 0.85) {
+      return <TrendingDown className="h-3 w-3 text-red-600" />;
+    }
+    return null;
+  };
+
   return (
     <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
       <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-4 sm:px-6 py-3 sm:py-4">
@@ -147,8 +195,22 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
               </div>
             </div>
             {homeScore && (
-              <div className="text-right flex-shrink-0">
-                <div className="text-2xl sm:text-3xl font-bold text-secondary-900">
+              <motion.div 
+                className="text-right flex-shrink-0"
+                animate={scoreChanged.home ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="text-2xl sm:text-3xl font-bold text-secondary-900 tabular-nums flex items-center justify-end gap-1">
+                  {scoreChanged.home && (
+                    <motion.span
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="text-primary-600"
+                    >
+                      <Zap className="h-4 w-4" />
+                    </motion.span>
+                  )}
                   {homeScore.runs}
                   {homeScore.wickets !== undefined && (
                     <span className="text-lg sm:text-xl text-gray-600 font-normal">/{homeScore.wickets}</span>
@@ -159,7 +221,7 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                     {homeScore.overs}.{homeScore.balls} overs
                   </div>
                 )}
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
@@ -175,8 +237,22 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
               </div>
             </div>
             {awayScore && (
-              <div className="text-right flex-shrink-0">
-                <div className="text-2xl sm:text-3xl font-bold text-secondary-900">
+              <motion.div 
+                className="text-right flex-shrink-0"
+                animate={scoreChanged.away ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="text-2xl sm:text-3xl font-bold text-secondary-900 tabular-nums flex items-center justify-end gap-1">
+                  {scoreChanged.away && (
+                    <motion.span
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="text-primary-600"
+                    >
+                      <Zap className="h-4 w-4" />
+                    </motion.span>
+                  )}
                   {awayScore.runs}
                   {awayScore.wickets !== undefined && (
                     <span className="text-lg sm:text-xl text-gray-600 font-normal">/{awayScore.wickets}</span>
@@ -187,7 +263,7 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                     {awayScore.overs}.{awayScore.balls} overs
                   </div>
                 )}
-              </div>
+              </motion.div>
             )}
           </div>
 
@@ -203,15 +279,22 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                   </div>
                 )}
                 {requiredRR && (
-                  <div className="px-4 py-2 rounded-lg bg-gray-50">
-                    <span className="text-xs text-gray-600 block">Required RR</span>
-                    <span className="text-sm font-semibold text-gray-900">{requiredRR}</span>
+                  <div className="px-4 py-2 rounded-lg bg-gray-50 border border-gray-200">
+                    <span className="text-xs text-gray-600 block mb-0.5">Required RR</span>
+                    <span className="text-sm font-bold text-gray-900 tabular-nums">{requiredRR}</span>
                   </div>
                 )}
                 {currentRR && (
-                  <div className="px-4 py-2 rounded-lg bg-gray-50">
-                    <span className="text-xs text-gray-600 block">Current RR</span>
-                    <span className="text-sm font-semibold text-gray-900">{currentRR}</span>
+                  <div className={`px-4 py-2 rounded-lg border ${getRRColor(currentRR, requiredRR || null).includes('green') ? 'bg-green-50 border-green-200' : getRRColor(currentRR, requiredRR || null).includes('red') ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'}`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <span className="text-xs text-gray-600 block mb-0.5">Current RR</span>
+                        <span className={`text-sm font-bold tabular-nums ${getRRColor(currentRR, requiredRR || null)}`}>
+                          {currentRR}
+                        </span>
+                      </div>
+                      {getRRBadge(currentRR, requiredRR || null)}
+                    </div>
                   </div>
                 )}
               </div>

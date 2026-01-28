@@ -9,10 +9,11 @@ import { MatchCommentary } from '@/components/cricket/MatchCommentary';
 import { MatchInfo } from '@/components/cricket/MatchInfo';
 import { MatchStats } from '@/components/cricket/MatchStats';
 import { LiveScoreView } from '@/components/cricket/LiveScoreView';
+import { CompletedMatchView } from '@/components/cricket/CompletedMatchView';
+import { MatchHeader } from '@/components/cricket/MatchHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { ArrowLeft, RefreshCw, Calendar, MapPin, Trophy, BarChart3, MessageSquare } from 'lucide-react';
-import Link from 'next/link';
+import { BarChart3, MessageSquare, Trophy } from 'lucide-react';
 import { useSocket } from '@/contexts/SocketContext';
 
 interface MatchDetails {
@@ -138,6 +139,13 @@ interface MatchDetails {
     balls: number;
     fowScore?: number;
     fowBalls?: number;
+  };
+  result?: {
+    winner: 'home' | 'away';
+    winnerName: string;
+    margin: number;
+    marginType: 'runs' | 'wickets';
+    resultText: string;
   };
 }
 
@@ -276,81 +284,14 @@ export default function MatchDetailPage() {
     );
   }
 
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Header Section - Cricinfo Style */}
-      <div className="bg-gradient-to-b from-secondary-900 via-secondary-800 to-secondary-900 text-white">
-        <Container size="2xl" className="py-4 sm:py-6">
-          {/* Back Button */}
-          <Link 
-            href="/" 
-            className="inline-flex items-center gap-1.5 sm:gap-2 text-white/80 hover:text-white transition-colors mb-3 sm:mb-4 text-xs sm:text-sm font-medium"
-          >
-            <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline">Back to Home</span>
-            <span className="xs:hidden">Back</span>
-          </Link>
-
-          {/* Match Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-white/70 mb-2 sm:mb-3">
-              <span className="inline-flex items-center gap-1.5 sm:gap-2">
-                <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-400 flex-shrink-0" />
-                <span className="truncate">{match.series || 'Cricket Match'}</span>
-              </span>
-              <span className="hidden sm:inline">•</span>
-              <span className="px-2 py-0.5 sm:py-1 rounded bg-white/10 text-white/90 font-medium text-xs sm:text-sm">
-                {match.format?.toUpperCase() || 'MATCH'}
-              </span>
-              {match.status === 'live' && (
-                <>
-                  <span className="hidden sm:inline">•</span>
-                  <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-red-500/20 border border-red-400/30 text-red-300 font-semibold text-xs sm:text-sm">
-                    <span className="live-dot bg-red-500 animate-pulse" />
-                    LIVE
-                  </span>
-                </>
-              )}
-            </div>
-            
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
-              <span className="block sm:inline">{match.teams.home.name}</span>
-              <span className="hidden sm:inline text-white/60 font-normal mx-2">vs</span>
-              <span className="sm:hidden text-white/60 font-normal mx-1.5">v</span>
-              <span className="block sm:inline">{match.teams.away.name}</span>
-            </h1>
-            
-            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-white/80">
-              <span className="inline-flex items-center gap-1.5 sm:gap-2">
-                <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                <span className="truncate">{match.venue.name}, {match.venue.city}</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 sm:gap-2">
-                <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                <span className="hidden sm:inline">
-                  {new Date(match.startTime).toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </span>
-                <span className="sm:hidden">
-                  {new Date(match.startTime).toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
-                </span>
-              </span>
-            </div>
-          </motion.div>
-        </Container>
-      </div>
+      {/* Enhanced Match Header */}
+      <MatchHeader match={match} onRefresh={handleRefresh} />
 
       {/* Main Content */}
       <Container size="2xl" className="py-4 sm:py-6 lg:py-8">
@@ -360,7 +301,7 @@ export default function MatchDetailPage() {
           <div className="lg:col-span-2">
             <Tabs
               tabs={[
-                { id: 'live', label: 'Live', icon: <Trophy className="h-4 w-4" /> },
+                { id: 'live', label: match.status === 'completed' ? 'Summary' : 'Live', icon: <Trophy className="h-4 w-4" /> },
                 { id: 'scorecard', label: 'Scorecard', icon: <BarChart3 className="h-4 w-4" /> },
                 ...(match.status === 'live' ? [{ id: 'commentary', label: 'Commentary', icon: <MessageSquare className="h-4 w-4" /> }] : []),
               ]}
@@ -368,6 +309,10 @@ export default function MatchDetailPage() {
             >
               {(activeTab) => {
                 if (activeTab === 'live') {
+                  // Show completed match view for completed matches, live view for live matches
+                  if (match.status === 'completed') {
+                    return <CompletedMatchView match={match} />;
+                  }
                   // Live tab: Show clean, focused live score view
                   return <LiveScoreView match={match} />;
                 }

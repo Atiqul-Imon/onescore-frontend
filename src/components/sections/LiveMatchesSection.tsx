@@ -394,23 +394,23 @@ export function LiveMatchesSection() {
           </div>
         ) : matches.length > 0 ? (
           <div className="card-grid-3">
-            {matches.map((match, index) => (
-              <motion.div
-                key={match._id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-              >
+            {matches.map((match, index) => {
+              // Construct detail URL from matchId if detailUrl is not provided
+              const detailUrl = match.detailUrl || (match.matchId 
+                ? (match.format ? `/cricket/match/${match.matchId}` : `/football/match/${match.matchId}`)
+                : null);
+              
+              const CardContent = (
                 <Card
                   variant="interactive"
-                  className={`h-full rounded-2xl border border-gray-100 bg-white/90 p-4 sm:p-6 shadow-lg ring-1 ${statusAccentRing[match.status]}`}
+                  className={`h-full rounded-2xl border border-gray-100 bg-white/90 p-4 sm:p-6 shadow-lg ring-1 ${statusAccentRing[match.status]} ${detailUrl ? 'cursor-pointer' : ''}`}
                 >
                   <div className="flex flex-col gap-4 sm:gap-5">
                     <div className="flex items-center justify-between gap-2 sm:gap-4">
                       <span className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-full border px-2 sm:px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses[match.status] || statusBadgeClasses['upcoming']}`}>
                         {match.status === 'live' && <span className="live-dot bg-red-500" />}
                         <span className="hidden xs:inline">{statusPillLabel[match.status] || statusPillLabel['upcoming']}</span>
-                        <span className="xs:hidden">{match.status === 'live' ? 'LIVE' : match.status === 'upcoming' ? 'UP' : 'END'}</span>
+                        <span className="xs:hidden">{match.status === 'live' ? 'LIVE' : match.status === 'upcoming' ? 'UP' : match.status === 'completed' ? 'COMP' : 'END'}</span>
                       </span>
                       <div className="text-right text-xs sm:text-sm text-gray-500 flex-shrink-0">
                         <div className="hidden sm:block">{formatTime(match.startTime)}</div>
@@ -480,11 +480,9 @@ export function LiveMatchesSection() {
                     </div>
 
                     <div>
-                      {match.detailUrl ? (
-                        <Button fullWidth asChild>
-                          <Link href={match.detailUrl}>
-                            {getCtaLabel(match.status)}
-                          </Link>
+                      {detailUrl ? (
+                        <Button fullWidth className="pointer-events-none">
+                          {getCtaLabel(match.status)}
                         </Button>
                       ) : (
                         <Button fullWidth disabled>
@@ -494,8 +492,25 @@ export function LiveMatchesSection() {
                     </div>
                   </div>
                 </Card>
-              </motion.div>
-            ))}
+              );
+              
+              return (
+                <motion.div
+                  key={match._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  {detailUrl ? (
+                    <Link href={detailUrl}>
+                      {CardContent}
+                    </Link>
+                  ) : (
+                    CardContent
+                  )}
+                </motion.div>
+              );
+            })}
           </div>
         ) : null}
 
@@ -507,8 +522,11 @@ export function LiveMatchesSection() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <Button variant="outline" asChild>
-              <Link href="/fixtures" className="inline-flex items-center gap-2">
-                View All Matches
+              <Link 
+                href={matches[0]?.status === 'completed' ? '/cricket/results' : '/fixtures'} 
+                className="inline-flex items-center gap-2"
+              >
+                {matches[0]?.status === 'completed' ? 'View All Results' : 'View All Matches'}
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
             </Button>

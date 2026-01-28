@@ -46,10 +46,12 @@ export function Button({
     danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800',
   };
 
+  // Mobile-first: Minimum touch target 44x44px (iOS) / 48x48px (Android)
+  // Desktop can be smaller but mobile needs proper touch targets
   const sizeClasses = {
-    sm: 'h-8 px-3 text-xs',
-    md: 'h-10 px-4 text-sm',
-    lg: 'h-12 px-6 text-base',
+    sm: 'h-11 sm:h-8 px-4 sm:px-3 text-xs min-w-[44px]', // 44px on mobile, 32px on desktop
+    md: 'h-12 sm:h-10 px-5 sm:px-4 text-sm min-w-[48px]', // 48px on mobile, 40px on desktop
+    lg: 'h-14 sm:h-12 px-6 text-base min-w-[56px]', // 56px on mobile, 48px on desktop
   };
 
   const widthClass = fullWidth ? 'w-full' : '';
