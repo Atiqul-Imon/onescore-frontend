@@ -280,14 +280,15 @@ export default function MatchDetailPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Header Section - Cricinfo Style */}
       <div className="bg-gradient-to-b from-secondary-900 via-secondary-800 to-secondary-900 text-white">
-        <Container size="2xl" className="py-6">
+        <Container size="2xl" className="py-4 sm:py-6">
           {/* Back Button */}
           <Link 
             href="/" 
-            className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors mb-4 text-sm font-medium"
+            className="inline-flex items-center gap-1.5 sm:gap-2 text-white/80 hover:text-white transition-colors mb-3 sm:mb-4 text-xs sm:text-sm font-medium"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
+            <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline">Back to Home</span>
+            <span className="xs:hidden">Back</span>
           </Link>
 
           {/* Match Header */}
@@ -296,19 +297,19 @@ export default function MatchDetailPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="flex flex-wrap items-center gap-3 text-sm text-white/70 mb-3">
-              <span className="inline-flex items-center gap-2">
-                <Trophy className="h-4 w-4 text-primary-400" />
-                {match.series || 'Cricket Match'}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-white/70 mb-2 sm:mb-3">
+              <span className="inline-flex items-center gap-1.5 sm:gap-2">
+                <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-400 flex-shrink-0" />
+                <span className="truncate">{match.series || 'Cricket Match'}</span>
               </span>
-              <span>•</span>
-              <span className="px-2 py-1 rounded bg-white/10 text-white/90 font-medium">
+              <span className="hidden sm:inline">•</span>
+              <span className="px-2 py-0.5 sm:py-1 rounded bg-white/10 text-white/90 font-medium text-xs sm:text-sm">
                 {match.format?.toUpperCase() || 'MATCH'}
               </span>
               {match.status === 'live' && (
                 <>
-                  <span>•</span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 border border-red-400/30 text-red-300 font-semibold">
+                  <span className="hidden sm:inline">•</span>
+                  <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-red-500/20 border border-red-400/30 text-red-300 font-semibold text-xs sm:text-sm">
                     <span className="live-dot bg-red-500 animate-pulse" />
                     LIVE
                   </span>
@@ -316,23 +317,35 @@ export default function MatchDetailPage() {
               )}
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-              {match.teams.home.name} <span className="text-white/60 font-normal">vs</span> {match.teams.away.name}
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
+              <span className="block sm:inline">{match.teams.home.name}</span>
+              <span className="hidden sm:inline text-white/60 font-normal mx-2">vs</span>
+              <span className="sm:hidden text-white/60 font-normal mx-1.5">v</span>
+              <span className="block sm:inline">{match.teams.away.name}</span>
             </h1>
             
-            <div className="flex flex-wrap items-center gap-4 text-white/80">
-              <span className="inline-flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                {match.venue.name}, {match.venue.city}
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-white/80">
+              <span className="inline-flex items-center gap-1.5 sm:gap-2">
+                <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="truncate">{match.venue.name}, {match.venue.city}</span>
               </span>
-              <span className="inline-flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                {new Date(match.startTime).toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
+              <span className="inline-flex items-center gap-1.5 sm:gap-2">
+                <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="hidden sm:inline">
+                  {new Date(match.startTime).toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </span>
+                <span className="sm:hidden">
+                  {new Date(match.startTime).toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </span>
               </span>
             </div>
           </motion.div>
@@ -340,9 +353,9 @@ export default function MatchDetailPage() {
       </div>
 
       {/* Main Content */}
-      <Container size="2xl" className="py-8">
+      <Container size="2xl" className="py-4 sm:py-6 lg:py-8">
         {/* Main Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           {/* Left Column - Tabs with Scorecard, Stats & Commentary */}
           <div className="lg:col-span-2">
             <Tabs

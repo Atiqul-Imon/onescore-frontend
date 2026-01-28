@@ -23,13 +23,13 @@ export function Tabs({ tabs, defaultTab, children, className = '' }: TabsProps) 
     <div className={className}>
       {/* Tab Headers */}
       <div className="border-b border-gray-200 bg-white">
-        <div className="flex overflow-x-auto scrollbar-hide">
+        <div className="flex overflow-x-auto scrollbar-hide -mx-4 sm:mx-0 px-4 sm:px-0">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`
-                relative px-6 py-4 text-sm font-semibold transition-colors whitespace-nowrap
+                relative px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold transition-colors whitespace-nowrap flex-shrink-0
                 ${
                   activeTab === tab.id
                     ? 'text-primary-700 border-b-2 border-primary-700'
@@ -37,7 +37,7 @@ export function Tabs({ tabs, defaultTab, children, className = '' }: TabsProps) 
                 }
               `}
             >
-              {tab.icon && <span className="mr-2 inline-block">{tab.icon}</span>}
+              {tab.icon && <span className="mr-1.5 sm:mr-2 inline-block">{tab.icon}</span>}
               {tab.label}
               {activeTab === tab.id && (
                 <motion.div
@@ -52,7 +52,7 @@ export function Tabs({ tabs, defaultTab, children, className = '' }: TabsProps) 
       </div>
 
       {/* Tab Content */}
-      <div className="mt-6">
+      <div className="mt-4 sm:mt-6">
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 10 }}
