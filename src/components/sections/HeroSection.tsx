@@ -15,70 +15,6 @@ interface HeroSectionProps {
   liveMatches?: LiveMatch[];
 }
 
-// Realistic demo live cricket matches (Cricinfo-style)
-const placeholderLiveMatches: LiveMatch[] = [
-  {
-    _id: 'demo-1',
-    matchId: 'demo-1',
-    teams: {
-      home: { name: 'India', shortName: 'IND', flag: '🇮🇳' },
-      away: { name: 'Australia', shortName: 'AUS', flag: '🇦🇺' },
-    },
-    status: 'live',
-    currentScore: {
-      home: { runs: 187, wickets: 4, overs: 18.3 },
-      away: { runs: 165, wickets: 6, overs: 20.0 },
-    },
-    format: 'T20I',
-    venue: { name: 'Melbourne Cricket Ground', city: 'Melbourne' },
-  },
-  {
-    _id: 'demo-2',
-    matchId: 'demo-2',
-    teams: {
-      home: { name: 'England', shortName: 'ENG', flag: '🏴' },
-      away: { name: 'Pakistan', shortName: 'PAK', flag: '🇵🇰' },
-    },
-    status: 'live',
-    currentScore: {
-      home: { runs: 142, wickets: 2, overs: 15.2 },
-      away: { runs: 0, wickets: 0, overs: 0 },
-    },
-    format: 'ODI',
-    venue: { name: 'Lord\'s Cricket Ground', city: 'London' },
-  },
-  {
-    _id: 'demo-3',
-    matchId: 'demo-3',
-    teams: {
-      home: { name: 'New Zealand', shortName: 'NZ', flag: '🇳🇿' },
-      away: { name: 'South Africa', shortName: 'SA', flag: '🇿🇦' },
-    },
-    status: 'live',
-    currentScore: {
-      home: { runs: 89, wickets: 1, overs: 12.4 },
-      away: { runs: 234, wickets: 8, overs: 50.0 },
-    },
-    format: 'ODI',
-    venue: { name: 'Eden Park', city: 'Auckland' },
-  },
-  {
-    _id: 'demo-4',
-    matchId: 'demo-4',
-    teams: {
-      home: { name: 'Bangladesh', shortName: 'BAN', flag: '🇧🇩' },
-      away: { name: 'Sri Lanka', shortName: 'SL', flag: '🇱🇰' },
-    },
-    status: 'live',
-    currentScore: {
-      home: { runs: 156, wickets: 3, overs: 16.5 },
-      away: { runs: 0, wickets: 0, overs: 0 },
-    },
-    format: 'T20I',
-    venue: { name: 'Sher-e-Bangla National Stadium', city: 'Dhaka' },
-  },
-];
-
 export function HeroSection({ featuredArticle: initialFeaturedArticle, secondaryArticles: initialSecondaryArticles, liveMatches: initialLiveMatches }: HeroSectionProps) {
   const [liveMatches, setLiveMatches] = useState<LiveMatch[]>(initialLiveMatches || []);
   const [featuredArticle, setFeaturedArticle] = useState<Article | null>(initialFeaturedArticle || null);
@@ -92,11 +28,15 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
       if (process.env.NODE_ENV === 'development') {
         console.log('[HeroSection] Fetching matches at', new Date().toLocaleTimeString());
       }
+      
+      // First try to fetch live matches
       const [newsRes, cricketLiveRes, footballLiveRes] = await Promise.allSettled([
         fetch(`${base}/api/v1/news?limit=5&state=published`, { cache: 'no-store', next: { revalidate: 0 } }),
         fetch(`${base}/api/v1/cricket/matches/live?t=${timestamp}`, { cache: 'no-store', next: { revalidate: 0 } }),
         fetch(`${base}/api/v1/football/matches/live?t=${timestamp}`, { cache: 'no-store', next: { revalidate: 0 } }),
       ]);
+      
+      let allLiveMatches: LiveMatch[] = [];
 
       // Update articles
       if (newsRes.status === 'fulfilled' && newsRes.value.ok) {
@@ -109,15 +49,22 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
       }
 
       // Update live matches
-      let allLiveMatches: LiveMatch[] = [];
-      
       if (cricketLiveRes.status === 'fulfilled' && cricketLiveRes.value.ok) {
         const cricketData = await cricketLiveRes.value.json();
-        const cricketMatches = Array.isArray(cricketData?.data) ? cricketData.data : [];
+        // Handle both array response and object with data property
+        const cricketMatches = Array.isArray(cricketData) 
+          ? cricketData 
+          : (Array.isArray(cricketData?.data) ? cricketData.data : []);
         const cricketLiveMatches = cricketMatches.filter((match: LiveMatch) => 
           match.format && !match.league
         );
         allLiveMatches = [...allLiveMatches, ...cricketLiveMatches];
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[HeroSection] Found ${cricketLiveMatches.length} cricket live matches`);
+        }
+      } else if (cricketLiveRes.status === 'rejected') {
+        console.error('[HeroSection] Failed to fetch cricket live matches:', cricketLiveRes.reason);
       }
       
       if (footballLiveRes.status === 'fulfilled' && footballLiveRes.value.ok) {
@@ -128,17 +75,46 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
         );
         allLiveMatches = [...allLiveMatches, ...footballLiveMatches];
       }
+
+      // Don't fetch upcoming matches - fixtures not available in subscription
+      // Only show live matches
+      const combinedMatches = [...allLiveMatches];
       
-      if (allLiveMatches.length > 0) {
-        allLiveMatches.sort((a, b) => {
+      if (combinedMatches.length > 0) {
+        // Sort: live matches first, then by start time (soonest first for upcoming)
+        combinedMatches.sort((a, b) => {
+          // Live matches always come first
           if (a.status === 'live' && b.status !== 'live') return -1;
           if (a.status !== 'live' && b.status === 'live') return 1;
+          
+          // For live matches, sort by start time (most recent first)
+          if (a.status === 'live' && b.status === 'live') {
+            const dateA = new Date(a.startTime || 0).getTime();
+            const dateB = new Date(b.startTime || 0).getTime();
+            return dateB - dateA;
+          }
+          
+          // For upcoming matches, sort by start time (soonest first)
+          if (a.status === 'upcoming' && b.status === 'upcoming') {
+            const dateA = new Date(a.startTime || 0).getTime();
+            const dateB = new Date(b.startTime || 0).getTime();
+            return dateA - dateB;
+          }
+          
           return 0;
         });
-        setLiveMatches(allLiveMatches.slice(0, 4));
+        
+        // Show up to 4 matches: prioritize live matches, then upcoming starting soon
+        setLiveMatches(combinedMatches.slice(0, 4));
+        return;
       }
+
+      // If no live matches, don't show anything (fixtures not available in subscription)
+      // Live matches will appear automatically when they start
+      setLiveMatches([]);
     } catch (error) {
       console.error('Error fetching hero data:', error);
+      setLiveMatches([]);
     }
   }, []);
 
@@ -161,11 +137,11 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
   const hasUpcomingMatches = liveHighlights.length > 0 && liveHighlights.some(m => m.status === 'upcoming');
   const hasAnyMatches = liveHighlights.length > 0;
   
-  // Always show matches - use demo if no real matches available
-  const matchesToRender = hasAnyMatches ? liveHighlights : placeholderLiveMatches;
+  // Only show real matches - no placeholders
+  const matchesToRender = liveHighlights;
   
   // Update status indicators based on what we're showing
-  const showingLiveMatches = hasLiveMatches || (!hasAnyMatches && placeholderLiveMatches.some(m => m.status === 'live'));
+  const showingLiveMatches = hasLiveMatches;
   const showingCompletedMatches = hasCompletedMatches && !hasLiveMatches;
   const showingUpcomingMatches = hasUpcomingMatches && !hasLiveMatches && !hasCompletedMatches;
 

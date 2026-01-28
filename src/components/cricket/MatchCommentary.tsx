@@ -87,23 +87,23 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
   }
 
   return (
-    <Card>
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+    <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg">
+      <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-6 py-4 rounded-t-2xl">
         <div className="flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
-            <MessageSquare className="h-5 w-5" />
-            <span className="font-semibold text-lg">Ball-by-Ball Commentary</span>
+            <MessageSquare className="h-5 w-5 text-primary-100" />
+            <span className="font-bold text-lg">Ball-by-Ball Commentary</span>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setAutoRefresh(!autoRefresh)}
-              className="text-sm font-medium hover:text-blue-100 transition-colors"
+              className="text-sm font-semibold hover:text-primary-100 transition-colors px-3 py-1.5 rounded-lg bg-white/10 border border-white/20"
             >
-              {autoRefresh ? 'Auto-refresh: ON' : 'Auto-refresh: OFF'}
+              {autoRefresh ? 'Auto: ON' : 'Auto: OFF'}
             </button>
             <button
               onClick={fetchCommentary}
-              className="p-1.5 rounded hover:bg-blue-600 transition-colors"
+              className="p-2 rounded-lg hover:bg-white/20 transition-colors border border-white/20"
               title="Refresh commentary"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
@@ -114,57 +114,61 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
 
       <div className="max-h-[600px] overflow-y-auto">
         {error ? (
-          <div className="p-6 text-center text-red-600">
-            <p>{error}</p>
+          <div className="p-8 text-center">
+            <div className="mb-4 text-red-600">
+              <p className="font-semibold">{error}</p>
+            </div>
             <button
               onClick={fetchCommentary}
-              className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              className="px-6 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold shadow-md"
             >
               Retry
             </button>
           </div>
         ) : commentary.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
-            <p>No commentary available yet.</p>
-            <p className="text-sm mt-2">Commentary will appear here once the match starts.</p>
+          <div className="p-8 text-center">
+            <div className="mb-4 text-gray-500">
+              <p className="font-semibold">No commentary available yet.</p>
+              <p className="text-sm mt-2 text-gray-400">Commentary will appear here once the match starts.</p>
+            </div>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
             {commentary.map((entry, index) => (
               <div
                 key={`${entry.over}.${entry.ballNumber}-${index}`}
-                className="p-4 hover:bg-gray-50 transition-colors"
+                className="p-5 hover:bg-primary-50/50 transition-colors border-l-4 border-l-transparent hover:border-l-primary-400"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-16 text-right">
-                    <div className="text-sm font-semibold text-gray-900">
+                  <div className="flex-shrink-0 w-20 text-right">
+                    <div className="text-base font-bold text-secondary-900">
                       {entry.over}.{entry.ballNumber}
                     </div>
                     {entry.timestamp && (
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-gray-500 mt-1 font-medium">
                         {formatTime(entry.timestamp)}
                       </div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-2">
                       {entry.runs > 0 && (
-                        <span className="px-2 py-0.5 rounded bg-primary-100 text-primary-700 text-xs font-semibold">
+                        <span className="px-2.5 py-1 rounded-lg bg-primary-100 text-primary-800 text-xs font-bold border border-primary-200">
                           {entry.runs} {entry.runs === 1 ? 'run' : 'runs'}
                         </span>
                       )}
                       {entry.wickets && entry.wickets > 0 && (
-                        <span className="px-2 py-0.5 rounded bg-red-100 text-red-700 text-xs font-semibold">
+                        <span className="px-2.5 py-1 rounded-lg bg-red-100 text-red-800 text-xs font-bold border border-red-200">
                           Wicket!
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-800 leading-relaxed">{entry.commentary}</p>
+                    <p className="text-gray-800 leading-relaxed font-medium">{entry.commentary}</p>
                     {(entry.batsman || entry.bowler) && (
-                      <div className="mt-2 text-xs text-gray-500">
-                        {entry.batsman && <span>Batting: {entry.batsman}</span>}
-                        {entry.batsman && entry.bowler && <span> • </span>}
-                        {entry.bowler && <span>Bowling: {entry.bowler}</span>}
+                      <div className="mt-2 text-xs text-gray-600 font-medium">
+                        {entry.batsman && <span className="text-secondary-700">Batting: {entry.batsman}</span>}
+                        {entry.batsman && entry.bowler && <span className="mx-2">•</span>}
+                        {entry.bowler && <span className="text-secondary-700">Bowling: {entry.bowler}</span>}
                       </div>
                     )}
                   </div>

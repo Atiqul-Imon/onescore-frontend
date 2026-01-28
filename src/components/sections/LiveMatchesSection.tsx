@@ -50,80 +50,11 @@ interface Match {
   league?: string;
 }
 
-// Demo matches for when no real data is available (demo mode)
-const demoLiveMatches: Match[] = [
-  {
-    _id: 'demo-1',
-    matchId: 'demo-1',
-    teams: {
-      home: { name: 'India', shortName: 'IND', flag: '🇮🇳' },
-      away: { name: 'Australia', shortName: 'AUS', flag: '🇦🇺' },
-    },
-    status: 'live',
-    currentScore: {
-      home: { runs: 187, wickets: 4, overs: 18.3 },
-      away: { runs: 165, wickets: 6, overs: 20.0 },
-    },
-    format: 'T20I',
-    venue: { name: 'Melbourne Cricket Ground', city: 'Melbourne' },
-    startTime: new Date().toISOString(),
-  },
-  {
-    _id: 'demo-2',
-    matchId: 'demo-2',
-    teams: {
-      home: { name: 'England', shortName: 'ENG', flag: '🏴' },
-      away: { name: 'Pakistan', shortName: 'PAK', flag: '🇵🇰' },
-    },
-    status: 'live',
-    currentScore: {
-      home: { runs: 142, wickets: 2, overs: 15.2 },
-      away: { runs: 0, wickets: 0, overs: 0 },
-    },
-    format: 'ODI',
-    venue: { name: 'Lord\'s Cricket Ground', city: 'London' },
-    startTime: new Date().toISOString(),
-  },
-  {
-    _id: 'demo-3',
-    matchId: 'demo-3',
-    teams: {
-      home: { name: 'New Zealand', shortName: 'NZ', flag: '🇳🇿' },
-      away: { name: 'South Africa', shortName: 'SA', flag: '🇿🇦' },
-    },
-    status: 'live',
-    currentScore: {
-      home: { runs: 89, wickets: 1, overs: 12.4 },
-      away: { runs: 234, wickets: 8, overs: 50.0 },
-    },
-    format: 'ODI',
-    venue: { name: 'Eden Park', city: 'Auckland' },
-    startTime: new Date().toISOString(),
-  },
-  {
-    _id: 'demo-4',
-    matchId: 'demo-4',
-    teams: {
-      home: { name: 'Bangladesh', shortName: 'BAN', flag: '🇧🇩' },
-      away: { name: 'Sri Lanka', shortName: 'SL', flag: '🇱🇰' },
-    },
-    status: 'live',
-    currentScore: {
-      home: { runs: 156, wickets: 3, overs: 16.5 },
-      away: { runs: 0, wickets: 0, overs: 0 },
-    },
-    format: 'T20I',
-    venue: { name: 'Sher-e-Bangla National Stadium', city: 'Dhaka' },
-    startTime: new Date().toISOString(),
-  },
-];
-
 export function LiveMatchesSection() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showingUpcoming, setShowingUpcoming] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
 
   const fetchMatches = useCallback(async () => {
     try {
@@ -154,12 +85,22 @@ export function LiveMatchesSection() {
       // Process cricket live matches
       if (cricketLiveRes.status === 'fulfilled' && cricketLiveRes.value.ok) {
         const cricketJson = await cricketLiveRes.value.json();
-        if (cricketJson.success && cricketJson.data && cricketJson.data.length > 0) {
-          const cricketMatches = cricketJson.data.filter((match: Match) => 
+        // Handle both array response and object with data property
+        const cricketData = Array.isArray(cricketJson) ? cricketJson : (cricketJson.data || cricketJson);
+        const cricketMatches = Array.isArray(cricketData) ? cricketData : [];
+        
+        if (cricketMatches.length > 0) {
+          const filteredCricketMatches = cricketMatches.filter((match: Match) => 
             match.format && !match.league
           );
-          allLiveMatches = [...allLiveMatches, ...cricketMatches];
+          allLiveMatches = [...allLiveMatches, ...filteredCricketMatches];
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[LiveMatchesSection] Found ${filteredCricketMatches.length} cricket live matches`);
+          }
         }
+      } else if (cricketLiveRes.status === 'rejected') {
+        console.error('[LiveMatchesSection] Failed to fetch cricket live matches:', cricketLiveRes.reason);
       }
       
       // Process football live matches
@@ -173,16 +114,74 @@ export function LiveMatchesSection() {
         }
       }
       
-      if (allLiveMatches.length > 0) {
-        // Sort by status: live first
-        allLiveMatches.sort((a, b) => {
+      // Fetch upcoming matches to show alongside live matches (especially those starting soon)
+      let upcomingMatches: Match[] = [];
+      try {
+        const fixturesRes = await fetch(`${base}/api/v1/cricket/matches/fixtures?limit=10`, {
+          cache: 'no-store',
+          next: { revalidate: 300 },
+        });
+
+        if (fixturesRes.ok) {
+          const fixturesJson = await fixturesRes.json();
+          if (fixturesJson.success && fixturesJson.data) {
+            const fixturesData = Array.isArray(fixturesJson.data) 
+              ? fixturesJson.data 
+              : fixturesJson.data.fixtures || [];
+            const cricketFixtures = fixturesData
+              .filter((match: Match) => match.format && !match.league)
+              .map((match: Match) => ({ ...match, status: 'upcoming' as const }));
+            
+            // Filter upcoming matches to show only those starting within next 6 hours
+            const now = new Date();
+            const sixHoursFromNow = new Date(now.getTime() + 6 * 60 * 60 * 1000);
+            upcomingMatches = cricketFixtures.filter((match: Match) => {
+              if (!match.startTime) return false;
+              const matchStart = new Date(match.startTime);
+              return matchStart > now && matchStart <= sixHoursFromNow;
+            });
+
+            // Sort upcoming matches by start time (soonest first)
+            upcomingMatches.sort((a, b) => {
+              const dateA = new Date(a.startTime || 0).getTime();
+              const dateB = new Date(b.startTime || 0).getTime();
+              return dateA - dateB;
+            });
+          }
+        }
+      } catch (upcomingError) {
+        console.error('Error fetching upcoming matches:', upcomingError);
+      }
+
+      // Combine live and upcoming matches
+      const combinedMatches = [...allLiveMatches, ...upcomingMatches];
+      
+      if (combinedMatches.length > 0) {
+        // Sort: live matches first, then by start time
+        combinedMatches.sort((a, b) => {
+          // Live matches always come first
           if (a.status === 'live' && b.status !== 'live') return -1;
           if (a.status !== 'live' && b.status === 'live') return 1;
+          
+          // For live matches, sort by start time (most recent first)
+          if (a.status === 'live' && b.status === 'live') {
+            const dateA = new Date(a.startTime || 0).getTime();
+            const dateB = new Date(b.startTime || 0).getTime();
+            return dateB - dateA;
+          }
+          
+          // For upcoming matches, sort by start time (soonest first)
+          if (a.status === 'upcoming' && b.status === 'upcoming') {
+            const dateA = new Date(a.startTime || 0).getTime();
+            const dateB = new Date(b.startTime || 0).getTime();
+            return dateA - dateB;
+          }
+          
           return 0;
         });
-        setMatches(allLiveMatches);
-        setShowingUpcoming(false);
-        setIsDemoMode(false);
+        
+        setMatches(combinedMatches);
+        setShowingUpcoming(combinedMatches.some(m => m.status === 'upcoming'));
         setLoading(false);
         return;
       }
@@ -216,7 +215,6 @@ export function LiveMatchesSection() {
           if (cricketResults.length > 0) {
             setMatches(cricketResults);
             setShowingUpcoming(false);
-            setIsDemoMode(false);
             setLoading(false);
             return;
           }
@@ -246,24 +244,16 @@ export function LiveMatchesSection() {
           if (cricketFixtures.length > 0) {
             setMatches(cricketFixtures);
             setShowingUpcoming(true);
-            setIsDemoMode(false);
             setLoading(false);
             return;
           }
         }
       }
 
-      // If all fetches failed or returned no data, use demo matches
-      if (allLiveMatches.length === 0) {
-        setMatches(demoLiveMatches);
-        setIsDemoMode(true);
-        setShowingUpcoming(false);
-        setLoading(false);
-        return;
-      }
-
+      // If all fetches failed or returned no data, show empty state
       setMatches([]);
       setShowingUpcoming(false);
+      setLoading(false);
     } catch (err: any) {
       const isConnectionError = err.message?.includes('Failed to fetch') || 
                                err.message?.includes('ERR_CONNECTION_REFUSED') ||
@@ -275,18 +265,11 @@ export function LiveMatchesSection() {
         console.error('Error fetching matches:', err);
       }
       
-      // Show demo matches if there's an error or no connection (demo mode)
-      if (isConnectionError || process.env.NODE_ENV === 'development') {
-        setMatches(demoLiveMatches);
-        setIsDemoMode(true);
-        setError(null);
-        setShowingUpcoming(false);
-      } else {
-        // Production or real error - show error message
-        setError(err.message || 'Failed to fetch matches');
-        setMatches([]);
-        setShowingUpcoming(false);
-      }
+      // Show error message instead of demo matches
+      setError(err.message || 'Failed to fetch matches');
+      setMatches([]);
+      setShowingUpcoming(false);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -382,11 +365,6 @@ export function LiveMatchesSection() {
               : showingUpcoming 
               ? 'Upcoming' 
               : 'Live Tracker'}
-            {isDemoMode && (
-              <span className="ml-2 rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700">
-                Demo
-              </span>
-            )}
           </div>
               <h2 className="heading-2 mt-5 text-gray-900">
                 {matches.length > 0 && matches[0]?.status === 'completed'
@@ -396,9 +374,7 @@ export function LiveMatchesSection() {
                   : 'Live Matches'}
               </h2>
               <p className="section-lede mt-4 text-gray-600">
-                {isDemoMode 
-                  ? 'Showing demo matches. Real-time data will appear when live matches are available.'
-                  : matches.length > 0 && matches[0]?.status === 'completed'
+                {matches.length > 0 && matches[0]?.status === 'completed'
                   ? 'Catch up on the latest match results and highlights from recent games.'
                   : showingUpcoming 
                   ? 'Check out the exciting matches coming up. Stay tuned for live action!'

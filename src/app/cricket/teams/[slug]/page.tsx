@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowUpRight, Award, CalendarDays, Newspaper, Trophy, Users, Flame, Star } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { FEATURED_CRICKET_TEAM_SLUGS } from '@/lib/cricket/teams';
+import { TeamMatchStats } from '@/components/cricket/TeamMatchStats';
 
 type TeamDetailPayload = {
   team: {
@@ -417,6 +418,17 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
               </div>
             </div>
           </aside>
+        </Container>
+      </section>
+
+      {/* Team Match Statistics Section */}
+      <section className="bg-gray-50 py-16">
+        <Container size="2xl">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Match Statistics</h2>
+            <p className="mt-2 text-gray-600">Batting and bowling statistics from recent matches</p>
+          </div>
+          <TeamMatchStats teamName={team.name} />
         </Container>
       </section>
     </div>
