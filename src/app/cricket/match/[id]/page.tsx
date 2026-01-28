@@ -246,8 +246,8 @@ export default function MatchDetailPage() {
         }
       };
     } else {
-      console.warn('[MatchDetail] WebSocket not available - match updates will not be received');
-      // No polling fallback - WebSocket only
+      // WebSocket will be available once SocketContext initializes
+      // No action needed - SocketContext handles connection
     }
   }, [matchId, socket, isConnected]);
 
