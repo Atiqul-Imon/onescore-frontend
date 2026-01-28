@@ -217,7 +217,7 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
               </div>
 
               {/* Current Batters */}
-              {match.currentBatters && match.currentBatters.length > 0 && (
+              {match.currentBatters && match.currentBatters.length > 0 ? (
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="flex items-center gap-2 mb-3">
                     <Users className="h-4 w-4 text-primary-600" />
@@ -225,18 +225,24 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                   </div>
                   <div className="space-y-2">
                     {match.currentBatters.map((batter, idx) => (
-                      <div key={batter.playerId || idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50">
+                      <div key={batter.playerId || idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-sm text-gray-900">{batter.playerName}</span>
-                            <span className="text-xs text-primary-600">*</span>
+                            <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium">*</span>
                           </div>
                           <div className="text-xs text-gray-600 mt-1">
-                            {batter.runs} ({batter.balls}b) • {batter.fours}x4 • {batter.sixes}x6 • SR {batter.strikeRate.toFixed(2)}
+                            <span className="font-medium">{batter.runs}</span> ({batter.balls}b) • {batter.fours}x4 • {batter.sixes}x6 • SR <span className="font-semibold">{batter.strikeRate.toFixed(1)}</span>
                           </div>
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="text-xs text-gray-500 text-center py-2">
+                    Current batters information will appear here once available
                   </div>
                 </div>
               )}
@@ -267,7 +273,7 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
               )}
 
               {/* Current Bowlers */}
-              {match.currentBowlers && match.currentBowlers.length > 0 && (
+              {match.currentBowlers && match.currentBowlers.length > 0 ? (
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="flex items-center gap-2 mb-3">
                     <Target className="h-4 w-4 text-primary-600" />
@@ -275,15 +281,21 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                   </div>
                   <div className="space-y-2">
                     {match.currentBowlers.map((bowler, idx) => (
-                      <div key={bowler.playerId || idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50">
+                      <div key={bowler.playerId || idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                         <div className="flex-1">
                           <span className="font-semibold text-sm text-gray-900">{bowler.playerName}</span>
                           <div className="text-xs text-gray-600 mt-1">
-                            {bowler.overs.toFixed(1)}-{bowler.maidens}-{bowler.runs}-{bowler.wickets} • Econ {bowler.economy.toFixed(2)}
+                            <span className="font-medium">{bowler.overs.toFixed(1)}</span>-{bowler.maidens}-<span className="font-medium">{bowler.runs}</span>-<span className="font-semibold text-primary-700">{bowler.wickets}</span> • Econ <span className="font-semibold">{bowler.economy.toFixed(2)}</span>
                           </div>
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="text-xs text-gray-500 text-center py-2">
+                    Current bowlers information will appear here once available
                   </div>
                 </div>
               )}

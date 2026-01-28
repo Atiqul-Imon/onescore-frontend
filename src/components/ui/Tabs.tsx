@@ -69,3 +69,4 @@ export function Tabs({ tabs, defaultTab, children, className = '' }: TabsProps) 
 
 
 
+

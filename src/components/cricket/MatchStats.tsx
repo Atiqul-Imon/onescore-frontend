@@ -43,12 +43,36 @@ interface MatchStatsProps {
 }
 
 export function MatchStats({ batting, bowling, teams, matchId }: MatchStatsProps) {
+  // Debug logging
+  console.log('[MatchStats] Received props:', {
+    battingCount: batting?.length || 0,
+    bowlingCount: bowling?.length || 0,
+    batting: batting,
+    bowling: bowling,
+    teams: teams,
+  });
+
   // Filter out entries with no meaningful data
   const validBatting = (batting || []).filter(b => (b.runs > 0 || b.balls > 0));
   const validBowling = (bowling || []).filter(b => (b.wickets > 0 || b.overs > 0));
   
+  console.log('[MatchStats] Filtered data:', {
+    validBattingCount: validBatting.length,
+    validBowlingCount: validBowling.length,
+  });
+  
   if (validBatting.length === 0 && validBowling.length === 0) {
-    return null;
+    // Show a helpful message instead of returning null
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-600">
+        <p className="mb-2">Player statistics are not available yet.</p>
+        <p className="text-sm text-gray-500">
+          {batting?.length || bowling?.length 
+            ? 'Statistics will appear once players have meaningful data (runs, balls, wickets, or overs).'
+            : 'Statistics will be available once the match progresses and data is collected.'}
+        </p>
+      </div>
+    );
   }
 
   // Group batting by team

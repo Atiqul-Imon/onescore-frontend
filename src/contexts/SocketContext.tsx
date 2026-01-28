@@ -42,7 +42,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     if (!wsUrl) {
       // Auto-detect protocol based on environment
       if (typeof window !== 'undefined') {
-        const isProduction = window.location.protocol === 'https:';
+        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
         
         if (isProduction) {
@@ -58,14 +58,28 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       }
     }
     
-    const newSocket = io(wsUrl, {
+    // Only connect if we have a valid URL and it's not the production URL in development
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost' && wsUrl?.includes('scorenews.net')) {
+      devWarn('Skipping WebSocket connection - production URL detected in development');
+      setSocket(null);
+      return;
+    }
+    
+    if (!wsUrl) {
+      devWarn('WebSocket URL not available, skipping connection');
+      setSocket(null);
+      return;
+    }
+    
+    // Connect to /live namespace (matches backend WebSocketGateway namespace)
+    const socketUrl = `${wsUrl}/live`;
+    
+    const newSocket = io(socketUrl, {
       transports: ['polling', 'websocket'], // Try polling first, then upgrade to websocket
       timeout: 20000,
       forceNew: true,
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 5,
-      reconnectionDelayMax: 5000,
+      reconnection: true, // Enable reconnection for better reliability
+      autoConnect: true, // Auto-connect when socket is created
     });
 
     newSocket.on('connect', () => {
@@ -84,7 +98,22 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       devWarn('Socket connection unavailable:', error.message);
     });
 
-    // Live score updates
+    // Match updates (from subscribe:match)
+    newSocket.on('match-update', (data) => {
+      devLog('Match update received:', data);
+      
+      // Update cricket match if it's a cricket match
+      if (data.format && ['test', 'odi', 't20i', 't20', 'first-class', 'list-a'].includes(data.format)) {
+        dispatch(updateMatch(data));
+      }
+      
+      // Update football match if it's a football match
+      if (data.league) {
+        dispatch(updateFootballMatch(data));
+      }
+    });
+
+    // Live score updates (legacy support)
     newSocket.on('liveScoreUpdate', (data) => {
       devLog('Live score update received:', data);
       
