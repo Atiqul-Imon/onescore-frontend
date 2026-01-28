@@ -120,42 +120,42 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
 
   return (
     <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
-      <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-6 py-4">
-        <div className="flex items-center justify-between text-white">
-          <div className="flex items-center gap-3">
-            <Trophy className="h-5 w-5 text-primary-100" />
-            <span className="font-bold text-lg">Live Score</span>
+      <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-4 sm:px-6 py-3 sm:py-4">
+        <div className="flex items-center justify-between text-white gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary-100 flex-shrink-0" />
+            <span className="font-bold text-base sm:text-lg truncate">Live Score</span>
           </div>
           {isLive && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 border border-white/30">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white/20 border border-white/30 flex-shrink-0">
               <span className="live-dot bg-white animate-pulse" />
-              <span className="text-sm font-semibold">LIVE</span>
+              <span className="text-xs sm:text-sm font-semibold">LIVE</span>
             </div>
           )}
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
         {/* Home Team Score */}
-        <div className="border-b-2 border-gray-200 pb-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{match.teams.home.flag}</span>
-              <div>
-                <h3 className="font-bold text-lg text-secondary-900">{match.teams.home.name}</h3>
+        <div className="border-b-2 border-gray-200 pb-3 sm:pb-4">
+          <div className="flex items-center justify-between mb-2 gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+              <span className="text-xl sm:text-2xl flex-shrink-0">{match.teams.home.flag}</span>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-bold text-base sm:text-lg text-secondary-900 truncate">{match.teams.home.name}</h3>
                 <p className="text-xs text-gray-600">{match.teams.home.shortName}</p>
               </div>
             </div>
             {homeScore && (
-              <div className="text-right">
-                <div className="text-3xl font-bold text-secondary-900">
+              <div className="text-right flex-shrink-0">
+                <div className="text-2xl sm:text-3xl font-bold text-secondary-900">
                   {homeScore.runs}
                   {homeScore.wickets !== undefined && (
-                    <span className="text-xl text-gray-600 font-normal">/{homeScore.wickets}</span>
+                    <span className="text-lg sm:text-xl text-gray-600 font-normal">/{homeScore.wickets}</span>
                   )}
                 </div>
                 {homeScore.overs > 0 && (
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="text-xs sm:text-sm text-gray-600 mt-1">
                     {homeScore.overs}.{homeScore.balls} overs
                   </div>
                 )}
@@ -166,24 +166,24 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
 
         {/* Away Team Score */}
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{match.teams.away.flag}</span>
-              <div>
-                <h3 className="font-bold text-lg text-secondary-900">{match.teams.away.name}</h3>
+          <div className="flex items-center justify-between mb-2 gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+              <span className="text-xl sm:text-2xl flex-shrink-0">{match.teams.away.flag}</span>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-bold text-base sm:text-lg text-secondary-900 truncate">{match.teams.away.name}</h3>
                 <p className="text-xs text-gray-600">{match.teams.away.shortName}</p>
               </div>
             </div>
             {awayScore && (
-              <div className="text-right">
-                <div className="text-3xl font-bold text-secondary-900">
+              <div className="text-right flex-shrink-0">
+                <div className="text-2xl sm:text-3xl font-bold text-secondary-900">
                   {awayScore.runs}
                   {awayScore.wickets !== undefined && (
-                    <span className="text-xl text-gray-600 font-normal">/{awayScore.wickets}</span>
+                    <span className="text-lg sm:text-xl text-gray-600 font-normal">/{awayScore.wickets}</span>
                   )}
                 </div>
                 {awayScore.overs > 0 && (
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="text-xs sm:text-sm text-gray-600 mt-1">
                     {awayScore.overs}.{awayScore.balls} overs
                   </div>
                 )}
@@ -193,7 +193,7 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
 
           {/* Live Match Info - Cricinfo Style */}
           {isLive && awayScore && (
-            <div className="mt-4 space-y-3">
+            <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
               {/* Target and Run Rates */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {match.target && (
@@ -218,21 +218,28 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
 
               {/* Current Batters */}
               {match.currentBatters && match.currentBatters.length > 0 ? (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Users className="h-4 w-4 text-primary-600" />
-                    <span className="text-sm font-semibold text-gray-700">Current Batters</span>
+                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                    <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm font-semibold text-gray-700">Current Batters</span>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5 sm:space-y-2">
                     {match.currentBatters.map((batter, idx) => (
-                      <div key={batter.playerId || idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-sm text-gray-900">{batter.playerName}</span>
-                            <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium">*</span>
+                      <div key={batter.playerId || idx} className="flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 sm:gap-2">
+                            <span className="font-semibold text-xs sm:text-sm text-gray-900 truncate">{batter.playerName}</span>
+                            <span className="text-xs px-1 sm:px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium flex-shrink-0">*</span>
                           </div>
-                          <div className="text-xs text-gray-600 mt-1">
-                            <span className="font-medium">{batter.runs}</span> ({batter.balls}b) • {batter.fours}x4 • {batter.sixes}x6 • SR <span className="font-semibold">{batter.strikeRate.toFixed(1)}</span>
+                          <div className="text-xs text-gray-600 mt-0.5 sm:mt-1 flex flex-wrap gap-x-1.5">
+                            <span className="font-medium">{batter.runs}</span>
+                            <span>({batter.balls}b)</span>
+                            <span>•</span>
+                            <span>{batter.fours}x4</span>
+                            <span>•</span>
+                            <span>{batter.sixes}x6</span>
+                            <span>•</span>
+                            <span>SR <span className="font-semibold">{batter.strikeRate.toFixed(1)}</span></span>
                           </div>
                         </div>
                       </div>
@@ -249,10 +256,10 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
 
               {/* Partnership */}
               {match.partnership && (
-                <div className="px-4 py-2 rounded-lg bg-green-50 border border-green-200">
-                  <div className="flex items-center justify-between">
+                <div className="px-3 sm:px-4 py-2 rounded-lg bg-green-50 border border-green-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
                     <span className="text-xs text-gray-600">Partnership</span>
-                    <span className="text-sm font-semibold text-gray-900">
+                    <span className="text-xs sm:text-sm font-semibold text-gray-900 break-words">
                       {match.partnership.runs} runs, {match.partnership.balls} balls (RR: {match.partnership.runRate})
                     </span>
                   </div>
@@ -261,10 +268,10 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
 
               {/* Last Wicket */}
               {match.lastWicket && (
-                <div className="px-4 py-2 rounded-lg bg-orange-50 border border-orange-200">
-                  <div className="flex items-center justify-between">
+                <div className="px-3 sm:px-4 py-2 rounded-lg bg-orange-50 border border-orange-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
                     <span className="text-xs text-gray-600">Last Wicket</span>
-                    <span className="text-sm font-semibold text-gray-900">
+                    <span className="text-xs sm:text-sm font-semibold text-gray-900 break-words">
                       {match.lastWicket.playerName} {match.lastWicket.runs} ({match.lastWicket.balls}b)
                       {match.lastWicket.fowScore !== undefined && ` • FOW: ${match.lastWicket.fowScore}/${match.currentScore?.away?.wickets || 0}`}
                     </span>
@@ -274,18 +281,24 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
 
               {/* Current Bowlers */}
               {match.currentBowlers && match.currentBowlers.length > 0 ? (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Target className="h-4 w-4 text-primary-600" />
-                    <span className="text-sm font-semibold text-gray-700">Current Bowlers</span>
+                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                    <Target className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm font-semibold text-gray-700">Current Bowlers</span>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5 sm:space-y-2">
                     {match.currentBowlers.map((bowler, idx) => (
-                      <div key={bowler.playerId || idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                        <div className="flex-1">
-                          <span className="font-semibold text-sm text-gray-900">{bowler.playerName}</span>
-                          <div className="text-xs text-gray-600 mt-1">
-                            <span className="font-medium">{bowler.overs.toFixed(1)}</span>-{bowler.maidens}-<span className="font-medium">{bowler.runs}</span>-<span className="font-semibold text-primary-700">{bowler.wickets}</span> • Econ <span className="font-semibold">{bowler.economy.toFixed(2)}</span>
+                      <div key={bowler.playerId || idx} className="flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <div className="flex-1 min-w-0">
+                          <span className="font-semibold text-xs sm:text-sm text-gray-900 truncate block">{bowler.playerName}</span>
+                          <div className="text-xs text-gray-600 mt-0.5 sm:mt-1 flex flex-wrap gap-x-1.5">
+                            <span className="font-medium">{bowler.overs.toFixed(1)}</span>
+                            <span>-{bowler.maidens}-</span>
+                            <span className="font-medium">{bowler.runs}</span>
+                            <span>-</span>
+                            <span className="font-semibold text-primary-700">{bowler.wickets}</span>
+                            <span>•</span>
+                            <span>Econ <span className="font-semibold">{bowler.economy.toFixed(2)}</span></span>
                           </div>
                         </div>
                       </div>
@@ -302,8 +315,8 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
 
               {/* Match Note */}
               {match.matchNote && (
-                <div className="px-4 py-2 rounded-lg bg-blue-50 border border-blue-200">
-                  <p className="text-sm text-blue-700">{match.matchNote}</p>
+                <div className="px-3 sm:px-4 py-2 rounded-lg bg-blue-50 border border-blue-200">
+                  <p className="text-xs sm:text-sm text-blue-700 break-words">{match.matchNote}</p>
                 </div>
               )}
             </div>

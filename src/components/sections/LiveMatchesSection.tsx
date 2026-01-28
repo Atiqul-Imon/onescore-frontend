@@ -403,23 +403,24 @@ export function LiveMatchesSection() {
               >
                 <Card
                   variant="interactive"
-                  className={`h-full rounded-2xl border border-gray-100 bg-white/90 p-6 shadow-lg ring-1 ${statusAccentRing[match.status]}`}
+                  className={`h-full rounded-2xl border border-gray-100 bg-white/90 p-4 sm:p-6 shadow-lg ring-1 ${statusAccentRing[match.status]}`}
                 >
-                  <div className="flex flex-col gap-5">
-                    <div className="flex items-center justify-between">
-                      <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses[match.status] || statusBadgeClasses['upcoming']}`}>
+                  <div className="flex flex-col gap-4 sm:gap-5">
+                    <div className="flex items-center justify-between gap-2 sm:gap-4">
+                      <span className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-full border px-2 sm:px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses[match.status] || statusBadgeClasses['upcoming']}`}>
                         {match.status === 'live' && <span className="live-dot bg-red-500" />}
-                        {statusPillLabel[match.status] || statusPillLabel['upcoming']}
+                        <span className="hidden xs:inline">{statusPillLabel[match.status] || statusPillLabel['upcoming']}</span>
+                        <span className="xs:hidden">{match.status === 'live' ? 'LIVE' : match.status === 'upcoming' ? 'UP' : 'END'}</span>
                       </span>
-                      <div className="text-right text-sm text-gray-500">
-                        <div>{formatTime(match.startTime)}</div>
+                      <div className="text-right text-xs sm:text-sm text-gray-500 flex-shrink-0">
+                        <div className="hidden sm:block">{formatTime(match.startTime)}</div>
                         <div className="text-xs text-gray-400">
                           {formatRelativeTime(match.startTime)}
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       {(['home', 'away'] as Array<'home' | 'away'>).map((side) => {
                         const team = match.teams[side];
                         const currentInnings = match.currentScore ? match.currentScore[side] : undefined;
@@ -445,35 +446,35 @@ export function LiveMatchesSection() {
                           : 'On air';
 
                         return (
-                          <div key={side} className="flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-3">
-                              <span className="text-2xl">{team.flag}</span>
-                              <div>
-                                <div className="font-semibold text-gray-900">{team.name}</div>
-                                <div className="text-sm text-gray-500">{team.shortName}</div>
+                          <div key={side} className="flex items-center justify-between gap-2 sm:gap-3">
+                            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                              <span className="text-xl sm:text-2xl flex-shrink-0">{team.flag}</span>
+                              <div className="min-w-0 flex-1">
+                                <div className="font-semibold text-gray-900 text-sm sm:text-base truncate">{team.name}</div>
+                                <div className="text-xs sm:text-sm text-gray-500">{team.shortName}</div>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className="text-2xl font-bold text-gray-900">{scoreDisplay}</div>
-                              <div className="text-sm text-gray-500">{subline}</div>
+                            <div className="text-right flex-shrink-0">
+                              <div className="text-xl sm:text-2xl font-bold text-gray-900">{scoreDisplay}</div>
+                              <div className="text-xs sm:text-sm text-gray-500">{subline}</div>
                             </div>
                           </div>
                         );
                       })}
                     </div>
 
-                    <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
-                      <div className="flex items-center justify-between text-gray-700">
-                        <span className="inline-flex items-center gap-2">
-                          <Trophy className="h-4 w-4 text-primary-500" />
-                          {match.format || match.league || 'Match'}
+                    <div className="rounded-xl bg-gray-50 p-3 sm:p-4 text-xs sm:text-sm text-gray-600">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 text-gray-700">
+                        <span className="inline-flex items-center gap-1.5 sm:gap-2">
+                          <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-500 flex-shrink-0" />
+                          <span className="truncate">{match.format || match.league || 'Match'}</span>
                         </span>
-                        <span className="inline-flex items-center gap-2 text-gray-500">
-                          <Users className="h-4 w-4 text-gray-400" />
-                          {match.venue.name}
+                        <span className="inline-flex items-center gap-1.5 sm:gap-2 text-gray-500">
+                          <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+                          <span className="truncate">{match.venue.name}</span>
                         </span>
                       </div>
-                      <div className="mt-1 text-xs uppercase tracking-wide text-gray-400">
+                      <div className="mt-1 text-xs uppercase tracking-wide text-gray-400 truncate">
                         {match.venue.city}
                       </div>
                     </div>

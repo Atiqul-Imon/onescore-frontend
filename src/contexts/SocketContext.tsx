@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 interface SocketContextType {
   socket: Socket | null;
   isConnected: boolean;
+  transport: string | null;
   joinMatch: (matchId: string) => void;
   leaveMatch: (matchId: string) => void;
   subscribeToTeam: (teamId: string) => void;
@@ -22,6 +23,7 @@ const SocketContext = createContext<SocketContextType | undefined>(undefined);
 export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [transport, setTransport] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const isDev = process.env.NODE_ENV !== 'production';
   const devLog = (...args: unknown[]) => {
@@ -88,28 +90,67 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       timeout: 20000,
       forceNew: true,
       reconnection: true, // Enable reconnection for better reliability
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
       autoConnect: true, // Auto-connect when socket is created
+      upgrade: true, // Allow transport upgrade
     });
 
     newSocket.on('connect', () => {
-      devLog('Socket connected:', newSocket.id);
+      const currentTransport = newSocket.io.engine?.transport?.name || 'unknown';
+      devLog('Socket connected:', {
+        id: newSocket.id,
+        transport: currentTransport,
+        url: socketUrl,
+      });
       setIsConnected(true);
+      setTransport(currentTransport);
     });
 
     newSocket.on('disconnect', (reason) => {
       devLog('Socket disconnected:', reason);
       setIsConnected(false);
+      setTransport(null);
     });
 
+    let connectionAttempts = 0;
+    const maxConnectionAttempts = 3;
+
     newSocket.on('connect_error', (error) => {
-      // Log connection errors for debugging
-      setIsConnected(false);
-      console.error('[SocketContext] WebSocket connection error:', {
-        message: error.message,
-        url: socketUrl,
-        timestamp: new Date().toISOString(),
-      });
-      devWarn('Socket connection unavailable:', error.message);
+      connectionAttempts++;
+      // Only log connection errors if we've tried multiple times and still not connected
+      // Socket.IO will automatically retry with polling if websocket fails
+      if (connectionAttempts >= maxConnectionAttempts && !isConnected) {
+        devWarn('Socket connection attempts failed, will continue retrying:', error.message);
+      } else {
+        // Silently retry - Socket.IO handles fallback automatically
+        devLog('Socket connection attempt, retrying...');
+      }
+    });
+
+    // Track transport changes after connection
+    const setupTransportMonitoring = () => {
+      if (newSocket.io.engine) {
+        newSocket.io.engine.on('upgrade', () => {
+          const currentTransport = newSocket.io.engine.transport.name;
+          devLog('Socket transport upgraded to:', currentTransport);
+          setTransport(currentTransport);
+          connectionAttempts = 0; // Reset on successful upgrade
+        });
+
+        newSocket.io.engine.on('upgradeError', (error: Error) => {
+          // This is not a critical error - polling will work fine
+          // Only log in development to avoid console noise in production
+          devLog('Socket upgrade failed, using polling (this is normal):', error.message);
+          // Keep current transport (polling)
+        });
+      }
+    };
+
+    // Set up transport monitoring when connected
+    newSocket.on('connect', () => {
+      setupTransportMonitoring();
     });
 
     // Match updates (from subscribe:match)
@@ -230,6 +271,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const value: SocketContextType = {
     socket,
     isConnected,
+    transport,
     joinMatch,
     leaveMatch,
     subscribeToTeam,
