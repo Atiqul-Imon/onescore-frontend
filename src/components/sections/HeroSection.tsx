@@ -109,8 +109,44 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
         return;
       }
 
-      // If no live matches, don't show anything (fixtures not available in subscription)
-      // Live matches will appear automatically when they start
+      // If no live matches, fetch completed matches from database
+      try {
+        const resultsRes = await fetch(`${base}/api/v1/cricket/matches/results?limit=4`, {
+          cache: 'no-store',
+          next: { revalidate: 3600 }, // Cache for 1 hour (completed matches don't change)
+        });
+
+        if (resultsRes.ok) {
+          const resultsJson = await resultsRes.json();
+          
+          if (resultsJson.success && resultsJson.data) {
+            // Handle both direct array and nested results property
+            const resultsData = Array.isArray(resultsJson.data) 
+              ? resultsJson.data 
+              : resultsJson.data.results || [];
+            
+            // Filter to show only cricket matches and ensure status is 'completed'
+            const cricketResults = resultsData
+              .filter((match: LiveMatch) => match.format && !match.league)
+              .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }))
+              .sort((a: LiveMatch, b: LiveMatch) => {
+                // Sort by start time (most recent first)
+                const dateA = new Date(a.startTime || 0).getTime();
+                const dateB = new Date(b.startTime || 0).getTime();
+                return dateB - dateA;
+              });
+            
+            if (cricketResults.length > 0) {
+              setLiveMatches(cricketResults.slice(0, 4));
+              return;
+            }
+          }
+        }
+      } catch (resultsError) {
+        console.error('[HeroSection] Failed to fetch completed matches:', resultsError);
+      }
+
+      // If no completed matches either, show empty
       setLiveMatches([]);
     } catch (error) {
       console.error('Error fetching hero data:', error);
@@ -180,7 +216,10 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
                     ? 'Matches' 
                     : 'Live Cricket Scores'}
                 </div>
-                <Link href="/fixtures" className="inline-flex items-center gap-1 text-sm font-semibold text-white/80 transition-standard hover:text-white">
+                <Link 
+                  href={showingCompletedMatches ? '/cricket/results' : '/fixtures'} 
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-white/80 transition-standard hover:text-white"
+                >
                   {showingLiveMatches 
                     ? 'View schedule' 
                     : showingCompletedMatches 
@@ -201,15 +240,34 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
                   const isFootball = !!match.league && !match.format;
                   const current = match.currentScore;
                   
+                  // Determine the correct link based on match status
+                  const getMatchLink = () => {
+                    // Demo matches don't have real IDs
+                    if (match._id.startsWith('demo')) {
+                      return '/fixtures';
+                    }
+                    
+                    // Live matches - link to match detail
+                    if (isLive) {
+                      return isFootball ? `/football/match/${match.matchId}` : `/cricket/match/${match.matchId}`;
+                    }
+                    
+                    // Completed matches - link to match detail
+                    if (match.status === 'completed' && match.matchId) {
+                      return isFootball ? `/football/match/${match.matchId}` : `/cricket/match/${match.matchId}`;
+                    }
+                    
+                    // Upcoming matches or others - link to fixtures
+                    return '/fixtures';
+                  };
+                  
                   return (
                     <Link
                       key={match._id}
-                      href={isLive && !match._id.startsWith('demo')
-                        ? (isFootball ? `/football/match/${match.matchId}` : `/cricket/match/${match.matchId}`)
-                        : '/fixtures'}
+                      href={getMatchLink()}
                       className="group relative rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] p-5 transition-all duration-300 hover:border hover:border-white/20 hover:bg-white/10 hover:shadow-lg hover:shadow-primary-500/10"
                     >
-                      {/* Live indicator badge */}
+                      {/* Status indicator badge */}
                       {isLive && (
                         <div className="absolute -top-2 -right-2 flex items-center gap-1.5 rounded-full bg-red-500 px-2.5 py-1 text-xs font-bold text-white shadow-lg">
                           <span className="relative flex h-2 w-2">
@@ -217,6 +275,11 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
                             <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
                           </span>
                           LIVE
+                        </div>
+                      )}
+                      {match.status === 'completed' && !isLive && (
+                        <div className="absolute -top-2 -right-2 flex items-center gap-1.5 rounded-full bg-gray-600 px-2.5 py-1 text-xs font-bold text-white shadow-lg">
+                          COMPLETED
                         </div>
                       )}
                       

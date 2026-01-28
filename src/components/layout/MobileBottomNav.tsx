@@ -70,7 +70,7 @@ export function MobileBottomNav() {
         isolation: 'isolate',
       }}
     >
-      <div className="flex items-center justify-around h-14 px-1 sm:px-2 max-w-screen-sm mx-auto">
+      <div className="flex items-center justify-around h-16 px-1 sm:px-2 max-w-screen-sm mx-auto">
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = isActivePath(pathname, item.href);
@@ -80,27 +80,29 @@ export function MobileBottomNav() {
               key={item.name}
               href={item.href}
               className={cn(
-                'flex flex-col items-center justify-center flex-1 h-full min-w-0 px-1 transition-all duration-200 relative',
+                'flex flex-col items-center justify-center flex-1 h-full min-w-0 px-2 transition-all duration-200 relative touch-manipulation',
+                // Ensure minimum touch target of 44x44px
+                'min-h-[44px] min-w-[44px]',
                 isActive
                   ? 'text-primary-600'
-                  : 'text-gray-500 hover:text-gray-700 active:scale-95'
+                  : 'text-gray-500 active:text-primary-600 active:scale-95'
               )}
               aria-current={isActive ? 'page' : undefined}
             >
               <div className="relative flex items-center justify-center mb-0.5">
                 <Icon 
                   className={cn(
-                    'h-5 w-5 transition-all duration-200',
+                    'h-6 w-6 sm:h-5 sm:w-5 transition-all duration-200',
                     isActive && 'scale-110'
                   )} 
                 />
                 {isActive && (
-                  <span className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary-600 rounded-full" />
+                  <span className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-primary-600 rounded-full animate-pulse" />
                 )}
               </div>
               <span 
                 className={cn(
-                  'text-[10px] font-medium truncate max-w-full leading-tight',
+                  'text-[11px] sm:text-[10px] font-medium truncate max-w-full leading-tight mt-0.5',
                   isActive ? 'text-primary-600 font-semibold' : 'text-gray-600'
                 )}
               >

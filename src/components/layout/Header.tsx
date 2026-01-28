@@ -90,7 +90,7 @@ export function Header() {
             {/* Refresh Button (Mobile only) */}
             <button
               onClick={handleRefresh}
-              className="md:hidden p-2 text-gray-600 hover:text-primary-600 transition-standard"
+              className="md:hidden p-3 sm:p-2 text-gray-600 hover:text-primary-600 transition-standard min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
               aria-label="Refresh page"
               title="Refresh page"
             >
@@ -100,7 +100,7 @@ export function Header() {
             {/* Search */}
             <button
               onClick={toggleSearch}
-              className="p-2 text-gray-600 hover:text-primary-600 transition-standard"
+              className="p-3 sm:p-2 text-gray-600 hover:text-primary-600 transition-standard min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
               aria-expanded={isSearchOpen}
               aria-controls="global-search"
             >
@@ -109,7 +109,7 @@ export function Header() {
             </button>
 
             {/* Notifications */}
-            <button className="relative p-2 text-gray-600 hover:text-primary-600 transition-standard" aria-label="Notifications">
+            <button className="relative p-3 sm:p-2 text-gray-600 hover:text-primary-600 transition-standard min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center" aria-label="Notifications">
               <Bell className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
                 <span className="text-xs text-white font-bold">3</span>
