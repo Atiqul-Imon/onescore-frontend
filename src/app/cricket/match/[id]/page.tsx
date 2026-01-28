@@ -13,6 +13,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ArrowLeft, RefreshCw, Calendar, MapPin, Trophy, BarChart3, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+import { useSocket } from '@/contexts/SocketContext';
 
 interface MatchDetails {
   _id: string;
@@ -146,7 +147,9 @@ export default function MatchDetailPage() {
   const [match, setMatch] = useState<MatchDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { socket, isConnected } = useSocket();
 
+  // Initial fetch and WebSocket setup
   useEffect(() => {
     if (!matchId) return;
 
@@ -156,14 +159,9 @@ export default function MatchDetailPage() {
         setError(null);
         
         const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        // Use timestamp to bypass cache for live matches
-        const timestamp = match?.status === 'live' ? Date.now() : undefined;
-        const url = timestamp 
-          ? `${base}/api/v1/cricket/matches/${matchId}?t=${timestamp}`
-          : `${base}/api/v1/cricket/matches/${matchId}`;
-        const response = await fetch(url, {
+        const response = await fetch(`${base}/api/v1/cricket/matches/${matchId}`, {
           cache: 'no-store',
-          next: { revalidate: match?.status === 'live' ? 0 : 30 },
+          next: { revalidate: 30 },
         });
 
         // Check status first
@@ -207,17 +205,39 @@ export default function MatchDetailPage() {
       }
     };
 
+    // Initial fetch
     fetchMatchDetails();
 
-    // Auto-refresh every 15 seconds for live matches only (not for completed/upcoming)
-    const interval = setInterval(() => {
-      if (match?.status === 'live') {
-        fetchMatchDetails();
-      }
-    }, 15000);
+    // Set up WebSocket subscription for live matches
+    if (socket && isConnected) {
+      // Subscribe to match updates
+      socket.emit('subscribe:match', { matchId, sport: 'cricket' });
+      
+      // Listen for match updates from WebSocket
+      const handleMatchUpdate = (updatedMatch: MatchDetails) => {
+        console.log('[MatchDetail] WebSocket update received:', updatedMatch);
+        if (updatedMatch.matchId === matchId) {
+          setMatch(updatedMatch);
+        }
+      };
 
-    return () => clearInterval(interval);
-  }, [matchId, match?.status]);
+      socket.on('match-update', handleMatchUpdate);
+
+      // Cleanup on unmount
+      return () => {
+        socket.off('match-update', handleMatchUpdate);
+        socket.emit('unsubscribe:match', { matchId, sport: 'cricket' });
+      };
+    } else {
+      // Fallback to polling if WebSocket is not available
+      console.log('[MatchDetail] WebSocket not available, using polling fallback');
+      const interval = setInterval(() => {
+        fetchMatchDetails();
+      }, 25000); // 25 seconds polling as fallback
+
+      return () => clearInterval(interval);
+    }
+  }, [matchId, socket, isConnected]);
 
   if (loading) {
     return (
@@ -327,19 +347,31 @@ export default function MatchDetailPage() {
                   return <LiveScoreView match={match} />;
                 }
                 if (activeTab === 'scorecard') {
-                  // Scorecard tab: Show detailed statistics only (no redundant scorecard)
+                  // Scorecard tab: Show detailed statistics
+                  // Use currentBatters/currentBowlers as fallback for live matches
+                  const battingData = match.batting || (match.currentBatters ? match.currentBatters.map((b: any) => ({
+                    ...b,
+                    isOut: false, // Current batters are not out
+                  })) : undefined);
+                  const bowlingData = match.bowling || match.currentBowlers;
+                  
                   return (
                     <div className="space-y-6">
-                      {(match.batting || match.bowling) ? (
+                      {(battingData || bowlingData) ? (
                         <MatchStats 
-                          batting={match.batting} 
-                          bowling={match.bowling}
+                          batting={battingData} 
+                          bowling={bowlingData}
                           teams={match.teams}
                           matchId={matchId}
                         />
                       ) : (
                         <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-600">
-                          <p>Player statistics will be available once the match progresses.</p>
+                          <p className="mb-2">Player statistics are not available yet.</p>
+                          <p className="text-sm text-gray-500">
+                            {match.status === 'live' 
+                              ? 'Statistics will appear as players bat and bowl during the match.'
+                              : 'Statistics will be available once the match progresses.'}
+                          </p>
                         </div>
                       )}
                     </div>
