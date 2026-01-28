@@ -72,6 +72,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     }
     
     // Connect to /live namespace (matches backend WebSocketGateway namespace)
+    // Updated: WebSocket connection for real-time match updates
     const socketUrl = `${wsUrl}/live`;
     
     console.log('[SocketContext] Connecting to WebSocket:', {
