@@ -64,11 +64,13 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
 
   const handleShare = () => {
     if (navigator.share) {
-      navigator.share({
-        title: `${match.teams.home.name} vs ${match.teams.away.name}`,
-        text: `Check out this cricket match on ScoreNews`,
-        url: window.location.href,
-      }).catch(() => {});
+      navigator
+        .share({
+          title: `${match.teams.home.name} vs ${match.teams.away.name}`,
+          text: `Check out this cricket match on ScoreNews`,
+          url: window.location.href,
+        })
+        .catch(() => {});
     } else {
       // Fallback: Copy to clipboard
       navigator.clipboard.writeText(window.location.href);
@@ -80,8 +82,8 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
         {/* Top Bar - Back Button and Actions */}
         <div className="flex items-center justify-between mb-3 sm:mb-4">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center gap-1.5 sm:gap-2 text-white/80 hover:text-white transition-colors text-xs sm:text-sm font-medium touch-target"
           >
             <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -167,9 +169,13 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
               {/* Home Team Score */}
               <div className="flex items-center justify-between bg-white/5 backdrop-blur-sm rounded-xl px-4 sm:px-6 py-3 sm:py-4 border border-white/10">
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                  <span className="text-2xl sm:text-3xl flex-shrink-0">{match.teams.home.flag}</span>
+                  <span className="text-2xl sm:text-3xl flex-shrink-0">
+                    {match.teams.home.flag}
+                  </span>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-base sm:text-lg text-white truncate">{match.teams.home.name}</h3>
+                    <h3 className="font-bold text-base sm:text-lg text-white truncate">
+                      {match.teams.home.name}
+                    </h3>
                     <p className="text-xs sm:text-sm text-white/60">{match.teams.home.shortName}</p>
                   </div>
                 </div>
@@ -178,7 +184,9 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
                     <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tabular-nums">
                       {homeScore.runs}
                       {homeScore.wickets !== undefined && (
-                        <span className="text-xl sm:text-2xl md:text-3xl text-white/70 font-normal">/{homeScore.wickets}</span>
+                        <span className="text-xl sm:text-2xl md:text-3xl text-white/70 font-normal">
+                          /{homeScore.wickets}
+                        </span>
                       )}
                     </div>
                     {homeScore.overs > 0 && (
@@ -193,9 +201,13 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
               {/* Away Team Score */}
               <div className="flex items-center justify-between bg-white/5 backdrop-blur-sm rounded-xl px-4 sm:px-6 py-3 sm:py-4 border border-white/10">
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                  <span className="text-2xl sm:text-3xl flex-shrink-0">{match.teams.away.flag}</span>
+                  <span className="text-2xl sm:text-3xl flex-shrink-0">
+                    {match.teams.away.flag}
+                  </span>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-base sm:text-lg text-white truncate">{match.teams.away.name}</h3>
+                    <h3 className="font-bold text-base sm:text-lg text-white truncate">
+                      {match.teams.away.name}
+                    </h3>
                     <p className="text-xs sm:text-sm text-white/60">{match.teams.away.shortName}</p>
                   </div>
                 </div>
@@ -204,7 +216,9 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
                     <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tabular-nums">
                       {awayScore.runs}
                       {awayScore.wickets !== undefined && (
-                        <span className="text-xl sm:text-2xl md:text-3xl text-white/70 font-normal">/{awayScore.wickets}</span>
+                        <span className="text-xl sm:text-2xl md:text-3xl text-white/70 font-normal">
+                          /{awayScore.wickets}
+                        </span>
                       )}
                     </div>
                     {awayScore.overs > 0 && (
@@ -215,15 +229,6 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
                   </div>
                 )}
               </div>
-
-              {/* Result Text for Completed Matches */}
-              {isCompleted && match.result && (
-                <div className="text-center px-4 py-3 bg-primary-500/20 backdrop-blur-sm rounded-xl border border-primary-400/30">
-                  <p className="text-base sm:text-lg font-bold text-primary-200">
-                    {match.result.resultText}
-                  </p>
-                </div>
-              )}
             </div>
           )}
 
@@ -231,23 +236,25 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
           <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-white/80">
             <span className="inline-flex items-center gap-1.5 sm:gap-2">
               <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-              <span className="truncate">{match.venue.name}, {match.venue.city}</span>
+              <span className="truncate">
+                {match.venue.name}, {match.venue.city}
+              </span>
             </span>
             <span className="inline-flex items-center gap-1.5 sm:gap-2">
               <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
               <span className="hidden sm:inline">
-                {new Date(match.startTime).toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
+                {new Date(match.startTime).toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
                 })}
               </span>
               <span className="sm:hidden">
-                {new Date(match.startTime).toLocaleDateString('en-US', { 
-                  month: 'short', 
+                {new Date(match.startTime).toLocaleDateString('en-US', {
+                  month: 'short',
                   day: 'numeric',
-                  year: 'numeric'
+                  year: 'numeric',
                 })}
               </span>
             </span>
@@ -257,4 +264,3 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
     </div>
   );
 }
-

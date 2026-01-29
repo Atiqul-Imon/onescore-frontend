@@ -57,6 +57,13 @@ interface MatchScorecardProps {
     tossWon?: string;
     elected?: string;
     target?: number;
+    result?: {
+      winner: 'home' | 'away';
+      winnerName: string;
+      margin: number;
+      marginType: 'runs' | 'wickets';
+      resultText: string;
+    };
   };
 }
 
@@ -118,7 +125,7 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
             <div className="flex items-center gap-4">
               <span className="text-3xl">{match.teams.home.flag}</span>
               <div>
-                <Link 
+                <Link
                   href={`/cricket/match/${match.matchId}/team/${encodeURIComponent(match.teams.home.name.toLowerCase().replace(/\s+/g, '-'))}`}
                   className="hover:text-primary-600 transition-colors"
                 >
@@ -144,11 +151,12 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
           {homeScore.overs && parseFloat(homeScore.overs) > 0 && (
             <div className="flex items-center gap-4 text-sm">
               <span className="px-3 py-1.5 rounded-lg bg-primary-50 text-primary-700 font-semibold">
-                RR: {((homeScore.runs / parseFloat(homeScore.overs)) || 0).toFixed(2)}
+                RR: {(homeScore.runs / parseFloat(homeScore.overs) || 0).toFixed(2)}
               </span>
               {isLive && (
                 <span className="text-gray-600">
-                  {match.currentScore?.home.balls !== undefined && `${match.currentScore.home.balls} balls`}
+                  {match.currentScore?.home.balls !== undefined &&
+                    `${match.currentScore.home.balls} balls`}
                 </span>
               )}
             </div>
@@ -161,7 +169,7 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
             <div className="flex items-center gap-4">
               <span className="text-3xl">{match.teams.away.flag}</span>
               <div>
-                <Link 
+                <Link
                   href={`/cricket/match/${match.matchId}/team/${encodeURIComponent(match.teams.away.name.toLowerCase().replace(/\s+/g, '-'))}`}
                   className="hover:text-primary-600 transition-colors"
                 >
@@ -187,22 +195,25 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
           {awayScore.overs && parseFloat(awayScore.overs) > 0 && (
             <div className="flex items-center gap-4 text-sm">
               <span className="px-3 py-1.5 rounded-lg bg-primary-50 text-primary-700 font-semibold">
-                RR: {((awayScore.runs / parseFloat(awayScore.overs)) || 0).toFixed(2)}
+                RR: {(awayScore.runs / parseFloat(awayScore.overs) || 0).toFixed(2)}
               </span>
               {isLive && (
                 <span className="text-gray-600">
-                  {match.currentScore?.away.balls !== undefined && `${match.currentScore.away.balls} balls`}
+                  {match.currentScore?.away.balls !== undefined &&
+                    `${match.currentScore.away.balls} balls`}
                 </span>
               )}
             </div>
           )}
         </div>
 
-        {/* Match Note / Target - Cricinfo Style */}
-        {match.matchNote && (
+        {/* Match Note / Target - Cricinfo Style (Only for live matches or if different from result) */}
+        {match.matchNote && match.status !== 'completed' && (
           <div className="pt-4 border-t-2 border-primary-200 bg-primary-50/50 rounded-lg p-4">
             <div className="text-center">
-              <p className="text-sm font-semibold text-primary-800 uppercase tracking-wide mb-1">Match Status</p>
+              <p className="text-sm font-semibold text-primary-800 uppercase tracking-wide mb-1">
+                Match Status
+              </p>
               <p className="text-lg font-bold text-secondary-900">{match.matchNote}</p>
               {match.target && (
                 <p className="text-sm text-gray-600 mt-1">Target: {match.target} runs</p>
@@ -210,6 +221,20 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
             </div>
           </div>
         )}
+        {/* For completed matches, only show target if result doesn't already show it */}
+        {match.status === 'completed' &&
+          match.target &&
+          match.result &&
+          !match.result.resultText.includes(`Target ${match.target}`) && (
+            <div className="pt-4 border-t-2 border-primary-200 bg-primary-50/50 rounded-lg p-4">
+              <div className="text-center">
+                <p className="text-sm font-semibold text-primary-800 uppercase tracking-wide mb-1">
+                  Target
+                </p>
+                <p className="text-lg font-bold text-secondary-900">Target: {match.target} runs</p>
+              </div>
+            </div>
+          )}
 
         {/* Toss Information */}
         {(match.tossWon || match.elected) && (
@@ -217,7 +242,8 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600 font-medium">Toss:</span>
               <span className="text-gray-900 font-semibold">
-                {match.tossWon} {match.elected ? `won the toss and ${match.elected}` : 'won the toss'}
+                {match.tossWon}{' '}
+                {match.elected ? `won the toss and ${match.elected}` : 'won the toss'}
               </span>
             </div>
           </div>
@@ -226,7 +252,9 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
         {/* Innings Breakdown - Cricinfo Style */}
         {match.innings && match.innings.length > 0 && (
           <div className="pt-6 border-t-2 border-gray-200">
-            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Innings Summary</h3>
+            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">
+              Innings Summary
+            </h3>
             <div className="space-y-4">
               {match.innings.map((inning, index) => (
                 <div key={index} className="p-4 rounded-xl bg-gray-50 border border-gray-200">
@@ -242,13 +270,17 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
                           <span className="text-lg text-gray-600">/{inning.wickets}</span>
                         )}
                       </p>
-                      <p className="text-sm text-gray-600 font-medium">{inning.overs.toFixed(1)} overs</p>
+                      <p className="text-sm text-gray-600 font-medium">
+                        {inning.overs.toFixed(1)} overs
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-200">
                     <div className="flex-1">
                       <p className="text-xs text-gray-500 uppercase tracking-wide">Run Rate</p>
-                      <p className="text-sm font-bold text-primary-700">{inning.runRate.toFixed(2)}</p>
+                      <p className="text-sm font-bold text-primary-700">
+                        {inning.runRate.toFixed(2)}
+                      </p>
                     </div>
                     <div className="flex-1">
                       <p className="text-xs text-gray-500 uppercase tracking-wide">Wickets</p>
@@ -271,16 +303,15 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
             <div className="flex items-center gap-3 text-sm text-gray-700">
               <Clock className="h-4 w-4 text-primary-600" />
               <span className="font-medium">
-                {isUpcoming 
+                {isUpcoming
                   ? `Starts at ${formatTime(match.startTime)}`
                   : isLive
-                  ? 'Match in Progress'
-                  : `Completed on ${new Date(match.startTime).toLocaleDateString('en-US', { 
-                      month: 'short', 
-                      day: 'numeric', 
-                      year: 'numeric' 
-                    })}`
-                }
+                    ? 'Match in Progress'
+                    : `Completed on ${new Date(match.startTime).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}`}
               </span>
             </div>
             <span className="px-4 py-2 rounded-lg bg-primary-100 text-primary-800 font-bold text-sm">
@@ -292,4 +323,3 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
     </Card>
   );
 }
-
