@@ -402,10 +402,10 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="rounded-3xl border border-gray-200 bg-white shadow-lg"
+              className="rounded-xl border border-gray-200 bg-white shadow-lg"
             >
               {featuredArticle ? (
-                <Link href={`/${featuredArticle.slug}`} className="group block overflow-hidden rounded-3xl">
+                <Link href={`/${featuredArticle.slug}`} className="group block overflow-hidden rounded-xl">
                   <div className="relative h-full min-h-[420px]">
                     {featuredArticle.heroImage ? (
                       <Image
@@ -485,7 +485,7 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="space-y-6 rounded-3xl border border-gray-200 bg-gray-50 p-6 shadow-lg"
+              className="space-y-6 rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-lg"
             >
               <div className="flex items-center justify-between">
                 <div>

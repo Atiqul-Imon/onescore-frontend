@@ -83,65 +83,69 @@ export function ArticleComments({ articleId }: ArticleCommentsProps) {
   }
 
   return (
-    <div className="mt-8">
-      <div className="flex items-center gap-2 mb-4">
-        <MessageSquare className="w-5 h-5" />
-        <h3 className="text-xl font-semibold">Comments ({comments.length})</h3>
+    <div className="border-t border-gray-200 pt-8">
+      <div className="flex items-center gap-2.5 mb-6">
+        <MessageSquare className="w-5 h-5 text-gray-600" />
+        <h3 className="text-xl sm:text-2xl font-semibold text-gray-900">Comments ({comments.length})</h3>
       </div>
 
       {user ? (
-        <form onSubmit={handleSubmit} className="mb-6">
+        <form onSubmit={handleSubmit} className="mb-8">
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Write a comment..."
-            className="w-full border rounded-md px-4 py-2 mb-2 min-h-[100px]"
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-3 min-h-[120px] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-y"
             rows={4}
           />
           <button
             type="submit"
             disabled={submitting || !newComment.trim()}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
           >
             <Send className="w-4 h-4" />
             {submitting ? 'Posting...' : 'Post Comment'}
           </button>
         </form>
       ) : (
-        <div className="mb-6 p-4 bg-gray-50 rounded-md text-center">
+        <div className="mb-8 p-5 bg-gray-50 rounded-lg text-center border border-gray-200">
           <p className="text-gray-600 mb-2">Please log in to comment</p>
-          <Link href="/login" className="text-blue-600 hover:underline">Log in</Link>
+          <Link href="/login" className="text-primary-600 hover:text-primary-700 font-semibold hover:underline">Log in</Link>
         </div>
       )}
 
       {loading ? (
-        <div className="text-center py-8 text-gray-500">Loading comments...</div>
+        <div className="text-center py-12 text-gray-500">Loading comments...</div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">No comments yet. Be the first to comment!</div>
+        <div className="text-center py-12 text-gray-500">No comments yet. Be the first to comment!</div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {comments.map((comment) => (
-            <div key={comment._id} className="border rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+            <div key={comment._id} className="border border-gray-200 rounded-lg p-5 bg-white hover:border-gray-300 transition-colors">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center flex-shrink-0 text-white font-semibold text-sm">
                   {comment.author?.avatar ? (
-                    <img src={comment.author.avatar} alt={comment.author.name} className="w-full h-full rounded-full" />
+                    <img src={comment.author.avatar} alt={comment.author.name} className="w-full h-full rounded-full object-cover" />
                   ) : (
-                    <span className="text-sm">{comment.author?.name?.[0] || 'U'}</span>
+                    <span>{comment.author?.name?.[0]?.toUpperCase() || 'U'}</span>
                   )}
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium">{comment.author?.name || 'Anonymous'}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2.5 mb-2">
+                    <span className="font-semibold text-gray-900">{comment.author?.name || 'Anonymous'}</span>
                     <span className="text-xs text-gray-500">
-                      {new Date(comment.createdAt).toLocaleDateString()}
+                      {new Date(comment.createdAt).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
                     </span>
                   </div>
-                  <p className="text-gray-700 mb-2">{comment.content}</p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <button className="hover:text-blue-600">↑ {comment.upvotes}</button>
-                    <button className="hover:text-red-600">↓ {comment.downvotes}</button>
-                    <button className="hover:text-blue-600">Reply</button>
+                  <p className="text-gray-700 mb-3 leading-relaxed">{comment.content}</p>
+                  <div className="flex items-center gap-5 text-sm">
+                    <button className="text-gray-600 hover:text-primary-600 transition-colors font-medium">↑ {comment.upvotes}</button>
+                    <button className="text-gray-600 hover:text-red-600 transition-colors font-medium">↓ {comment.downvotes}</button>
+                    <button className="text-gray-600 hover:text-primary-600 transition-colors font-medium">Reply</button>
                   </div>
                 </div>
               </div>
