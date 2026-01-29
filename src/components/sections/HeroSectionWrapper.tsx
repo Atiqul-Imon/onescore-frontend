@@ -39,10 +39,10 @@ async function fetchHeroData() {
   try {
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     const [newsRes, trendingRes, cricketLiveRes, footballLiveRes] = await Promise.allSettled([
-      fetch(`${base}/api/v1/news?limit=5&state=published`, { cache: 'no-store', next: { revalidate: 0 } }),
-      fetch(`${base}/api/v1/news/trending?limit=4`, { cache: 'no-store', next: { revalidate: 0 } }),
-      fetch(`${base}/api/v1/cricket/matches/live?t=${Date.now()}`, { cache: 'no-store', next: { revalidate: 0 } }),
-      fetch(`${base}/api/v1/football/matches/live?t=${Date.now()}`, { cache: 'no-store', next: { revalidate: 0 } }),
+      fetch(`${base}/api/v1/news?limit=5&state=published`, { next: { revalidate: 300 } }), // Cache for 5 minutes
+      fetch(`${base}/api/v1/news/trending?limit=4`, { next: { revalidate: 300 } }), // Cache for 5 minutes
+      fetch(`${base}/api/v1/cricket/matches/live?t=${Date.now()}`, { next: { revalidate: 30 } }), // Cache for 30 seconds
+      fetch(`${base}/api/v1/football/matches/live?t=${Date.now()}`, { next: { revalidate: 30 } }), // Cache for 30 seconds
     ]);
 
     let articles: Article[] = [];
@@ -99,8 +99,8 @@ async function fetchHeroData() {
     if (remainingSlots > 0) {
       try {
         const [cricketCompletedRes, footballCompletedRes] = await Promise.allSettled([
-          fetch(`${base}/api/v1/cricket/matches/results?limit=${remainingSlots}`, { cache: 'no-store', next: { revalidate: 3600 } }),
-          fetch(`${base}/api/v1/football/matches/results?limit=${remainingSlots}`, { cache: 'no-store', next: { revalidate: 3600 } }),
+          fetch(`${base}/api/v1/cricket/matches/results?limit=${remainingSlots}`, { next: { revalidate: 600 } }), // Cache for 10 minutes
+          fetch(`${base}/api/v1/football/matches/results?limit=${remainingSlots}`, { next: { revalidate: 600 } }), // Cache for 10 minutes
         ]);
         
         let completedMatches: LiveMatch[] = [];
@@ -152,8 +152,8 @@ async function fetchHeroData() {
     if (stillRemainingSlots > 0) {
       try {
         const [cricketFixturesRes, footballFixturesRes] = await Promise.allSettled([
-          fetch(`${base}/api/v1/cricket/matches/fixtures?limit=${stillRemainingSlots}`, { cache: 'no-store', next: { revalidate: 300 } }),
-          fetch(`${base}/api/v1/football/matches/fixtures?limit=${stillRemainingSlots}`, { cache: 'no-store', next: { revalidate: 300 } }),
+          fetch(`${base}/api/v1/cricket/matches/fixtures?limit=${stillRemainingSlots}`, { next: { revalidate: 300 } }), // Cache for 5 minutes
+          fetch(`${base}/api/v1/football/matches/fixtures?limit=${stillRemainingSlots}`, { next: { revalidate: 300 } }), // Cache for 5 minutes
         ]);
         
         let upcomingMatches: LiveMatch[] = [];

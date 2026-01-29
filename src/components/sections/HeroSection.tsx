@@ -29,9 +29,9 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
         console.log('[HeroSection] Fetching matches at', new Date().toLocaleTimeString());
       }
       
-      // First try to fetch live matches
+      // First try to fetch live matches (only these need frequent updates)
       const [newsRes, cricketLiveRes, footballLiveRes] = await Promise.allSettled([
-        fetch(`${base}/api/v1/news?limit=5&state=published`, { cache: 'no-store', next: { revalidate: 0 } }),
+        fetch(`${base}/api/v1/news?limit=5&state=published`, { next: { revalidate: 300 } }), // Cache news for 5 minutes
         fetch(`${base}/api/v1/cricket/matches/live?t=${timestamp}`, { cache: 'no-store', next: { revalidate: 0 } }),
         fetch(`${base}/api/v1/football/matches/live?t=${timestamp}`, { cache: 'no-store', next: { revalidate: 0 } }),
       ]);
@@ -86,20 +86,19 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
       }
 
       // If we have less than 4 matches, fill remaining slots with completed matches
+      // Only fetch completed matches if we don't have enough live matches
       const maxMatches = 4;
       const remainingSlots = maxMatches - allLiveMatches.length;
       
       if (remainingSlots > 0) {
-        // Fetch completed matches to fill empty slots
+        // Fetch completed matches to fill empty slots (cache for 10 minutes - they don't change)
         try {
           const [cricketCompletedRes, footballCompletedRes] = await Promise.allSettled([
             fetch(`${base}/api/v1/cricket/matches/results?limit=${remainingSlots}`, { 
-              cache: 'no-store', 
-              next: { revalidate: 3600 } 
+              next: { revalidate: 600 } // Cache for 10 minutes
             }),
             fetch(`${base}/api/v1/football/matches/results?limit=${remainingSlots}`, { 
-              cache: 'no-store', 
-              next: { revalidate: 3600 } 
+              next: { revalidate: 600 } // Cache for 10 minutes
             }),
           ]);
           
@@ -158,10 +157,10 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
     // Initial fetch
     fetchHeroData();
     
-    // Auto-refresh every 15 seconds for live matches
+    // Auto-refresh every 30 seconds for live matches (reduced frequency to avoid rate limiting)
     const interval = setInterval(() => {
       fetchHeroData();
-    }, 15000);
+    }, 30000); // Increased from 15s to 30s
     
     return () => clearInterval(interval);
   }, [fetchHeroData]);

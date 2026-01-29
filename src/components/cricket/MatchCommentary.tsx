@@ -67,7 +67,7 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
     fetchCommentary();
 
     if (autoRefresh) {
-      const interval = setInterval(fetchCommentary, 10000); // Refresh every 10 seconds
+      const interval = setInterval(fetchCommentary, 15000); // Refresh every 15 seconds (reduced frequency)
       return () => clearInterval(interval);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
