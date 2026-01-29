@@ -76,78 +76,78 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
         allLiveMatches = [...allLiveMatches, ...footballLiveMatches];
       }
 
-      // Don't fetch upcoming matches - fixtures not available in subscription
-      // Only show live matches
-      const combinedMatches = [...allLiveMatches];
-      
-      if (combinedMatches.length > 0) {
-        // Sort: live matches first, then by start time (soonest first for upcoming)
-        combinedMatches.sort((a, b) => {
-          // Live matches always come first
+      // Sort live matches: live first, then by start time
+      if (allLiveMatches.length > 0) {
+        allLiveMatches.sort((a, b) => {
           if (a.status === 'live' && b.status !== 'live') return -1;
           if (a.status !== 'live' && b.status === 'live') return 1;
-          
-          // For live matches, sort by start time (most recent first)
-          if (a.status === 'live' && b.status === 'live') {
-            const dateA = new Date(a.startTime || 0).getTime();
-            const dateB = new Date(b.startTime || 0).getTime();
-            return dateB - dateA;
-          }
-          
-          // For upcoming matches, sort by start time (soonest first)
-          if (a.status === 'upcoming' && b.status === 'upcoming') {
-            const dateA = new Date(a.startTime || 0).getTime();
-            const dateB = new Date(b.startTime || 0).getTime();
-            return dateA - dateB;
-          }
-          
           return 0;
         });
-        
-        // Show up to 4 matches: prioritize live matches, then upcoming starting soon
-        setLiveMatches(combinedMatches.slice(0, 4));
-        return;
       }
 
-      // If no live matches, fetch completed matches from database
-      try {
-        const resultsRes = await fetch(`${base}/api/v1/cricket/matches/results?limit=4`, {
-          cache: 'no-store',
-          next: { revalidate: 3600 }, // Cache for 1 hour (completed matches don't change)
-        });
-
-        if (resultsRes.ok) {
-          const resultsJson = await resultsRes.json();
+      // If we have less than 4 matches, fill remaining slots with completed matches
+      const maxMatches = 4;
+      const remainingSlots = maxMatches - allLiveMatches.length;
+      
+      if (remainingSlots > 0) {
+        // Fetch completed matches to fill empty slots
+        try {
+          const [cricketCompletedRes, footballCompletedRes] = await Promise.allSettled([
+            fetch(`${base}/api/v1/cricket/matches/results?limit=${remainingSlots}`, { 
+              cache: 'no-store', 
+              next: { revalidate: 3600 } 
+            }),
+            fetch(`${base}/api/v1/football/matches/results?limit=${remainingSlots}`, { 
+              cache: 'no-store', 
+              next: { revalidate: 3600 } 
+            }),
+          ]);
           
-          if (resultsJson.success && resultsJson.data) {
-            // Handle both direct array and nested results property
-            const resultsData = Array.isArray(resultsJson.data) 
-              ? resultsJson.data 
-              : resultsJson.data.results || [];
-            
-            // Filter to show only cricket matches and ensure status is 'completed'
-            const cricketResults = resultsData
+          let completedMatches: LiveMatch[] = [];
+          
+          // Fetch cricket completed matches
+          if (cricketCompletedRes.status === 'fulfilled' && cricketCompletedRes.value.ok) {
+            const cricketData = await cricketCompletedRes.value.json();
+            const cricketResults = Array.isArray(cricketData?.data) 
+              ? cricketData.data 
+              : cricketData?.data?.results || [];
+            const cricketCompleted = cricketResults
               .filter((match: LiveMatch) => match.format && !match.league)
-              .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }))
-              .sort((a: LiveMatch, b: LiveMatch) => {
-                // Sort by start time (most recent first)
-                const dateA = new Date(a.startTime || 0).getTime();
-                const dateB = new Date(b.startTime || 0).getTime();
-                return dateB - dateA;
-              });
-            
-            if (cricketResults.length > 0) {
-              setLiveMatches(cricketResults.slice(0, 4));
-              return;
-            }
+              .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }));
+            completedMatches = [...completedMatches, ...cricketCompleted];
           }
+          
+          // Fetch football completed matches
+          if (footballCompletedRes.status === 'fulfilled' && footballCompletedRes.value.ok) {
+            const footballData = await footballCompletedRes.value.json();
+            const footballResults = Array.isArray(footballData?.data) 
+              ? footballData.data 
+              : footballData?.data?.results || [];
+            const footballCompleted = footballResults
+              .filter((match: LiveMatch) => match.league && !match.format)
+              .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }));
+            completedMatches = [...completedMatches, ...footballCompleted];
+          }
+          
+          if (completedMatches.length > 0) {
+            // Sort by start time (most recent first)
+            completedMatches.sort((a, b) => {
+              const dateA = new Date(a.startTime || 0).getTime();
+              const dateB = new Date(b.startTime || 0).getTime();
+              return dateB - dateA;
+            });
+            
+            // Add completed matches to fill remaining slots
+            const matchesToAdd = completedMatches.slice(0, remainingSlots);
+            allLiveMatches = [...allLiveMatches, ...matchesToAdd];
+          }
+        } catch (resultsError) {
+          console.error('[HeroSection] Failed to fetch completed matches:', resultsError);
         }
-      } catch (resultsError) {
-        console.error('[HeroSection] Failed to fetch completed matches:', resultsError);
       }
 
-      // If no completed matches either, show empty
-      setLiveMatches([]);
+      // Set matches (max 4 total: live first, then completed)
+      setLiveMatches(allLiveMatches.slice(0, maxMatches));
     } catch (error) {
       console.error('Error fetching hero data:', error);
       setLiveMatches([]);

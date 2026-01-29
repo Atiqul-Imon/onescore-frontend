@@ -1,7 +1,6 @@
 'use client';
 
 import { Card } from '@/components/ui/Card';
-import { Trophy, Award, Target, TrendingUp, CheckCircle2 } from 'lucide-react';
 
 interface CompletedMatchViewProps {
   match: {
@@ -109,7 +108,6 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
       <Card className="rounded-2xl border-2 border-primary-200 bg-gradient-to-br from-primary-50 via-white to-primary-50 shadow-xl overflow-hidden">
         <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-600 px-4 sm:px-6 py-4 sm:py-5">
           <div className="flex items-center gap-2 sm:gap-3 text-white">
-            <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary-100 flex-shrink-0" />
             <span className="font-bold text-lg sm:text-xl">Match Result</span>
           </div>
         </div>
@@ -118,7 +116,6 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
           {/* Winner Announcement */}
           <div className="text-center pb-4 border-b-2 border-primary-200">
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2">
-              <Trophy className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-500" />
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-900">
                 {match.result?.resultText || `${winner.name} won by ${marginText}`}
               </h2>
@@ -208,7 +205,6 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
         <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
           <div className="bg-gradient-to-r from-secondary-800 via-secondary-900 to-secondary-800 px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center gap-2 sm:gap-3 text-white">
-              <Award className="h-4 w-4 sm:h-5 sm:w-5 text-primary-400 flex-shrink-0" />
               <span className="font-bold text-base sm:text-lg">Innings Breakdown</span>
             </div>
           </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import { Card } from '@/components/ui/Card';
-import { Trophy, Clock, Users, Target, TrendingUp, TrendingDown, Zap } from 'lucide-react';
 import { formatTime } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
@@ -109,7 +108,6 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
       <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-6 py-4">
           <div className="flex items-center gap-3 text-white">
-            <Clock className="h-5 w-5 text-primary-100" />
             <span className="font-bold text-lg">Match Preview</span>
           </div>
         </div>
@@ -154,15 +152,7 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
   };
 
   const getRRBadge = (rr: string | null, required: string | null) => {
-    if (!rr || !required) return null;
-    const rrNum = parseFloat(rr);
-    const reqNum = parseFloat(required);
-    if (rrNum >= reqNum) {
-      return <TrendingUp className="h-3 w-3 text-green-600" />;
-    }
-    if (rrNum < reqNum * 0.85) {
-      return <TrendingDown className="h-3 w-3 text-red-600" />;
-    }
+    // Icon removed - return null
     return null;
   };
 
@@ -171,7 +161,6 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
       <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between text-white gap-2">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary-100 flex-shrink-0" />
             <span className="font-bold text-base sm:text-lg truncate">Live Score</span>
           </div>
           {isLive && (
@@ -208,7 +197,6 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                       exit={{ opacity: 0 }}
                       className="text-primary-600"
                     >
-                      <Zap className="h-4 w-4" />
                     </motion.span>
                   )}
                   {homeScore.runs}
@@ -250,7 +238,6 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                       exit={{ opacity: 0 }}
                       className="text-primary-600"
                     >
-                      <Zap className="h-4 w-4" />
                     </motion.span>
                   )}
                   {awayScore.runs}
@@ -303,7 +290,6 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
               {match.currentBatters && match.currentBatters.length > 0 ? (
                 <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
                   <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                    <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 flex-shrink-0" />
                     <span className="text-xs sm:text-sm font-semibold text-gray-700">Current Batters</span>
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
@@ -366,7 +352,6 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
               {match.currentBowlers && match.currentBowlers.length > 0 ? (
                 <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
                   <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                    <Target className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-600 flex-shrink-0" />
                     <span className="text-xs sm:text-sm font-semibold text-gray-700">Current Bowlers</span>
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
