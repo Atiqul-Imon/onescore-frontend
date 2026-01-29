@@ -40,6 +40,7 @@
     "web-vitals": "^5.1.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.3",
     "@playwright/test": "^1.40.0",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
@@ -51,7 +52,7 @@
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "autoprefixer": "^10.4.16",
-    "eslint": "^9.0.0",
+    "eslint": "^8.57.1",
     "eslint-config-next": "^16.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-testing-library": "^6.2.0",
