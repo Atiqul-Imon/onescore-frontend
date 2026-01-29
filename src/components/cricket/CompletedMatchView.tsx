@@ -91,7 +91,7 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
     winnerScore = homeWon ? homeScore : awayScore;
     loserScore = homeWon ? awayScore : homeScore;
     const margin = Math.abs(homeFinal - awayFinal);
-    
+
     // Fallback logic
     const winnerWickets = winnerScore?.wickets ?? 10;
     if (winnerWickets < 10) {
@@ -120,9 +120,13 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                 {match.result?.resultText || `${winner.name} won by ${marginText}`}
               </h2>
             </div>
-            {match.matchNote && (
-              <p className="text-sm sm:text-base text-gray-700 mt-2">{match.matchNote}</p>
-            )}
+            {/* Only show matchNote if it's different from resultText (additional context) */}
+            {match.matchNote &&
+              match.result?.resultText &&
+              match.matchNote !== match.result.resultText &&
+              !match.matchNote.includes(match.result.resultText) && (
+                <p className="text-sm sm:text-base text-gray-700 mt-2">{match.matchNote}</p>
+              )}
           </div>
 
           {/* Final Scores */}
@@ -141,7 +145,9 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                   <div className="text-2xl sm:text-3xl font-bold text-green-700">
                     {winnerScore?.runs || (homeFinal > awayFinal ? homeFinal : awayFinal)}
                     {winnerScore?.wickets !== undefined && (
-                      <span className="text-xl sm:text-2xl text-gray-600 font-normal">/{winnerScore.wickets}</span>
+                      <span className="text-xl sm:text-2xl text-gray-600 font-normal">
+                        /{winnerScore.wickets}
+                      </span>
                     )}
                   </div>
                   {winnerScore?.overs > 0 && (
@@ -167,7 +173,9 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                   <div className="text-2xl sm:text-3xl font-bold text-gray-700">
                     {loserScore?.runs || (homeFinal > awayFinal ? awayFinal : homeFinal)}
                     {loserScore?.wickets !== undefined && (
-                      <span className="text-xl sm:text-2xl text-gray-600 font-normal">/{loserScore.wickets}</span>
+                      <span className="text-xl sm:text-2xl text-gray-600 font-normal">
+                        /{loserScore.wickets}
+                      </span>
                     )}
                   </div>
                   {loserScore?.overs > 0 && (
@@ -217,9 +225,7 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                   <div
                     key={index}
                     className={`rounded-xl border-2 p-4 sm:p-5 ${
-                      isWinnerInning
-                        ? 'bg-green-50 border-green-200'
-                        : 'bg-gray-50 border-gray-200'
+                      isWinnerInning ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -237,9 +243,7 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                         </div>
                         <div className="text-xs sm:text-sm text-gray-600 mt-1">
                           {inning.overs.toFixed(1)} overs
-                          {inning.runRate > 0 && (
-                            <span> • RR: {inning.runRate.toFixed(2)}</span>
-                          )}
+                          {inning.runRate > 0 && <span> • RR: {inning.runRate.toFixed(2)}</span>}
                         </div>
                       </div>
                     </div>
@@ -253,4 +257,3 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
     </div>
   );
 }
-

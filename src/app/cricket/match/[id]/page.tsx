@@ -11,7 +11,11 @@ import { CompletedMatchView } from '@/components/cricket/CompletedMatchView';
 import { MatchHeader } from '@/components/cricket/MatchHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { MatchHeaderSkeleton, LiveScoreSkeleton, ScorecardSkeleton } from '@/components/ui/Skeleton';
+import {
+  MatchHeaderSkeleton,
+  LiveScoreSkeleton,
+  ScorecardSkeleton,
+} from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { useSocket } from '@/contexts/SocketContext';
 
@@ -164,7 +168,7 @@ export default function MatchDetailPage() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
         const response = await fetch(`${base}/api/v1/cricket/matches/${matchId}`, {
           cache: 'no-store',
@@ -188,16 +192,16 @@ export default function MatchDetailPage() {
         }
 
         const json = await response.json();
-        
+
         // Handle case where response indicates not found
         if (!json.success || json.statusCode === 404) {
           notFound();
           return;
         }
-        
+
         // Handle case where data might be at root level (TransformInterceptor wraps it)
         const matchData = json.data || json;
-        
+
         // Check if we have actual match data
         if (!matchData || (!matchData.matchId && !matchData._id && !matchData.id)) {
           throw new Error('Match data is invalid or empty');
@@ -229,7 +233,7 @@ export default function MatchDetailPage() {
 
       // Subscribe to match updates (subscribe immediately if connected, or wait for connection)
       let connectHandler: (() => void) | null = null;
-      
+
       if (isConnected) {
         socket.emit('subscribe:match', { matchId, sport: 'cricket' });
         console.log('[MatchDetail] Subscribed to WebSocket for match:', matchId);
@@ -278,7 +282,9 @@ export default function MatchDetailPage() {
         <Container size="2xl">
           <ErrorState
             title="Match Not Found"
-            message={error || 'The match you are looking for does not exist or may have been removed.'}
+            message={
+              error || 'The match you are looking for does not exist or may have been removed.'
+            }
             showHomeButton
             showBackButton
             backHref="/"
@@ -301,9 +307,11 @@ export default function MatchDetailPage() {
       {/* Main Content */}
       <Container size="2xl" className="py-4 sm:py-6 lg:py-8">
         {/* Main Content Grid */}
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
+        <div
+          className={`grid gap-4 sm:gap-6 ${match.status === 'completed' ? 'lg:grid-cols-1' : 'lg:grid-cols-3'}`}
+        >
           {/* Left Column - Tabs with Scorecard, Stats & Commentary */}
-          <div className="lg:col-span-2">
+          <div className={match.status === 'completed' ? 'lg:col-span-1' : 'lg:col-span-2'}>
             <Tabs
               tabs={[
                 { id: 'live', label: match.status === 'completed' ? 'Summary' : 'Live' },
@@ -324,17 +332,21 @@ export default function MatchDetailPage() {
                 if (activeTab === 'scorecard') {
                   // Scorecard tab: Show detailed statistics
                   // Use currentBatters/currentBowlers as fallback for live matches
-                  const battingData = match.batting || (match.currentBatters ? match.currentBatters.map((b: any) => ({
-                    ...b,
-                    isOut: false, // Current batters are not out
-                  })) : undefined);
+                  const battingData =
+                    match.batting ||
+                    (match.currentBatters
+                      ? match.currentBatters.map((b: any) => ({
+                          ...b,
+                          isOut: false, // Current batters are not out
+                        }))
+                      : undefined);
                   const bowlingData = match.bowling || match.currentBowlers;
-                  
+
                   return (
                     <div className="space-y-4 sm:space-y-6 overflow-x-hidden">
-                      {(battingData || bowlingData) ? (
-                        <LazyMatchStats 
-                          batting={battingData} 
+                      {battingData || bowlingData ? (
+                        <LazyMatchStats
+                          batting={battingData}
                           bowling={bowlingData}
                           teams={match.teams}
                           matchId={matchId}
@@ -343,7 +355,7 @@ export default function MatchDetailPage() {
                         <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-600">
                           <p className="mb-2">Player statistics are not available yet.</p>
                           <p className="text-sm text-gray-500">
-                            {match.status === 'live' 
+                            {match.status === 'live'
                               ? 'Statistics will appear as players bat and bowl during the match.'
                               : 'Statistics will be available once the match progresses.'}
                           </p>
@@ -360,13 +372,14 @@ export default function MatchDetailPage() {
             </Tabs>
           </div>
 
-          {/* Right Column - Match Info */}
-          <div className="lg:col-span-1">
-            <MatchInfo match={match} />
-          </div>
+          {/* Right Column - Match Info (Only for live/upcoming matches) */}
+          {match.status !== 'completed' && (
+            <div className="lg:col-span-1">
+              <MatchInfo match={match} />
+            </div>
+          )}
         </div>
       </Container>
     </div>
   );
 }
-
