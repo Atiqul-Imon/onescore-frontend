@@ -47,33 +47,34 @@ export function RelatedArticles({ articleId }: RelatedArticlesProps) {
   if (loading || articles.length === 0) return null;
 
   return (
-    <div className="mt-12 border-t pt-8">
-      <h3 className="text-2xl font-semibold mb-6">Related Articles</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="border-t border-gray-200 pt-8">
+      <h3 className="text-xl sm:text-2xl font-semibold mb-6 sm:mb-8 text-gray-900">Related Articles</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {articles.map((article) => (
           <Link key={article._id} href={`/${article.slug}`} className="group">
-            <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all bg-white">
               {article.heroImage && (
-                <div className="relative w-full h-48">
+                <div className="relative w-full h-48 sm:h-52 overflow-hidden bg-gray-100">
                   <Image
                     src={article.heroImage}
                     alt={article.title}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
               )}
-              <div className="p-4">
-                <h4 className="font-semibold mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+              <div className="p-5">
+                <h4 className="font-semibold mb-2.5 line-clamp-2 group-hover:text-primary-600 transition-colors text-gray-900 leading-snug">
                   {article.title}
                 </h4>
                 {article.summary && (
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{article.summary}</p>
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">{article.summary}</p>
                 )}
                 <div className="flex items-center gap-4 text-xs text-gray-500">
                   {article.readingTimeMinutes && (
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5" />
                       <span>{article.readingTimeMinutes} min read</span>
                     </div>
                   )}
