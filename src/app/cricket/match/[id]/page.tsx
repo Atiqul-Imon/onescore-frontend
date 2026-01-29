@@ -15,7 +15,6 @@ import { Tabs } from '@/components/ui/Tabs';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { MatchHeaderSkeleton, LiveScoreSkeleton, ScorecardSkeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
-import { BarChart3, MessageSquare, Trophy } from 'lucide-react';
 import { useSocket } from '@/contexts/SocketContext';
 
 interface MatchDetails {
@@ -309,9 +308,9 @@ export default function MatchDetailPage() {
           <div className="lg:col-span-2">
             <Tabs
               tabs={[
-                { id: 'live', label: match.status === 'completed' ? 'Summary' : 'Live', icon: <Trophy className="h-4 w-4" /> },
-                { id: 'scorecard', label: 'Scorecard', icon: <BarChart3 className="h-4 w-4" /> },
-                ...(match.status === 'live' ? [{ id: 'commentary', label: 'Commentary', icon: <MessageSquare className="h-4 w-4" /> }] : []),
+                { id: 'live', label: match.status === 'completed' ? 'Summary' : 'Live' },
+                { id: 'scorecard', label: 'Scorecard' },
+                ...(match.status === 'live' ? [{ id: 'commentary', label: 'Commentary' }] : []),
               ]}
               defaultTab="live"
             >

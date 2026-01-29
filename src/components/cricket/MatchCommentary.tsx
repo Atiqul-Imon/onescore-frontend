@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/Card';
-import { MessageSquare, RefreshCw, Zap, Target, Filter } from 'lucide-react';
+import { RefreshCw, Filter } from 'lucide-react';
 import { formatTime } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -96,7 +96,6 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
       <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-4 sm:px-6 py-3 sm:py-4 rounded-t-2xl">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 text-white">
           <div className="flex items-center gap-2 sm:gap-3">
-            <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-primary-100 flex-shrink-0" />
             <span className="font-bold text-base sm:text-lg">Ball-by-Ball Commentary</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
@@ -198,8 +197,6 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
                                 ? 'bg-blue-100 text-blue-800 border-blue-300'
                                 : 'bg-primary-100 text-primary-800 border-primary-200'
                             }`}>
-                              {entry.runs === 6 && <Zap className="inline h-3 w-3 mr-1" />}
-                              {entry.runs === 4 && <Target className="inline h-3 w-3 mr-1" />}
                               {entry.runs} {entry.runs === 1 ? 'run' : 'runs'}
                             </span>
                           )}

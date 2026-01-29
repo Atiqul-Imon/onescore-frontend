@@ -1,7 +1,6 @@
 'use client';
 
 import { Card } from '@/components/ui/Card';
-import { MapPin, Calendar, Trophy, Users } from 'lucide-react';
 import { formatDate, formatTime } from '@/lib/utils';
 
 interface MatchInfoProps {
@@ -40,7 +39,6 @@ export function MatchInfo({ match }: MatchInfoProps) {
     <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg">
       <div className="bg-gradient-to-r from-secondary-800 via-secondary-900 to-secondary-800 px-4 sm:px-6 py-3 sm:py-4 rounded-t-2xl">
         <div className="flex items-center gap-2 sm:gap-3 text-white">
-          <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary-400 flex-shrink-0" />
           <span className="font-bold text-base sm:text-lg">Match Information</span>
         </div>
       </div>
@@ -77,7 +75,6 @@ export function MatchInfo({ match }: MatchInfoProps) {
         {/* Venue */}
         <div className="pb-3 sm:pb-4 border-b border-gray-200">
           <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2">
-            <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
             Venue
           </h3>
           <p className="text-gray-900 font-semibold text-sm sm:text-base break-words">{match.venue.name}</p>
@@ -89,7 +86,6 @@ export function MatchInfo({ match }: MatchInfoProps) {
         {/* Date & Time */}
         <div className="pb-3 sm:pb-4 border-b border-gray-200">
           <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2">
-            <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
             Date & Time
           </h3>
           <p className="text-gray-900 font-semibold text-sm sm:text-base">{formatDate(match.startTime)}</p>
@@ -99,7 +95,6 @@ export function MatchInfo({ match }: MatchInfoProps) {
         {/* Teams */}
         <div className="pb-3 sm:pb-4 border-b border-gray-200">
           <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2">
-            <Users className="h-3.5 w-3.5 flex-shrink-0" />
             Teams
           </h3>
           <div className="space-y-2 sm:space-y-3">

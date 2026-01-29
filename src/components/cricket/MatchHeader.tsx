@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, Trophy, MapPin, Calendar, Share2, Heart, RefreshCw, Settings } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Share2, Heart, RefreshCw, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 
@@ -128,7 +128,6 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
           {/* Series and Format Badge */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-white/70 mb-3 sm:mb-4">
             <span className="inline-flex items-center gap-1.5 sm:gap-2">
-              <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-400 flex-shrink-0" />
               <span className="truncate">{match.series || 'Cricket Match'}</span>
             </span>
             <span className="hidden sm:inline text-white/40">•</span>
