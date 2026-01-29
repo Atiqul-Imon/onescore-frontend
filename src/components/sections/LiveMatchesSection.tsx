@@ -281,10 +281,10 @@ export function LiveMatchesSection() {
     // Initial fetch
     fetchMatches();
     
-    // Auto-refresh every 15 seconds
+    // Auto-refresh every 30 seconds (reduced frequency to avoid rate limiting)
     const interval = setInterval(() => {
       fetchMatches();
-    }, 15000);
+    }, 30000); // Increased from 15s to 30s
     
     return () => clearInterval(interval);
   }, [fetchMatches]);
