@@ -211,10 +211,10 @@ export function HeroSection({
     // Initial fetch
     fetchHeroData();
 
-    // Auto-refresh every 30 seconds for live matches (reduced frequency to avoid rate limiting)
+    // Auto-refresh every 60 seconds for live matches (increased interval to reduce API load)
     const interval = setInterval(() => {
       fetchHeroData();
-    }, 30000); // Increased from 15s to 30s
+    }, 60000); // Increased to 60s to reduce rate limiting issues
 
     return () => clearInterval(interval);
   }, [fetchHeroData]);
