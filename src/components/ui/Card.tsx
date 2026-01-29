@@ -9,18 +9,30 @@ interface CardProps {
 }
 
 /**
- * Standardized Card component with consistent styling
+ * Card - Standardized card component with consistent styling and variants
  * 
- * Variants:
- * - default: Standard card with shadow
- * - interactive: Hover effects for clickable cards
- * - compact: Less padding for dense layouts
+ * Provides a flexible container with multiple variants, padding options, and elevation levels.
+ * Used for displaying content in a structured, visually consistent manner.
  * 
- * Padding:
- * - none: No padding
- * - sm: p-4
- * - md: p-6 (default)
- * - lg: p-8
+ * @param props - Card component props
+ * @param props.children - Card content (ReactNode)
+ * @param props.className - Additional CSS classes
+ * @param props.variant - Card style variant ('default' | 'interactive' | 'compact' | 'elevated' | 'outlined' | 'filled')
+ * @param props.padding - Padding size ('none' | 'sm' | 'md' | 'lg')
+ * @param props.elevation - Shadow elevation level (0-5), overrides variant default
+ * @returns Card container element
+ * 
+ * @example
+ * ```tsx
+ * <Card variant="default" padding="md">
+ *   <h2>Card Title</h2>
+ *   <p>Card content</p>
+ * </Card>
+ * 
+ * <Card variant="interactive" padding="lg" elevation={3}>
+ *   Clickable card content
+ * </Card>
+ * ```
  */
 export function Card({
   children,

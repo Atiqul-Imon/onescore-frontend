@@ -7,14 +7,48 @@ import { motion } from 'framer-motion';
 import { useState, useEffect, useCallback } from 'react';
 import { Container } from '@/components/ui/Container';
 import { formatDate } from '@/lib/utils';
+import { logger } from '@/lib/logger';
+import { handleApiError, getErrorMessage } from '@/lib/errors';
 import type { Article, LiveMatch } from './HeroSectionWrapper';
 
 interface HeroSectionProps {
+  /** Featured article to display prominently */
   featuredArticle?: Article | null;
+  /** Secondary articles to display in grid */
   secondaryArticles?: Article[];
+  /** Live matches to display */
   liveMatches?: LiveMatch[];
 }
 
+/**
+ * HeroSection - Main hero section component for the homepage
+ * 
+ * Displays:
+ * - Featured article (large, prominent)
+ * - Secondary articles (grid layout)
+ * - Live cricket and football matches
+ * 
+ * Features:
+ * - Auto-refreshes live match data every 30 seconds
+ * - Fetches news and match data from API
+ * - Handles loading and error states
+ * - Responsive design
+ * 
+ * @param props - HeroSection component props
+ * @param props.featuredArticle - Initial featured article (optional, will fetch if not provided)
+ * @param props.secondaryArticles - Initial secondary articles (optional, will fetch if not provided)
+ * @param props.liveMatches - Initial live matches (optional, will fetch if not provided)
+ * @returns Hero section JSX element
+ * 
+ * @example
+ * ```tsx
+ * <HeroSection 
+ *   featuredArticle={article}
+ *   secondaryArticles={articles}
+ *   liveMatches={matches}
+ * />
+ * ```
+ */
 export function HeroSection({ featuredArticle: initialFeaturedArticle, secondaryArticles: initialSecondaryArticles, liveMatches: initialLiveMatches }: HeroSectionProps) {
   const [liveMatches, setLiveMatches] = useState<LiveMatch[]>(initialLiveMatches || []);
   const [featuredArticle, setFeaturedArticle] = useState<Article | null>(initialFeaturedArticle || null);
@@ -25,9 +59,7 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       // Use timestamp to bypass backend cache for real-time updates
       const timestamp = Date.now();
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[HeroSection] Fetching matches at', new Date().toLocaleTimeString());
-      }
+      logger.debug('Fetching matches', { timestamp: new Date().toLocaleTimeString() }, 'HeroSection');
       
       // First try to fetch live matches (only these need frequent updates)
       const [newsRes, cricketLiveRes, footballLiveRes] = await Promise.allSettled([
@@ -60,11 +92,9 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
         );
         allLiveMatches = [...allLiveMatches, ...cricketLiveMatches];
         
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`[HeroSection] Found ${cricketLiveMatches.length} cricket live matches`);
-        }
+        logger.debug(`Found ${cricketLiveMatches.length} cricket live matches`, undefined, 'HeroSection');
       } else if (cricketLiveRes.status === 'rejected') {
-        console.error('[HeroSection] Failed to fetch cricket live matches:', cricketLiveRes.reason);
+        logger.error('Failed to fetch cricket live matches', cricketLiveRes.reason, 'HeroSection');
       }
       
       if (footballLiveRes.status === 'fulfilled' && footballLiveRes.value.ok) {
@@ -141,14 +171,14 @@ export function HeroSection({ featuredArticle: initialFeaturedArticle, secondary
             allLiveMatches = [...allLiveMatches, ...matchesToAdd];
           }
         } catch (resultsError) {
-          console.error('[HeroSection] Failed to fetch completed matches:', resultsError);
+          logger.error('Failed to fetch completed matches', resultsError, 'HeroSection');
         }
       }
 
       // Set matches (max 4 total: live first, then completed)
       setLiveMatches(allLiveMatches.slice(0, maxMatches));
     } catch (error) {
-      console.error('Error fetching hero data:', error);
+      logger.error('Error fetching hero data', error, 'HeroSection');
       setLiveMatches([]);
     }
   }, []);

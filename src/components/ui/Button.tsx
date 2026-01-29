@@ -11,19 +11,33 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Standardized Button component with consistent styling
+ * Button - Standardized button component with consistent styling and variants
  * 
- * Variants:
- * - primary: primary-600 background (default)
- * - secondary: gray background
- * - outline: border with transparent background
- * - ghost: transparent with hover effect
- * - danger: red background
+ * Supports multiple variants, sizes, loading states, and full-width option.
+ * Includes proper accessibility attributes and mobile-friendly touch targets.
  * 
- * Sizes:
- * - sm: small (h-8 px-3 text-xs)
- * - md: medium (h-10 px-4) - default
- * - lg: large (h-12 px-6 text-base)
+ * @param props - Button component props
+ * @param props.children - Button content (text or ReactNode)
+ * @param props.variant - Button style variant ('primary' | 'secondary' | 'outline' | 'ghost' | 'danger')
+ * @param props.size - Button size ('sm' | 'md' | 'lg')
+ * @param props.isLoading - Shows loading spinner and disables button
+ * @param props.fullWidth - Makes button full width of container
+ * @param props.asChild - Renders button styles on child element
+ * @param props.className - Additional CSS classes
+ * @param props.disabled - Disables the button
+ * @param props.onClick - Click handler function
+ * @returns Button element
+ * 
+ * @example
+ * ```tsx
+ * <Button variant="primary" size="md" onClick={handleClick}>
+ *   Click me
+ * </Button>
+ * 
+ * <Button variant="danger" isLoading={isSubmitting}>
+ *   Delete
+ * </Button>
+ * ```
  */
 export function Button({
   children,

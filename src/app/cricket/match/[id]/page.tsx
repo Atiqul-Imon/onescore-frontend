@@ -4,10 +4,8 @@ import { useEffect, useState } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Container } from '@/components/ui/Container';
-import { MatchScorecard } from '@/components/cricket/MatchScorecard';
-import { MatchCommentary } from '@/components/cricket/MatchCommentary';
+import { LazyMatchScorecard, LazyMatchCommentary, LazyMatchStats } from '@/components/cricket/lazy';
 import { MatchInfo } from '@/components/cricket/MatchInfo';
-import { MatchStats } from '@/components/cricket/MatchStats';
 import { LiveScoreView } from '@/components/cricket/LiveScoreView';
 import { CompletedMatchView } from '@/components/cricket/CompletedMatchView';
 import { MatchHeader } from '@/components/cricket/MatchHeader';
@@ -335,7 +333,7 @@ export default function MatchDetailPage() {
                   return (
                     <div className="space-y-4 sm:space-y-6 overflow-x-hidden">
                       {(battingData || bowlingData) ? (
-                        <MatchStats 
+                        <LazyMatchStats 
                           batting={battingData} 
                           bowling={bowlingData}
                           teams={match.teams}
@@ -355,7 +353,7 @@ export default function MatchDetailPage() {
                   );
                 }
                 if (activeTab === 'commentary' && match.status === 'live') {
-                  return <MatchCommentary matchId={matchId} />;
+                  return <LazyMatchCommentary matchId={matchId} />;
                 }
                 return null;
               }}

@@ -323,7 +323,7 @@ export default function CompletedMatchesPage() {
                                   <span className="text-lg sm:text-xl text-gray-600 font-normal">/{match.currentScore.home.wickets}</span>
                                 )}
                               </div>
-                              {match.currentScore?.home?.overs > 0 && (
+                              {match.currentScore?.home?.overs !== undefined && match.currentScore.home.overs > 0 && (
                                 <div className="text-xs sm:text-sm text-gray-600">
                                   ({match.currentScore.home.overs} ov)
                                 </div>
@@ -358,7 +358,7 @@ export default function CompletedMatchesPage() {
                                   <span className="text-lg sm:text-xl text-gray-600 font-normal">/{match.currentScore.away.wickets}</span>
                                 )}
                               </div>
-                              {match.currentScore?.away?.overs > 0 && (
+                              {match.currentScore?.away?.overs !== undefined && match.currentScore.away.overs > 0 && (
                                 <div className="text-xs sm:text-sm text-gray-600">
                                   ({match.currentScore.away.overs} ov)
                                 </div>

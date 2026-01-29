@@ -5,6 +5,8 @@ import { Card } from '@/components/ui/Card';
 import { RefreshCw, Filter } from 'lucide-react';
 import { formatTime } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { logger } from '@/lib/logger';
+import { getErrorMessage } from '@/lib/errors';
 
 interface CommentaryEntry {
   ball: string;
@@ -55,9 +57,9 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
         });
         setCommentary(sorted);
       }
-    } catch (err: any) {
-      console.error('Error fetching commentary:', err);
-      setError(err.message || 'Failed to load commentary');
+    } catch (err: unknown) {
+      logger.error('Error fetching commentary', err, 'MatchCommentary');
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
