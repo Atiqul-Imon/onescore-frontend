@@ -4,6 +4,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { Toaster } from 'react-hot-toast';
 import { ConditionalLayout } from '@/components/layout/ConditionalLayout';
+import { WebVitalsReporter } from '@/components/performance/WebVitalsReporter';
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -144,6 +145,7 @@ export default function RootLayout({
               },
             }}
           />
+          <WebVitalsReporter />
         </Providers>
       </body>
     </html>
