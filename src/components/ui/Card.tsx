@@ -3,47 +3,77 @@ import { ReactNode } from 'react';
 interface CardProps {
   children: ReactNode;
   className?: string;
-  variant?: 'default' | 'interactive' | 'compact';
+  variant?: 'default' | 'interactive' | 'compact' | 'elevated' | 'outlined' | 'filled';
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  elevation?: 0 | 1 | 2 | 3 | 4 | 5;
 }
 
 /**
- * Standardized Card component with consistent styling
+ * Card - Standardized card component with consistent styling and variants
  * 
- * Variants:
- * - default: Standard card with shadow
- * - interactive: Hover effects for clickable cards
- * - compact: Less padding for dense layouts
+ * Provides a flexible container with multiple variants, padding options, and elevation levels.
+ * Used for displaying content in a structured, visually consistent manner.
  * 
- * Padding:
- * - none: No padding
- * - sm: p-4
- * - md: p-6 (default)
- * - lg: p-8
+ * @param props - Card component props
+ * @param props.children - Card content (ReactNode)
+ * @param props.className - Additional CSS classes
+ * @param props.variant - Card style variant ('default' | 'interactive' | 'compact' | 'elevated' | 'outlined' | 'filled')
+ * @param props.padding - Padding size ('none' | 'sm' | 'md' | 'lg')
+ * @param props.elevation - Shadow elevation level (0-5), overrides variant default
+ * @returns Card container element
+ * 
+ * @example
+ * ```tsx
+ * <Card variant="default" padding="md">
+ *   <h2>Card Title</h2>
+ *   <p>Card content</p>
+ * </Card>
+ * 
+ * <Card variant="interactive" padding="lg" elevation={3}>
+ *   Clickable card content
+ * </Card>
+ * ```
  */
 export function Card({
   children,
   className = '',
   variant = 'default',
   padding = 'md',
+  elevation,
 }: CardProps) {
-  const baseClasses = 'rounded-lg border border-gray-200 bg-white';
-  
+  // Use elevation prop if provided, otherwise use variant defaults
+  const elevationClasses = {
+    0: 'card-elevation-0',
+    1: 'card-elevation-1',
+    2: 'card-elevation-2',
+    3: 'card-elevation-3',
+    4: 'card-elevation-4',
+    5: 'card-elevation-5',
+  };
+
   const variantClasses = {
-    default: 'shadow-sm',
-    interactive: 'shadow-sm hover:shadow-md transition-shadow cursor-pointer',
-    compact: 'shadow-sm',
+    default: 'card-default',
+    interactive: 'card-interactive',
+    compact: 'card-elevation-1',
+    elevated: 'card-elevated',
+    outlined: 'card-outlined',
+    filled: 'card-filled',
   };
 
   const paddingClasses = {
     none: '',
-    sm: 'p-4',
-    md: 'p-6',
-    lg: 'p-8',
+    sm: 'p-3 sm:p-4',
+    md: 'p-4 sm:p-6',
+    lg: 'p-6 sm:p-8',
   };
 
+  // Determine elevation class
+  const elevationClass = elevation !== undefined 
+    ? elevationClasses[elevation] 
+    : variantClasses[variant];
+
   return (
-    <div className={`${baseClasses} ${variantClasses[variant]} ${paddingClasses[padding]} ${className}`}>
+    <div className={`${elevationClass} ${paddingClasses[padding]} ${className}`}>
       {children}
     </div>
   );

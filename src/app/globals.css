@@ -6,6 +6,48 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom scrollbar utilities for mobile-friendly scrolling */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(209 213 219) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(209 213 219);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(156 163 175);
+  }
+
+  .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+    background-color: rgb(209 213 219);
+  }
+
+  .scrollbar-track-transparent::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -31,7 +73,7 @@
     /* Brand palette reference (align components & marketing collateral) */
     --brand-primary: #F7C455; /* Primary golden yellow */
     --brand-primary-hover: #d9a63c; /* Primary darker */
-    --brand-secondary: #221E1B; /* Secondary dark brown/black */
+    --brand-secondary: rgb(3, 54, 105); /* Secondary dark blue */
     --brand-accent: #F7C455; /* Primary as accent */
     --brand-surface: #f9fafb; /* gray-50 */
   }
@@ -74,12 +116,30 @@
     /* Prevent fixed position issues on mobile */
     position: relative;
     overflow-x: hidden;
+    /* Allow pull-to-refresh on mobile */
+    overscroll-behavior-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   body {
     /* Prevent fixed position issues */
     position: relative;
     overflow-x: hidden;
+    /* Enable vertical scrolling and pull-to-refresh */
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* On mobile, allow pull-to-refresh */
+  @media (max-width: 768px) {
+    body {
+      /* Enable native pull-to-refresh */
+      overscroll-behavior-y: auto;
+      /* Prevent horizontal scroll but allow vertical */
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
   }
 
   /* Custom scrollbar */
@@ -111,6 +171,233 @@
 }
 
 @layer components {
+  /* Mobile-First Typography System */
+  /* Display - For hero sections and large titles */
+  .heading-display {
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight;
+  }
+
+  /* H1 - Page titles */
+  .heading-1 {
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight;
+  }
+
+  /* H2 - Section titles */
+  .heading-2 {
+    @apply text-xl sm:text-2xl md:text-3xl font-bold leading-snug;
+  }
+
+  /* H3 - Subsection titles */
+  .heading-3 {
+    @apply text-lg sm:text-xl md:text-2xl font-semibold leading-snug;
+  }
+
+  /* H4 - Card titles */
+  .heading-4 {
+    @apply text-base sm:text-lg md:text-xl font-semibold leading-normal;
+  }
+
+  /* Body text - Default */
+  .body-text {
+    @apply text-sm sm:text-base leading-relaxed text-gray-700;
+  }
+
+  /* Small text - Captions, labels */
+  .text-small {
+    @apply text-xs sm:text-sm leading-normal text-gray-600;
+  }
+
+  /* Tiny text - Fine print */
+  .text-tiny {
+    @apply text-[10px] sm:text-xs leading-tight text-gray-500;
+  }
+
+  /* Number display - For scores, stats */
+  .number-display {
+    @apply text-2xl sm:text-3xl md:text-4xl font-bold tabular-nums;
+  }
+
+  /* Number large - For prominent scores */
+  .number-large {
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tabular-nums;
+  }
+
+  /* Typography Refinements - Line Heights for Readability */
+  .text-readable {
+    @apply leading-relaxed;
+  }
+
+  .text-tight {
+    @apply leading-tight;
+  }
+
+  .text-normal {
+    @apply leading-normal;
+  }
+
+  /* Touch Target Utilities - Mobile-first */
+  /* Minimum touch target: 44x44px (iOS) / 48x48px (Android) */
+  .touch-target {
+    @apply min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0;
+  }
+
+  .touch-target-lg {
+    @apply min-w-[56px] min-h-[56px] sm:min-w-0 sm:min-h-0;
+  }
+
+  /* Mobile spacing utilities */
+  .mobile-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  .mobile-padding-y {
+    @apply py-4 sm:py-6 lg:py-8;
+  }
+
+  /* Mobile text utilities */
+  .mobile-text-sm {
+    @apply text-sm sm:text-base;
+  }
+
+  .mobile-text-base {
+    @apply text-base sm:text-lg;
+  }
+
+  .mobile-text-lg {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+
+  /* Semantic Color Utilities - WCAG AA Compliant */
+  /* Success - Green */
+  .text-success {
+    @apply text-green-600;
+  }
+
+  .bg-success {
+    @apply bg-green-50 border-green-200;
+  }
+
+  .text-success-strong {
+    @apply text-green-700 font-semibold;
+  }
+
+  /* Warning - Amber/Yellow */
+  .text-warning {
+    @apply text-amber-600;
+  }
+
+  .bg-warning {
+    @apply bg-amber-50 border-amber-200;
+  }
+
+  .text-warning-strong {
+    @apply text-amber-700 font-semibold;
+  }
+
+  /* Error - Red */
+  .text-error {
+    @apply text-red-600;
+  }
+
+  .bg-error {
+    @apply bg-red-50 border-red-200;
+  }
+
+  .text-error-strong {
+    @apply text-red-700 font-semibold;
+  }
+
+  /* Info - Blue */
+  .text-info {
+    @apply text-blue-600;
+  }
+
+  .bg-info {
+    @apply bg-blue-50 border-blue-200;
+  }
+
+  .text-info-strong {
+    @apply text-blue-700 font-semibold;
+  }
+
+  /* Primary - Brand color */
+  .text-primary {
+    @apply text-primary-600;
+  }
+
+  .bg-primary {
+    @apply bg-primary-50 border-primary-200;
+  }
+
+  .text-primary-strong {
+    @apply text-primary-700 font-semibold;
+  }
+
+  /* Secondary - Brand secondary */
+  .text-secondary {
+    @apply text-secondary-900;
+  }
+
+  .bg-secondary {
+    @apply bg-secondary-50 border-secondary-200;
+  }
+
+  .text-secondary-strong {
+    @apply text-secondary-900 font-semibold;
+  }
+
+  /* Icon System - Standardized Sizes */
+  .icon-xs {
+    @apply h-3 w-3;
+  }
+
+  .icon-sm {
+    @apply h-4 w-4;
+  }
+
+  .icon-md {
+    @apply h-5 w-5;
+  }
+
+  .icon-lg {
+    @apply h-6 w-6;
+  }
+
+  .icon-xl {
+    @apply h-8 w-8;
+  }
+
+  /* Icon with responsive sizing */
+  .icon-responsive {
+    @apply h-4 w-4 sm:h-5 sm:w-5;
+  }
+
+  .icon-responsive-lg {
+    @apply h-5 w-5 sm:h-6 sm:w-6;
+  }
+
+  /* Shimmer Animation for Skeleton Loaders */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(
+      to right,
+      #f3f4f6 0%,
+      #e5e7eb 20%,
+      #f3f4f6 40%,
+      #f3f4f6 100%
+    );
+    background-size: 1000px 100%;
+  }
+
   /* Button variants */
   .btn {
     @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
@@ -148,29 +435,76 @@
     @apply h-12 px-6 text-base;
   }
 
-  /* Card variants */
+  /* Card Design System - Elevation Levels */
   .card {
-    @apply rounded-lg border bg-white text-gray-900 shadow-sm;
+    @apply rounded-lg border bg-white text-gray-900;
   }
 
+  /* Elevation levels for depth (Material Design inspired) */
+  .card-elevation-0 {
+    @apply shadow-none border-gray-200;
+  }
+
+  .card-elevation-1 {
+    @apply shadow-sm border-gray-200;
+  }
+
+  .card-elevation-2 {
+    @apply shadow-md border-gray-200;
+  }
+
+  .card-elevation-3 {
+    @apply shadow-lg border-gray-200;
+  }
+
+  .card-elevation-4 {
+    @apply shadow-xl border-gray-200;
+  }
+
+  .card-elevation-5 {
+    @apply shadow-2xl border-gray-200;
+  }
+
+  /* Card variants with consistent styling */
+  .card-default {
+    @apply card card-elevation-1 rounded-xl;
+  }
+
+  .card-interactive {
+    @apply card card-elevation-1 hover:card-elevation-2 transition-all duration-200 cursor-pointer rounded-xl;
+  }
+
+  .card-elevated {
+    @apply card card-elevation-3 rounded-xl;
+  }
+
+  .card-outlined {
+    @apply card card-elevation-0 border-2 rounded-xl;
+  }
+
+  .card-filled {
+    @apply card card-elevation-0 bg-gray-50 border-gray-200 rounded-xl;
+  }
+
+  /* Card components */
   .card-header {
-    @apply flex flex-col space-y-1.5 p-6;
+    @apply flex flex-col space-y-1.5 p-4 sm:p-6;
   }
 
   .card-title {
-    @apply text-2xl font-semibold leading-none tracking-tight;
+    @apply heading-4;
   }
 
   .card-description {
-    @apply text-sm text-muted-foreground;
+    @apply text-small;
   }
 
   .card-content {
-    @apply p-6 pt-0;
+    @apply p-4 sm:p-6 pt-0;
   }
 
   .card-footer {
-    @apply flex items-center p-6 pt-0;
+    @apply flex items-center p-4 sm:p-6 pt-0;
   }
 
   /* Input variants */
@@ -308,9 +642,11 @@
     body {
       overflow-x: hidden;
       position: relative;
-      /* Prevent iOS bounce scroll from affecting fixed nav */
+      /* Enable pull-to-refresh on mobile while maintaining smooth scrolling */
       -webkit-overflow-scrolling: touch;
-      overscroll-behavior-y: contain;
+      overscroll-behavior-y: auto; /* Changed from 'contain' to allow pull-to-refresh */
+      /* Allow vertical scrolling */
+      overflow-y: auto;
     }
 
     /* Ensure fixed positioning works correctly */

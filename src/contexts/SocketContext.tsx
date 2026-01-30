@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 interface SocketContextType {
   socket: Socket | null;
   isConnected: boolean;
+  transport: string | null;
   joinMatch: (matchId: string) => void;
   leaveMatch: (matchId: string) => void;
   subscribeToTeam: (teamId: string) => void;
@@ -22,6 +23,7 @@ const SocketContext = createContext<SocketContextType | undefined>(undefined);
 export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [transport, setTransport] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const isDev = process.env.NODE_ENV !== 'production';
   const devLog = (...args: unknown[]) => {
@@ -42,7 +44,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     if (!wsUrl) {
       // Auto-detect protocol based on environment
       if (typeof window !== 'undefined') {
-        const isProduction = window.location.protocol === 'https:';
+        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
         
         if (isProduction) {
@@ -58,33 +60,115 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       }
     }
     
-    const newSocket = io(wsUrl, {
+    // Only connect if we have a valid URL and it's not the production URL in development
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost' && wsUrl?.includes('scorenews.net')) {
+      devWarn('Skipping WebSocket connection - production URL detected in development');
+      setSocket(null);
+      return;
+    }
+    
+    if (!wsUrl) {
+      devWarn('WebSocket URL not available, skipping connection');
+      setSocket(null);
+      return;
+    }
+    
+    // Connect to /live namespace (matches backend WebSocketGateway namespace)
+    // Updated: WebSocket connection for real-time match updates
+    const socketUrl = `${wsUrl}/live`;
+    
+    console.log('[SocketContext] Connecting to WebSocket:', {
+      url: socketUrl,
+      wsUrl,
+      apiUrl: process.env.NEXT_PUBLIC_API_URL,
+      env: process.env.NODE_ENV,
+      hostname: typeof window !== 'undefined' ? window.location.hostname : 'server',
+    });
+    
+    const newSocket = io(socketUrl, {
       transports: ['polling', 'websocket'], // Try polling first, then upgrade to websocket
       timeout: 20000,
       forceNew: true,
-      reconnection: true,
+      reconnection: true, // Enable reconnection for better reliability
       reconnectionDelay: 1000,
-      reconnectionAttempts: 5,
       reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+      autoConnect: true, // Auto-connect when socket is created
+      upgrade: true, // Allow transport upgrade
     });
 
     newSocket.on('connect', () => {
-      devLog('Socket connected:', newSocket.id);
+      const currentTransport = newSocket.io.engine?.transport?.name || 'unknown';
+      devLog('Socket connected:', {
+        id: newSocket.id,
+        transport: currentTransport,
+        url: socketUrl,
+      });
       setIsConnected(true);
+      setTransport(currentTransport);
     });
 
     newSocket.on('disconnect', (reason) => {
       devLog('Socket disconnected:', reason);
       setIsConnected(false);
+      setTransport(null);
     });
+
+    let connectionAttempts = 0;
+    const maxConnectionAttempts = 3;
 
     newSocket.on('connect_error', (error) => {
-      // Silently handle connection errors - backend may not be running
-      setIsConnected(false);
-      devWarn('Socket connection unavailable:', error.message);
+      connectionAttempts++;
+      // Only log connection errors if we've tried multiple times and still not connected
+      // Socket.IO will automatically retry with polling if websocket fails
+      if (connectionAttempts >= maxConnectionAttempts && !isConnected) {
+        devWarn('Socket connection attempts failed, will continue retrying:', error.message);
+      } else {
+        // Silently retry - Socket.IO handles fallback automatically
+        devLog('Socket connection attempt, retrying...');
+      }
     });
 
-    // Live score updates
+    // Track transport changes after connection
+    const setupTransportMonitoring = () => {
+      if (newSocket.io.engine) {
+        newSocket.io.engine.on('upgrade', () => {
+          const currentTransport = newSocket.io.engine.transport.name;
+          devLog('Socket transport upgraded to:', currentTransport);
+          setTransport(currentTransport);
+          connectionAttempts = 0; // Reset on successful upgrade
+        });
+
+        newSocket.io.engine.on('upgradeError', (error: Error) => {
+          // This is not a critical error - polling will work fine
+          // Only log in development to avoid console noise in production
+          devLog('Socket upgrade failed, using polling (this is normal):', error.message);
+          // Keep current transport (polling)
+        });
+      }
+    };
+
+    // Set up transport monitoring when connected
+    newSocket.on('connect', () => {
+      setupTransportMonitoring();
+    });
+
+    // Match updates (from subscribe:match)
+    newSocket.on('match-update', (data) => {
+      devLog('Match update received:', data);
+      
+      // Update cricket match if it's a cricket match
+      if (data.format && ['test', 'odi', 't20i', 't20', 'first-class', 'list-a'].includes(data.format)) {
+        dispatch(updateMatch(data));
+      }
+      
+      // Update football match if it's a football match
+      if (data.league) {
+        dispatch(updateFootballMatch(data));
+      }
+    });
+
+    // Live score updates (legacy support)
     newSocket.on('liveScoreUpdate', (data) => {
       devLog('Live score update received:', data);
       
@@ -187,6 +271,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const value: SocketContextType = {
     socket,
     isConnected,
+    transport,
     joinMatch,
     leaveMatch,
     subscribeToTeam,

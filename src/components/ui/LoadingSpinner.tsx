@@ -81,3 +81,12 @@ export function LoadingMatchCard() {
     </div>
   );
 }
+
+// Re-export new skeleton components
+export { 
+  Skeleton,
+  MatchCardSkeleton,
+  ScorecardSkeleton,
+  MatchHeaderSkeleton,
+  LiveScoreSkeleton,
+} from './Skeleton';

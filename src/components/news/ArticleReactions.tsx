@@ -54,12 +54,14 @@ export function ArticleReactions({ articleId, initialLikes, initialDislikes }: A
   }
 
   return (
-    <div className="flex items-center gap-4 py-4 border-t border-b">
+    <div className="flex items-center gap-4 py-6 border-t border-gray-200">
       <button
         onClick={handleLike}
         disabled={loading}
-        className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-          reacted === 'like' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'
+        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg transition-all font-medium ${
+          reacted === 'like' 
+            ? 'bg-primary-100 text-primary-700 border border-primary-200' 
+            : 'hover:bg-gray-100 text-gray-700 border border-transparent hover:border-gray-200'
         }`}
       >
         <ThumbsUp className="w-5 h-5" />
@@ -68,8 +70,10 @@ export function ArticleReactions({ articleId, initialLikes, initialDislikes }: A
       <button
         onClick={handleDislike}
         disabled={loading}
-        className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-          reacted === 'dislike' ? 'bg-red-100 text-red-600' : 'hover:bg-gray-100'
+        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg transition-all font-medium ${
+          reacted === 'dislike' 
+            ? 'bg-red-100 text-red-700 border border-red-200' 
+            : 'hover:bg-gray-100 text-gray-700 border border-transparent hover:border-gray-200'
         }`}
       >
         <ThumbsDown className="w-5 h-5" />

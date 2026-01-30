@@ -11,19 +11,33 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Standardized Button component with consistent styling
+ * Button - Standardized button component with consistent styling and variants
  * 
- * Variants:
- * - primary: primary-600 background (default)
- * - secondary: gray background
- * - outline: border with transparent background
- * - ghost: transparent with hover effect
- * - danger: red background
+ * Supports multiple variants, sizes, loading states, and full-width option.
+ * Includes proper accessibility attributes and mobile-friendly touch targets.
  * 
- * Sizes:
- * - sm: small (h-8 px-3 text-xs)
- * - md: medium (h-10 px-4) - default
- * - lg: large (h-12 px-6 text-base)
+ * @param props - Button component props
+ * @param props.children - Button content (text or ReactNode)
+ * @param props.variant - Button style variant ('primary' | 'secondary' | 'outline' | 'ghost' | 'danger')
+ * @param props.size - Button size ('sm' | 'md' | 'lg')
+ * @param props.isLoading - Shows loading spinner and disables button
+ * @param props.fullWidth - Makes button full width of container
+ * @param props.asChild - Renders button styles on child element
+ * @param props.className - Additional CSS classes
+ * @param props.disabled - Disables the button
+ * @param props.onClick - Click handler function
+ * @returns Button element
+ * 
+ * @example
+ * ```tsx
+ * <Button variant="primary" size="md" onClick={handleClick}>
+ *   Click me
+ * </Button>
+ * 
+ * <Button variant="danger" isLoading={isSubmitting}>
+ *   Delete
+ * </Button>
+ * ```
  */
 export function Button({
   children,
@@ -46,10 +60,12 @@ export function Button({
     danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800',
   };
 
+  // Mobile-first: Minimum touch target 44x44px (iOS) / 48x48px (Android)
+  // Desktop can be smaller but mobile needs proper touch targets
   const sizeClasses = {
-    sm: 'h-8 px-3 text-xs',
-    md: 'h-10 px-4 text-sm',
-    lg: 'h-12 px-6 text-base',
+    sm: 'h-11 sm:h-8 px-4 sm:px-3 text-xs min-w-[44px]', // 44px on mobile, 32px on desktop
+    md: 'h-12 sm:h-10 px-5 sm:px-4 text-sm min-w-[48px]', // 48px on mobile, 40px on desktop
+    lg: 'h-14 sm:h-12 px-6 text-base min-w-[56px]', // 56px on mobile, 48px on desktop
   };
 
   const widthClass = fullWidth ? 'w-full' : '';

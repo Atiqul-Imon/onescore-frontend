@@ -39,6 +39,11 @@ const nextConfig = {
         hostname: 'ik.imagekit.io',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.sportmonks.com',
+        pathname: '/**',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
   },
@@ -117,6 +122,30 @@ const nextConfig = {
   httpAgentOptions: {
     keepAlive: true,
   },
+  // Performance optimizations
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      '@tanstack/react-query',
+    ],
+  },
+  // Bundle analyzer (enable with ANALYZE=true)
+  ...(process.env.ANALYZE === 'true' && {
+    webpack: (config, { isServer }) => {
+      if (!isServer) {
+        const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+        config.plugins.push(
+          new BundleAnalyzerPlugin({
+            analyzerMode: 'static',
+            openAnalyzer: false,
+            reportFilename: '../analyze/client.html',
+          })
+        );
+      }
+      return config;
+    },
+  }),
 };
 
 export default nextConfig;
