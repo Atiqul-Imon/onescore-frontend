@@ -41,4 +41,3 @@ export const LazyCricketTeamEditor = dynamic(
     ssr: false,
   }
 );
-

@@ -13,7 +13,7 @@ const navigationItems = [
   },
   {
     name: 'Matches',
-    href: '/fixtures',
+    href: '/cricket/results',
     icon: Calendar,
   },
   {
@@ -44,19 +44,20 @@ export function MobileBottomNav() {
   const pathname = usePathname();
 
   // Don't show on admin pages or auth pages
-  const shouldHide = pathname.startsWith('/admin') || 
-                     pathname.startsWith('/login') || 
-                     pathname.startsWith('/register');
+  const shouldHide =
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/register');
 
   if (shouldHide) {
     return null;
   }
 
   return (
-    <nav 
+    <nav
       data-mobile-bottom-nav
       className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t border-gray-200/80 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] md:hidden"
-      style={{ 
+      style={{
         position: 'fixed',
         bottom: 0,
         left: 0,
@@ -90,17 +91,17 @@ export function MobileBottomNav() {
               aria-current={isActive ? 'page' : undefined}
             >
               <div className="relative flex items-center justify-center mb-0.5">
-                <Icon 
+                <Icon
                   className={cn(
                     'h-6 w-6 sm:h-5 sm:w-5 transition-all duration-200',
                     isActive && 'scale-110'
-                  )} 
+                  )}
                 />
                 {isActive && (
                   <span className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-primary-600 rounded-full animate-pulse" />
                 )}
               </div>
-              <span 
+              <span
                 className={cn(
                   'text-[11px] sm:text-[10px] font-medium truncate max-w-full leading-tight mt-0.5',
                   isActive ? 'text-primary-600 font-semibold' : 'text-gray-600'
@@ -115,4 +116,3 @@ export function MobileBottomNav() {
     </nav>
   );
 }
-

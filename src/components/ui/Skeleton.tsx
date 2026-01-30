@@ -13,12 +13,12 @@ interface SkeletonProps {
 /**
  * Base Skeleton component for loading states
  */
-export function Skeleton({ 
-  className = '', 
+export function Skeleton({
+  className = '',
   variant = 'rectangular',
   width,
   height,
-  animation = 'pulse'
+  animation = 'pulse',
 }: SkeletonProps) {
   const variantClasses = {
     text: 'h-4 rounded',
@@ -39,12 +39,7 @@ export function Skeleton({
 
   return (
     <div
-      className={cn(
-        'bg-gray-200',
-        variantClasses[variant],
-        animationClasses[animation],
-        className
-      )}
+      className={cn('bg-gray-200', variantClasses[variant], animationClasses[animation], className)}
       style={style}
     />
   );
@@ -283,8 +278,3 @@ export function LiveScoreSkeleton() {
     </div>
   );
 }
-
-
-
-
-

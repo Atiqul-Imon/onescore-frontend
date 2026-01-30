@@ -23,10 +23,10 @@ components/
 
 All components should follow this structure:
 
-```tsx
+````tsx
 /**
  * Component description
- * 
+ *
  * @example
  * ```tsx
  * <ComponentName prop1="value" prop2={value} />
@@ -45,14 +45,14 @@ interface ComponentProps {
 
 /**
  * ComponentName - Brief description
- * 
+ *
  * @param props - Component props
  * @returns JSX element
  */
 export function ComponentName({ prop1, prop2 }: ComponentProps) {
   // Component implementation
 }
-```
+````
 
 ### 2. Props Documentation
 
@@ -80,48 +80,59 @@ export function ComponentName({ prop1, prop2 }: ComponentProps) {
 ## Component Categories
 
 ### UI Components (`/ui`)
+
 Reusable, generic UI components:
+
 - `Button`, `Card`, `Input`, `Select`, etc.
 - Should be framework-agnostic where possible
 - Well-documented with examples
 
 ### Layout Components (`/layout`)
+
 Page structure components:
+
 - `Header`, `Footer`, `PageLayout`
 - Navigation components
 - Conditional layouts
 
 ### Feature Components
+
 Domain-specific components:
+
 - `cricket/` - Cricket match components
 - `football/` - Football match components
 - `news/` - News/article components
 - `threads/` - Discussion components
 
 ### Section Components (`/sections`)
+
 Large page sections:
+
 - `HeroSection`, `LiveMatchesSection`
 - Usually composed of smaller components
 
 ## Usage Examples
 
 ### Basic Component
+
 ```tsx
 import { Button } from '@/components/ui/Button';
 
-<Button onClick={handleClick}>Click me</Button>
+<Button onClick={handleClick}>Click me</Button>;
 ```
 
 ### Component with Props
+
 ```tsx
 import { Card } from '@/components/ui/Card';
 
-<Card title="Title" description="Description" />
+<Card title="Title" description="Description" />;
 ```
 
 ## Testing
 
 All components should have:
+
 - Unit tests (Jest + React Testing Library)
 - Accessibility tests
 - Visual regression tests (optional)
@@ -129,9 +140,9 @@ All components should have:
 ## Contributing
 
 When adding new components:
+
 1. Follow the structure guidelines
 2. Add JSDoc documentation
 3. Write tests
 4. Update this README if needed
 5. Use TypeScript strict mode
-

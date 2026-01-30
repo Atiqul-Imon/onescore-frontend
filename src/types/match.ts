@@ -74,4 +74,3 @@ export interface UpcomingMatch extends BaseMatch {
 }
 
 export type Match = LiveMatch | CompletedMatch | UpcomingMatch;
-
