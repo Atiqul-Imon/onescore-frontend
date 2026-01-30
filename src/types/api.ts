@@ -60,8 +60,4 @@ export interface ApiRequestOptions {
 /**
  * Fetch function type
  */
-export type FetchFunction = (
-  url: string,
-  options?: ApiRequestOptions
-) => Promise<Response>;
-
+export type FetchFunction = (url: string, options?: ApiRequestOptions) => Promise<Response>;

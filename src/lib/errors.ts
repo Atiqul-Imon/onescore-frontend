@@ -14,7 +14,7 @@ export class ApiError extends Error {
   ) {
     super(message);
     this.name = 'ApiError';
-    
+
     // Maintains proper stack trace for where error was thrown
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, ApiError);
@@ -49,23 +49,23 @@ export class ApiError extends Error {
     if (this.isNetworkError()) {
       return 'Network error. Please check your connection and try again.';
     }
-    
+
     if (this.statusCode === 401) {
       return 'You are not authorized. Please log in and try again.';
     }
-    
+
     if (this.statusCode === 403) {
       return 'You do not have permission to perform this action.';
     }
-    
+
     if (this.statusCode === 404) {
       return 'The requested resource was not found.';
     }
-    
+
     if (this.isServerError()) {
       return 'Server error. Please try again later.';
     }
-    
+
     return this.message || 'An unexpected error occurred.';
   }
 }
@@ -81,7 +81,7 @@ export class ValidationError extends Error {
   ) {
     super(message);
     this.name = 'ValidationError';
-    
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, ValidationError);
     }
@@ -101,7 +101,7 @@ export function handleApiError(error: unknown): ApiError {
     if (error.message.includes('fetch')) {
       return new ApiError('Network error', 0, undefined, error);
     }
-    
+
     return new ApiError(error.message, 500, undefined, error);
   }
 
@@ -110,7 +110,7 @@ export function handleApiError(error: unknown): ApiError {
     const message = (errorObj.message as string) || 'An error occurred';
     const statusCode = (errorObj.statusCode as number) || 500;
     const data = errorObj.data;
-    
+
     return new ApiError(message, statusCode, data);
   }
 
@@ -131,7 +131,7 @@ export async function handleFetchError(response: Response): Promise<never> {
       const data = errorData as { message?: string; error?: string };
       errorMessage = data.message || data.error || errorMessage;
     } else {
-      errorMessage = await response.text() || errorMessage;
+      errorMessage = (await response.text()) || errorMessage;
     }
   } catch {
     // If parsing fails, use default message
@@ -185,11 +185,6 @@ export function isValidationError(error: unknown): error is ValidationError {
 /**
  * Create error from API response
  */
-export function createApiError(
-  message: string,
-  statusCode: number,
-  data?: unknown
-): ApiError {
+export function createApiError(message: string, statusCode: number, data?: unknown): ApiError {
   return new ApiError(message, statusCode, data);
 }
-

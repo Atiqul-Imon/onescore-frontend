@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Activity, User, Search, Bell } from 'lucide-react';
-import { useSocket } from '@/contexts/SocketContext';
+import { Menu, X, Activity, User } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 
 function isActivePath(pathname: string, target: string) {
@@ -15,16 +14,13 @@ function isActivePath(pathname: string, target: string) {
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const { isConnected } = useSocket();
   const pathname = usePathname();
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const navigation = [
     { name: 'Cricket', href: '/cricket' },
     { name: 'Teams', href: '/cricket/teams' },
     { name: 'Football', href: '/football' },
-    { name: 'Future', href: '/fixtures' },
+    { name: 'Matches', href: '/cricket/results' },
     { name: 'News', href: '/news' },
     { name: 'Crowd Thread', href: '/threads' },
     { name: 'Quiz', href: '/quiz' },
@@ -33,16 +29,6 @@ export function Header() {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
   };
-
-  const toggleSearch = () => {
-    setIsSearchOpen((prev) => !prev);
-  };
-
-  useEffect(() => {
-    if (isSearchOpen) {
-      searchInputRef.current?.focus();
-    }
-  }, [isSearchOpen]);
 
   return (
     <>
@@ -94,36 +80,6 @@ export function Header() {
 
             {/* Right Side Actions - Desktop Only */}
             <div className="hidden md:flex items-center space-x-4 flex-shrink-0">
-              {/* Search */}
-              <button
-                onClick={toggleSearch}
-                className="p-2 text-gray-600 hover:text-primary-600 transition-standard flex items-center justify-center"
-                aria-expanded={isSearchOpen}
-                aria-controls="global-search"
-              >
-                <Search className="w-5 h-5" />
-                <span className="sr-only">Toggle search</span>
-              </button>
-
-              {/* Notifications */}
-              <button
-                className="relative p-2 text-gray-600 hover:text-primary-600 transition-standard flex items-center justify-center"
-                aria-label="Notifications"
-              >
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-xs text-white font-bold">3</span>
-                </span>
-              </button>
-
-              {/* Connection Status */}
-              <div className="flex items-center space-x-2">
-                <div
-                  className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}
-                />
-                <span className="text-sm text-gray-600">{isConnected ? 'Live' : 'Offline'}</span>
-              </div>
-
               {/* User Profile / Login */}
               <Link
                 href="/login"
@@ -139,36 +95,6 @@ export function Header() {
             {/* Mobile - Empty space to balance layout */}
             <div className="md:hidden w-10 flex-shrink-0"></div>
           </div>
-
-          {/* Search Bar - Desktop Only */}
-          <AnimatePresence>
-            {isSearchOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="hidden md:block border-t border-gray-200"
-              >
-                <div className="py-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      placeholder="Search matches, teams, players..."
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-standard"
-                      id="global-search"
-                      onKeyDown={(event) => {
-                        if (event.key === 'Escape') {
-                          setIsSearchOpen(false);
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </header>
 
@@ -220,16 +146,6 @@ export function Header() {
                     </Link>
                   );
                 })}
-
-                {/* Mobile Connection Status */}
-                <div className="flex items-center space-x-3 px-4 py-3 border-t border-gray-200 mt-4">
-                  <div
-                    className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}
-                  />
-                  <span className="text-sm text-gray-600">
-                    {isConnected ? 'Live Connection' : 'Connection Lost'}
-                  </span>
-                </div>
 
                 {/* Mobile Login Link */}
                 <Link

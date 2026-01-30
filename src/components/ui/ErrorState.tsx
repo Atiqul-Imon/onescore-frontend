@@ -30,7 +30,8 @@ export function ErrorState({
   backHref = '/',
   className = '',
 }: ErrorStateProps) {
-  const errorMessage = error instanceof Error ? error.message : typeof error === 'string' ? error : undefined;
+  const errorMessage =
+    error instanceof Error ? error.message : typeof error === 'string' ? error : undefined;
 
   return (
     <Card className={`p-6 sm:p-8 text-center ${className}`}>
@@ -45,9 +46,7 @@ export function ErrorState({
         {/* Error Title */}
         <div>
           <h2 className="heading-3 text-gray-900 mb-2">{title}</h2>
-          <p className="body-text text-gray-600">
-            {message}
-          </p>
+          <p className="body-text text-gray-600">{message}</p>
           {errorMessage && (
             <p className="text-small text-gray-500 mt-2 font-mono bg-gray-50 p-2 rounded">
               {errorMessage}
@@ -58,21 +57,14 @@ export function ErrorState({
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2">
           {onRetry && (
-            <Button
-              variant="primary"
-              onClick={onRetry}
-              className="w-full sm:w-auto min-w-[120px]"
-            >
+            <Button variant="primary" onClick={onRetry} className="w-full sm:w-auto min-w-[120px]">
               <RefreshCw className="h-4 w-4 mr-2" />
               Try Again
             </Button>
           )}
           {showBackButton && (
             <Link href={backHref}>
-              <Button
-                variant="outline"
-                className="w-full sm:w-auto min-w-[120px]"
-              >
+              <Button variant="outline" className="w-full sm:w-auto min-w-[120px]">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Go Back
               </Button>
@@ -80,10 +72,7 @@ export function ErrorState({
           )}
           {showHomeButton && (
             <Link href="/">
-              <Button
-                variant="outline"
-                className="w-full sm:w-auto min-w-[120px]"
-              >
+              <Button variant="outline" className="w-full sm:w-auto min-w-[120px]">
                 <Home className="h-4 w-4 mr-2" />
                 Go Home
               </Button>
@@ -122,8 +111,3 @@ export function ErrorStateCompact({
     </div>
   );
 }
-
-
-
-
-

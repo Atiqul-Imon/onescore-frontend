@@ -120,4 +120,3 @@ export const SUCCESS_MESSAGES = {
   CREATED: 'Created successfully',
   COPIED: 'Copied to clipboard',
 } as const;
-

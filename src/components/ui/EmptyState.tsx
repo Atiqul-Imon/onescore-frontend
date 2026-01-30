@@ -40,9 +40,7 @@ export function EmptyState({
         <div className="flex flex-col items-center gap-2 sm:gap-3">
           <div className="text-gray-400">{displayIcon}</div>
           <h3 className="heading-4 text-gray-900">{title}</h3>
-          {description && (
-            <p className="text-small text-gray-600 max-w-md">{description}</p>
-          )}
+          {description && <p className="text-small text-gray-600 max-w-md">{description}</p>}
           {action && (
             <div className="mt-2">
               {action.href ? (
@@ -68,17 +66,13 @@ export function EmptyState({
       <div className="max-w-md mx-auto space-y-4 sm:space-y-6">
         {/* Icon */}
         <div className="flex justify-center">
-          <div className="rounded-full bg-gray-100 p-4 sm:p-6">
-            {displayIcon}
-          </div>
+          <div className="rounded-full bg-gray-100 p-4 sm:p-6">{displayIcon}</div>
         </div>
 
         {/* Title and Description */}
         <div>
           <h2 className="heading-3 text-gray-900 mb-2">{title}</h2>
-          {description && (
-            <p className="body-text text-gray-600">{description}</p>
-          )}
+          {description && <p className="body-text text-gray-600">{description}</p>}
         </div>
 
         {/* Action Button */}
@@ -156,8 +150,3 @@ export function EmptyStateNoData() {
     />
   );
 }
-
-
-
-
-

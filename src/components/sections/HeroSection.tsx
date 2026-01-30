@@ -347,7 +347,7 @@ export function HeroSection({
                       >
                         {/* Status indicator badge */}
                         {isLive && (
-                          <div className="absolute top-2 right-2 sm:-top-2 sm:-right-2 flex items-center gap-1 sm:gap-1.5 rounded-full bg-red-500 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-lg z-10">
+                          <div className="absolute top-2 right-2 flex items-center gap-1 sm:gap-1.5 rounded-full bg-red-500 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-lg z-10">
                             <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
                               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
                               <span className="relative inline-flex h-full w-full rounded-full bg-red-500"></span>
@@ -357,7 +357,7 @@ export function HeroSection({
                           </div>
                         )}
                         {match.status === 'completed' && !isLive && (
-                          <div className="absolute top-2 right-2 sm:-top-2 sm:-right-2 flex items-center gap-1 sm:gap-1.5 rounded-full bg-gray-600 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-lg z-10">
+                          <div className="absolute top-2 right-2 flex items-center gap-1 sm:gap-1.5 rounded-full bg-gray-600 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-lg z-10">
                             <span className="hidden sm:inline">COMPLETED</span>
                             <span className="sm:hidden">DONE</span>
                           </div>
@@ -517,62 +517,17 @@ export function HeroSection({
                           <span className="text-gray-500">Image coming soon</span>
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                      <div className="relative flex h-full flex-col justify-between p-6 sm:p-10 text-white">
-                        <div className="space-y-4">
-                          <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.2em]">
-                            <span className="rounded-full border border-white/30 bg-white/20 px-3 py-1 text-xs font-semibold">
-                              {featuredArticle.category}
-                            </span>
-                            {featuredArticle.type === 'breaking' && (
-                              <span className="inline-flex items-center gap-1 rounded-full border border-red-400/60 bg-red-500/30 px-3 py-1 text-xs font-semibold text-white">
-                                <Flame className="h-3 w-3" />
-                                Breaking
-                              </span>
-                            )}
-                            <span className="rounded-full border border-white/20 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur">
-                              {featuredArticle.type
-                                ? featuredArticle.type.replace('_', ' ')
-                                : 'Story'}
-                            </span>
-                          </div>
-                          <p className="text-xs font-semibold tracking-[0.3em] text-white/70">
-                            Featured story
-                          </p>
-                          <h2 className="text-3xl font-semibold leading-tight drop-shadow-lg sm:text-4xl lg:text-5xl">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/30" />
+                      <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 lg:p-10 text-white">
+                        <div className="space-y-3 sm:space-y-4 max-w-4xl">
+                          <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight text-white drop-shadow-lg">
                             {featuredArticle.title}
                           </h2>
                           {featuredArticle.summary && (
-                            <p className="text-base text-white/85 sm:text-lg">
+                            <p className="text-sm sm:text-base lg:text-lg text-white/95 leading-relaxed max-w-3xl line-clamp-3 font-medium">
                               {featuredArticle.summary}
                             </p>
                           )}
-                        </div>
-                        <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-white/80">
-                          {featuredArticle.author?.name && (
-                            <span>By {featuredArticle.author.name}</span>
-                          )}
-                          {featuredArticle.publishedAt && (
-                            <>
-                              <span>•</span>
-                              <time dateTime={featuredArticle.publishedAt}>
-                                {formatDate(featuredArticle.publishedAt)}
-                              </time>
-                            </>
-                          )}
-                          {featuredArticle.readingTimeMinutes && (
-                            <>
-                              <span>•</span>
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {featuredArticle.readingTimeMinutes} min read
-                              </span>
-                            </>
-                          )}
-                          <span className="inline-flex items-center gap-2 text-sm font-semibold text-white">
-                            Read full story
-                            <ArrowRight className="h-4 w-4" />
-                          </span>
                         </div>
                       </div>
                     </div>
@@ -634,19 +589,13 @@ export function HeroSection({
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <span
-                              className={`h-2 w-2 rounded-full ${article.category === 'cricket' ? 'bg-primary-500' : article.category === 'football' ? 'bg-blue-500' : 'bg-gray-400'}`}
-                            />
-                            <span className="uppercase tracking-[0.2em]">{article.category}</span>
-                          </div>
-                          <h4 className="mt-1 text-base font-semibold text-gray-900 line-clamp-2 group-hover:text-primary-700">
+                          <h4 className="text-base font-semibold text-gray-900 line-clamp-2 group-hover:text-primary-700">
                             {article.title}
                           </h4>
-                          {article.publishedAt && (
-                            <time className="text-xs text-gray-500" dateTime={article.publishedAt}>
-                              {formatDate(article.publishedAt)}
-                            </time>
+                          {article.summary && (
+                            <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+                              {article.summary}
+                            </p>
                           )}
                         </div>
                       </Link>

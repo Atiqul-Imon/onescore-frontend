@@ -61,4 +61,3 @@ export interface DraftArticle extends BaseArticle {
 }
 
 export type ArticleType = Article | DraftArticle;
-

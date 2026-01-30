@@ -44,8 +44,10 @@ export function TeamMatchStats({ teamName }: TeamMatchStatsProps) {
       try {
         setLoading(true);
         const encodedTeamName = encodeURIComponent(teamName.toLowerCase().replace(/\s+/g, '-'));
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/v1/cricket/teams/${encodedTeamName}/matches`);
-        
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/v1/cricket/teams/${encodedTeamName}/matches`
+        );
+
         if (!response.ok) {
           throw new Error('Failed to fetch team statistics');
         }
@@ -109,19 +111,38 @@ export function TeamMatchStats({ teamName }: TeamMatchStatsProps) {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">Player</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">M</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">R</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">B</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">4s</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">6s</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">SR</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">Avg</th>
+                    <th className="text-left py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      Player
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      M
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      R
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      B
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      4s
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      6s
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      SR
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      Avg
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {batting.map((player, index) => (
-                    <tr key={player.playerId || index} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={player.playerId || index}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="py-3 px-4">
                         <span className="font-semibold text-gray-900">{player.playerName}</span>
                       </td>
@@ -160,24 +181,45 @@ export function TeamMatchStats({ teamName }: TeamMatchStatsProps) {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">Player</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">M</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">O</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">M</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">R</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">W</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">Econ</th>
-                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">Avg</th>
+                    <th className="text-left py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      Player
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      M
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      O
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      M
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      R
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      W
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      Econ
+                    </th>
+                    <th className="text-right py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                      Avg
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {bowling.map((player, index) => (
-                    <tr key={player.playerId || index} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={player.playerId || index}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="py-3 px-4">
                         <span className="font-semibold text-gray-900">{player.playerName}</span>
                       </td>
                       <td className="text-right py-3 px-4 text-gray-600">{player.matches}</td>
-                      <td className="text-right py-3 px-4 text-gray-600">{player.overs.toFixed(1)}</td>
+                      <td className="text-right py-3 px-4 text-gray-600">
+                        {player.overs.toFixed(1)}
+                      </td>
                       <td className="text-right py-3 px-4 text-gray-600">{player.maidens}</td>
                       <td className="text-right py-3 px-4 text-gray-600">{player.runs}</td>
                       <td className="text-right py-3 px-4">
@@ -198,11 +240,3 @@ export function TeamMatchStats({ teamName }: TeamMatchStatsProps) {
     </div>
   );
 }
-
-
-
-
-
-
-
-

@@ -53,4 +53,3 @@ export const LazyTeamMatchStats = dynamic(
     ssr: true,
   }
 );
-
