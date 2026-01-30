@@ -10,6 +10,7 @@ import {
   LogOut,
   Menu,
   ShieldCheck,
+  Shield,
   Users,
   X,
   Image as ImageIcon,
@@ -36,7 +37,11 @@ const navSections: NavSection[] = [
     title: 'Command',
     items: [
       { label: 'Dashboard', href: '/admin', icon: <LayoutDashboard className="h-4 w-4" /> },
-      { label: 'Moderation', href: '/admin/moderation/comments', icon: <ShieldCheck className="h-4 w-4" /> },
+      {
+        label: 'Moderation',
+        href: '/admin/moderation/comments',
+        icon: <ShieldCheck className="h-4 w-4" />,
+      },
     ],
   },
   {
@@ -51,6 +56,7 @@ const navSections: NavSection[] = [
     title: 'People',
     items: [
       { label: 'Users', href: '/admin/users', icon: <Users className="h-4 w-4" /> },
+      { label: 'Scorers', href: '/admin/scorers', icon: <Shield className="h-4 w-4" /> },
       { label: 'System Logs', href: '/admin', icon: <FileText className="h-4 w-4" /> },
       { label: 'Settings', href: '/admin', icon: <Settings className="h-4 w-4" /> },
     ],
@@ -66,7 +72,9 @@ export function AdminLayoutShell({ children }: { children: ReactNode }) {
   const renderNav = () => (
     <div className="flex h-full flex-col gap-8 overflow-y-auto px-6 pb-10 pt-8">
       <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-white">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500 text-lg font-bold">OS</span>
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500 text-lg font-bold">
+          OS
+        </span>
         Onescore Admin
       </Link>
       <div className="space-y-8">
@@ -190,4 +198,3 @@ export function AdminLayoutShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
