@@ -84,7 +84,8 @@ export default function CompletedMatchesPage() {
       setError(null);
 
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const formatParam = format ? `&format=${format}` : '';
+      // Format values are already lowercase in the formats array, but ensure lowercase for safety
+      const formatParam = format ? `&format=${format.toLowerCase()}` : '';
       const response = await fetch(
         `${base}/api/v1/cricket/matches/results?page=${pageNum}&limit=${limit}${formatParam}`,
         {
@@ -199,9 +200,9 @@ export default function CompletedMatchesPage() {
 
   const formats = [
     { value: '', label: 'All Formats' },
-    { value: 'T20I', label: 'T20I' },
-    { value: 'ODI', label: 'ODI' },
-    { value: 'Test', label: 'Test' },
+    { value: 't20i', label: 'T20I' },
+    { value: 'odi', label: 'ODI' },
+    { value: 'test', label: 'Test' },
   ];
 
   return (
