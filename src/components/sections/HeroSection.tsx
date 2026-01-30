@@ -161,9 +161,10 @@ export function HeroSection({
           // Fetch cricket completed matches
           if (cricketCompletedRes.status === 'fulfilled' && cricketCompletedRes.value.ok) {
             const cricketData = await cricketCompletedRes.value.json();
-            const cricketResults = Array.isArray(cricketData?.data)
-              ? cricketData.data
-              : cricketData?.data?.results || [];
+            // Backend returns: { success: true, data: { matches: [], pagination: {} } }
+            const cricketResults = Array.isArray(cricketData?.data?.matches)
+              ? cricketData.data.matches
+              : cricketData?.data?.matches || [];
             const cricketCompleted = cricketResults
               .filter((match: LiveMatch) => match.format && !match.league)
               .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }));

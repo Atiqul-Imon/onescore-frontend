@@ -75,9 +75,10 @@ export function CricketResults() {
         const json = await response.json();
 
         if (json.success && json.data) {
-          const resultsData = Array.isArray(json.data.results)
-            ? json.data.results
-            : json.data.results?.results || json.data || [];
+          // Backend returns: { success: true, data: { matches: [], pagination: {} } }
+          const resultsData = Array.isArray(json.data.matches)
+            ? json.data.matches
+            : json.data?.matches || [];
 
           // Filter only cricket matches (not football)
           const cricketResults = resultsData

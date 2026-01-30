@@ -101,9 +101,10 @@ export default function CompletedMatchesPage() {
       const json = await response.json();
 
       if (json.success && json.data) {
-        const results = Array.isArray(json.data.results)
-          ? json.data.results
-          : json.data.results?.results || [];
+        // Backend returns: { success: true, data: { matches: [], pagination: {} } }
+        const results = Array.isArray(json.data.matches)
+          ? json.data.matches
+          : json.data?.matches || [];
 
         // Sort by format: T20, T20I, ODI, Test (in that order)
         const formatOrder: { [key: string]: number } = {
