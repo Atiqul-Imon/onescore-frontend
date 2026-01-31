@@ -519,7 +519,7 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
               )}
 
               {/* Live Commentary - Cricinfo Style */}
-              <LiveCommentary matchId={match.matchId} />
+              <LiveCommentary matchId={match.matchId} matchStatus={match.status} />
             </div>
           )}
         </div>
@@ -548,7 +548,7 @@ interface CommentaryData {
   all: CommentaryEntry[];
 }
 
-function LiveCommentary({ matchId }: { matchId: string }) {
+function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus?: string }) {
   const [commentaryData, setCommentaryData] = useState<CommentaryData>({
     firstInnings: [],
     secondInnings: [],
@@ -797,7 +797,7 @@ function LiveCommentary({ matchId }: { matchId: string }) {
           </div>
         ) : (
           <div className="divide-y divide-gray-200">
-            {/* Second Innings (if exists) - Show first as it's the current/latest */}
+            {/* Second Innings - Show first if it exists (it's the current/latest) */}
             {validSecondInnings.length > 0 && (
               <div className="border-b border-gray-200">
                 <div className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-50">
