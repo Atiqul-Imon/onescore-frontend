@@ -266,12 +266,14 @@ export default function MatchDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <MatchHeaderSkeleton />
-        <Container size="2xl" className="py-8">
-          <div className="space-y-6">
-            <LiveScoreSkeleton />
-            <ScorecardSkeleton />
+        <div className="w-full px-0 lg:px-8">
+          <div className="max-w-[1400px] mx-auto py-2 sm:py-4 lg:py-8">
+            <div className="space-y-6">
+              <LiveScoreSkeleton />
+              <ScorecardSkeleton />
+            </div>
           </div>
-        </Container>
+        </div>
       </div>
     );
   }
@@ -279,18 +281,20 @@ export default function MatchDetailPage() {
   if (error || !match) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
-        <Container size="2xl">
-          <ErrorState
-            title="Match Not Found"
-            message={
-              error || 'The match you are looking for does not exist or may have been removed.'
-            }
-            showHomeButton
-            showBackButton
-            backHref="/"
-            onRetry={() => window.location.reload()}
-          />
-        </Container>
+        <div className="w-full px-0 lg:px-8">
+          <div className="max-w-[1400px] mx-auto">
+            <ErrorState
+              title="Match Not Found"
+              message={
+                error || 'The match you are looking for does not exist or may have been removed.'
+              }
+              showHomeButton
+              showBackButton
+              backHref="/"
+              onRetry={() => window.location.reload()}
+            />
+          </div>
+        </div>
       </div>
     );
   }
@@ -305,81 +309,79 @@ export default function MatchDetailPage() {
       <MatchHeader match={match} onRefresh={handleRefresh} />
 
       {/* Main Content */}
-      <Container size="2xl" className="py-4 sm:py-6 lg:py-8">
-        {/* Main Content Grid */}
-        <div
-          className={`grid gap-4 sm:gap-6 ${match.status === 'completed' ? 'lg:grid-cols-1' : 'lg:grid-cols-3'}`}
-        >
-          {/* Left Column - Tabs with Scorecard, Stats & Commentary */}
-          <div className={match.status === 'completed' ? 'lg:col-span-1' : 'lg:col-span-2'}>
-            <Tabs
-              tabs={[
-                { id: 'live', label: match.status === 'completed' ? 'Summary' : 'Live' },
-                { id: 'scorecard', label: 'Scorecard' },
-                ...(match.status === 'live' ? [{ id: 'commentary', label: 'Commentary' }] : []),
-              ]}
-              defaultTab="live"
-            >
-              {(activeTab) => {
-                if (activeTab === 'live') {
-                  // Show completed match view for completed matches, live view for live matches
-                  if (match.status === 'completed') {
-                    return <CompletedMatchView match={match} />;
+      <div className="w-full px-0 lg:px-8">
+        <div className="max-w-[1400px] mx-auto py-2 sm:py-4 lg:py-8">
+          {/* Main Content Grid */}
+          <div
+            className={`grid gap-4 sm:gap-6 ${match.status === 'completed' ? 'lg:grid-cols-1' : 'lg:grid-cols-3'}`}
+          >
+            {/* Left Column - Tabs with Scorecard, Stats & Commentary */}
+            <div className={match.status === 'completed' ? 'lg:col-span-1' : 'lg:col-span-2'}>
+              <Tabs
+                tabs={[
+                  { id: 'live', label: match.status === 'completed' ? 'Summary' : 'Live' },
+                  { id: 'scorecard', label: 'Scorecard' },
+                ]}
+                defaultTab="live"
+              >
+                {(activeTab) => {
+                  if (activeTab === 'live') {
+                    // Show completed match view for completed matches, live view for live matches
+                    if (match.status === 'completed') {
+                      return <CompletedMatchView match={match} />;
+                    }
+                    // Live tab: Show clean, focused live score view
+                    return <LiveScoreView match={match} />;
                   }
-                  // Live tab: Show clean, focused live score view
-                  return <LiveScoreView match={match} />;
-                }
-                if (activeTab === 'scorecard') {
-                  // Scorecard tab: Show detailed statistics
-                  // Use currentBatters/currentBowlers as fallback for live matches
-                  const battingData =
-                    match.batting ||
-                    (match.currentBatters
-                      ? match.currentBatters.map((b: any) => ({
-                          ...b,
-                          isOut: false, // Current batters are not out
-                        }))
-                      : undefined);
-                  const bowlingData = match.bowling || match.currentBowlers;
+                  if (activeTab === 'scorecard') {
+                    // Scorecard tab: Show detailed statistics
+                    // Use currentBatters/currentBowlers as fallback for live matches
+                    const battingData =
+                      match.batting ||
+                      (match.currentBatters
+                        ? match.currentBatters.map((b: any) => ({
+                            ...b,
+                            isOut: false, // Current batters are not out
+                          }))
+                        : undefined);
+                    const bowlingData = match.bowling || match.currentBowlers;
 
-                  return (
-                    <div className="space-y-4 sm:space-y-6 overflow-x-hidden">
-                      {battingData || bowlingData ? (
-                        <LazyMatchStats
-                          batting={battingData}
-                          bowling={bowlingData}
-                          teams={match.teams}
-                          matchId={matchId}
-                        />
-                      ) : (
-                        <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-600">
-                          <p className="mb-2">Player statistics are not available yet.</p>
-                          <p className="text-sm text-gray-500">
-                            {match.status === 'live'
-                              ? 'Statistics will appear as players bat and bowl during the match.'
-                              : 'Statistics will be available once the match progresses.'}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-                if (activeTab === 'commentary' && match.status === 'live') {
-                  return <LazyMatchCommentary matchId={matchId} />;
-                }
-                return null;
-              }}
-            </Tabs>
-          </div>
-
-          {/* Right Column - Match Info (Only for live/upcoming matches) */}
-          {match.status !== 'completed' && (
-            <div className="lg:col-span-1">
-              <MatchInfo match={match} />
+                    return (
+                      <div className="space-y-4 sm:space-y-6 overflow-x-hidden">
+                        {battingData || bowlingData ? (
+                          <LazyMatchStats
+                            batting={battingData}
+                            bowling={bowlingData}
+                            teams={match.teams}
+                            matchId={matchId}
+                          />
+                        ) : (
+                          <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-600">
+                            <p className="mb-2">Player statistics are not available yet.</p>
+                            <p className="text-sm text-gray-500">
+                              {match.status === 'live'
+                                ? 'Statistics will appear as players bat and bowl during the match.'
+                                : 'Statistics will be available once the match progresses.'}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              </Tabs>
             </div>
-          )}
+
+            {/* Right Column - Match Info (Only for live/upcoming matches) */}
+            {match.status !== 'completed' && (
+              <div className="lg:col-span-1">
+                <MatchInfo match={match} />
+              </div>
+            )}
+          </div>
         </div>
-      </Container>
+      </div>
     </div>
   );
 }

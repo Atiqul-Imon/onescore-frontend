@@ -67,33 +67,33 @@ export function LiveCricketMatches() {
           home: {
             name: 'India',
             shortName: 'IND',
-            flag: '🇮🇳'
+            flag: '🇮🇳',
           },
           away: {
             name: 'Australia',
             shortName: 'AUS',
-            flag: '🇦🇺'
-          }
+            flag: '🇦🇺',
+          },
         },
         venue: {
           name: 'Melbourne Cricket Ground',
           city: 'Melbourne',
-          country: 'Australia'
+          country: 'Australia',
         },
         status: 'live',
         format: 'test',
         startTime: '2024-01-15T10:30:00Z',
         currentScore: {
           home: { runs: 245, wickets: 3, overs: 45.2 },
-          away: { runs: 198, wickets: 5, overs: 42.1 }
+          away: { runs: 198, wickets: 5, overs: 42.1 },
         },
         liveData: {
           currentOver: 45.2,
           currentBatsman: 'Virat Kohli',
           currentBowler: 'Pat Cummins',
           lastBall: '4',
-          currentRunRate: 5.4
-        }
+          currentRunRate: 5.4,
+        },
       },
       {
         id: '2',
@@ -103,33 +103,33 @@ export function LiveCricketMatches() {
           home: {
             name: 'Karachi Kings',
             shortName: 'KK',
-            flag: '🏏'
+            flag: '',
           },
           away: {
             name: 'Lahore Qalandars',
             shortName: 'LQ',
-            flag: '🏏'
-          }
+            flag: '',
+          },
         },
         venue: {
           name: 'National Stadium',
           city: 'Karachi',
-          country: 'Pakistan'
+          country: 'Pakistan',
         },
         status: 'live',
         format: 't20',
         startTime: '2024-01-15T14:00:00Z',
         currentScore: {
           home: { runs: 156, wickets: 2, overs: 18.3 },
-          away: { runs: 142, wickets: 4, overs: 16.2 }
+          away: { runs: 142, wickets: 4, overs: 16.2 },
         },
         liveData: {
           currentOver: 18.3,
           currentBatsman: 'Babar Azam',
           currentBowler: 'Shaheen Afridi',
           lastBall: '1',
-          currentRunRate: 8.5
-        }
+          currentRunRate: 8.5,
+        },
       },
       {
         id: '3',
@@ -139,34 +139,34 @@ export function LiveCricketMatches() {
           home: {
             name: 'Sydney Sixers',
             shortName: 'SYS',
-            flag: '🇦🇺'
+            flag: '🇦🇺',
           },
           away: {
             name: 'Melbourne Stars',
             shortName: 'MLS',
-            flag: '🇦🇺'
-          }
+            flag: '🇦🇺',
+          },
         },
         venue: {
           name: 'Sydney Cricket Ground',
           city: 'Sydney',
-          country: 'Australia'
+          country: 'Australia',
         },
         status: 'live',
         format: 't20',
         startTime: '2024-01-15T18:30:00Z',
         currentScore: {
           home: { runs: 89, wickets: 1, overs: 12.4 },
-          away: { runs: 0, wickets: 0, overs: 0 }
+          away: { runs: 0, wickets: 0, overs: 0 },
         },
         liveData: {
           currentOver: 12.4,
           currentBatsman: 'Josh Philippe',
           currentBowler: 'Glenn Maxwell',
           lastBall: '2',
-          currentRunRate: 7.1
-        }
-      }
+          currentRunRate: 7.1,
+        },
+      },
     ];
 
     setTimeout(() => {
@@ -203,7 +203,8 @@ export function LiveCricketMatches() {
           </div>
           <h2 className="heading-2 mt-5">Live Cricket Matches</h2>
           <p className="section-lede mt-3 text-gray-600">
-            Follow every wicket, partnership, and clutch spell with broadcast-grade data from our match center.
+            Follow every wicket, partnership, and clutch spell with broadcast-grade data from our
+            match center.
           </p>
         </motion.div>
 
@@ -227,14 +228,14 @@ export function LiveCricketMatches() {
                     {match.format.toUpperCase()}
                   </span>
                 </div>
-                
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {match.series}
-                </h3>
-                
+
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{match.series}</h3>
+
                 <div className="flex items-center text-sm text-gray-600">
                   <MapPin className="w-4 h-4 mr-1" />
-                  <span>{match.venue.name}, {match.venue.city}</span>
+                  <span>
+                    {match.venue.name}, {match.venue.city}
+                  </span>
                 </div>
               </div>
 
@@ -246,12 +247,8 @@ export function LiveCricketMatches() {
                     <div className="flex items-center space-x-3">
                       <span className="text-2xl">{match.teams.home.flag}</span>
                       <div>
-                        <div className="font-semibold text-gray-900">
-                          {match.teams.home.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {match.teams.home.shortName}
-                        </div>
+                        <div className="font-semibold text-gray-900">{match.teams.home.name}</div>
+                        <div className="text-sm text-gray-500">{match.teams.home.shortName}</div>
                       </div>
                     </div>
                     <div className="text-right">
@@ -259,7 +256,8 @@ export function LiveCricketMatches() {
                         {match.currentScore?.home.runs || 0}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {match.currentScore?.home.wickets || 0}/{match.currentScore?.home.overs || 0}
+                        {match.currentScore?.home.wickets || 0}/
+                        {match.currentScore?.home.overs || 0}
                       </div>
                     </div>
                   </div>
@@ -269,12 +267,8 @@ export function LiveCricketMatches() {
                     <div className="flex items-center space-x-3">
                       <span className="text-2xl">{match.teams.away.flag}</span>
                       <div>
-                        <div className="font-semibold text-gray-900">
-                          {match.teams.away.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {match.teams.away.shortName}
-                        </div>
+                        <div className="font-semibold text-gray-900">{match.teams.away.name}</div>
+                        <div className="text-sm text-gray-500">{match.teams.away.shortName}</div>
                       </div>
                     </div>
                     <div className="text-right">
@@ -282,7 +276,8 @@ export function LiveCricketMatches() {
                         {match.currentScore?.away.runs || 0}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {match.currentScore?.away.wickets || 0}/{match.currentScore?.away.overs || 0}
+                        {match.currentScore?.away.wickets || 0}/
+                        {match.currentScore?.away.overs || 0}
                       </div>
                     </div>
                   </div>
@@ -320,7 +315,10 @@ export function LiveCricketMatches() {
                     <span>Live Updates</span>
                   </div>
                   {match.detailUrl ? (
-                    <Link href={match.detailUrl} className="text-green-600 hover:text-green-700 font-medium">
+                    <Link
+                      href={match.detailUrl}
+                      className="text-green-600 hover:text-green-700 font-medium"
+                    >
                       View Details
                     </Link>
                   ) : (
@@ -338,9 +336,7 @@ export function LiveCricketMatches() {
               <Activity className="h-10 w-10 text-gray-400" />
             </div>
             <h3 className="heading-4 mb-2">No Live Matches</h3>
-            <p className="body-text text-gray-600">
-              Check back later for live cricket action.
-            </p>
+            <p className="body-text text-gray-600">Check back later for live cricket action.</p>
           </div>
         )}
       </Container>

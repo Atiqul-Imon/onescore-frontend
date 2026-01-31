@@ -242,8 +242,9 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600 font-medium">Toss:</span>
               <span className="text-gray-900 font-semibold">
-                {match.tossWon}{' '}
-                {match.elected ? `won the toss and ${match.elected}` : 'won the toss'}
+                {match.elected
+                  ? `${match.tossWon} choose to ${match.elected.charAt(0).toUpperCase() + match.elected.slice(1)} First`
+                  : `${match.tossWon} won the toss`}
               </span>
             </div>
           </div>
