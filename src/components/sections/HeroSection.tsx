@@ -423,7 +423,7 @@ export function HeroSection({
                               >
                                 <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
                                   <span className="text-xl sm:text-2xl flex-shrink-0">
-                                    {team.flag || (isFootball ? '⚽' : '🏏')}
+                                    {team.flag || ''}
                                   </span>
                                   <div className="min-w-0 flex-1 overflow-hidden">
                                     <p className="text-xs sm:text-sm font-bold text-white truncate">

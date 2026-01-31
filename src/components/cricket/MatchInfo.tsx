@@ -45,13 +45,13 @@ interface MatchInfoProps {
 export function MatchInfo({ match }: MatchInfoProps) {
   return (
     <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg">
-      <div className="bg-gradient-to-r from-secondary-800 via-secondary-900 to-secondary-800 px-4 sm:px-6 py-3 sm:py-4 rounded-t-2xl">
+      <div className="bg-gradient-to-r from-secondary-800 via-secondary-900 to-secondary-800 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 rounded-t-2xl">
         <div className="flex items-center gap-2 sm:gap-3 text-white">
           <span className="font-bold text-base sm:text-lg">Match Information</span>
         </div>
       </div>
 
-      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6 space-y-3 sm:space-y-4 lg:space-y-6">
         {/* Series */}
         {match.series && (
           <div className="pb-3 sm:pb-4 border-b border-gray-200">

@@ -143,8 +143,11 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Match Summary - Combined Result & Innings */}
-      <Card className="rounded-2xl border-2 border-primary-200 bg-gradient-to-br from-primary-50 via-white to-primary-50 shadow-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-600 px-4 sm:px-6 py-4 sm:py-5">
+      <Card
+        padding="none"
+        className="rounded-none sm:rounded-2xl border-2 border-primary-300/60 bg-gradient-to-br from-primary-50/80 via-white to-blue-50/50 shadow-xl overflow-hidden"
+      >
+        <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-blue-700 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-5 shadow-lg">
           <div className="flex items-center justify-between text-white">
             <span className="font-bold text-lg sm:text-xl">Match Summary</span>
             {match.series && (
@@ -155,7 +158,7 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
           </div>
         </div>
 
-        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+        <div className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6 space-y-3 sm:space-y-4 lg:space-y-6">
           {/* Winner Announcement */}
           <div className="text-center pb-4 border-b-2 border-primary-200">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-900">
@@ -176,11 +179,19 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
               <table className="w-full text-sm sm:text-base">
                 <thead>
                   <tr className="border-b-2 border-gray-300">
-                    <th className="text-left py-3 px-3 sm:px-4 font-bold text-gray-900">Team</th>
-                    <th className="text-right py-3 px-3 sm:px-4 font-bold text-gray-900">Score</th>
-                    <th className="text-right py-3 px-3 sm:px-4 font-bold text-gray-900">Overs</th>
+                    <th className="text-left py-2 sm:py-3 px-2 lg:px-4 font-bold text-gray-900">
+                      Team
+                    </th>
+                    <th className="text-right py-2 sm:py-3 px-2 lg:px-4 font-bold text-gray-900">
+                      Score
+                    </th>
+                    <th className="text-right py-2 sm:py-3 px-2 lg:px-4 font-bold text-gray-900">
+                      Overs
+                    </th>
                     {match.innings && match.innings.some((i) => i.runRate && i.runRate > 0) && (
-                      <th className="text-right py-3 px-3 sm:px-4 font-bold text-gray-900">RR</th>
+                      <th className="text-right py-2 sm:py-3 px-2 lg:px-4 font-bold text-gray-900">
+                        RR
+                      </th>
                     )}
                   </tr>
                 </thead>
@@ -196,7 +207,7 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                           isWinnerInning ? 'bg-green-50' : 'bg-white'
                         } hover:bg-gray-50 transition-colors`}
                       >
-                        <td className="py-3 px-3 sm:px-4">
+                        <td className="py-2 sm:py-3 px-2 lg:px-4">
                           <div className="flex items-center gap-2 sm:gap-3">
                             <span className="text-xl sm:text-2xl">{teamData.flag}</span>
                             <div>
@@ -207,7 +218,7 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                             </div>
                           </div>
                         </td>
-                        <td className="text-right py-3 px-3 sm:px-4">
+                        <td className="text-right py-2 sm:py-3 px-2 lg:px-4">
                           <div className="font-bold text-lg sm:text-xl text-gray-900">
                             {inning.runs}/{inning.wickets}
                           </div>
@@ -229,7 +240,7 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
           ) : (
             /* Fallback if innings data not available - show final scores */
             <div className="space-y-3 sm:space-y-4">
-              <div className="rounded-xl bg-green-50 border-2 border-green-200 p-4 sm:p-5">
+              <div className="rounded-xl bg-gradient-to-br from-green-100 via-emerald-50 to-green-100 border-2 border-green-300 shadow-md px-2 lg:px-5 py-3 sm:py-4 lg:py-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 sm:gap-3">
                     <span className="text-2xl sm:text-3xl">{winner.flag}</span>
@@ -257,7 +268,7 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                   </div>
                 </div>
               </div>
-              <div className="rounded-xl bg-gray-50 border-2 border-gray-200 p-4 sm:p-5">
+              <div className="rounded-xl bg-gradient-to-br from-blue-100 via-indigo-50 to-blue-100 border-2 border-blue-300 shadow-md px-2 lg:px-5 py-3 sm:py-4 lg:py-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 sm:gap-3">
                     <span className="text-2xl sm:text-3xl">{loser.flag}</span>
@@ -289,7 +300,7 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
           {/* Match Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-gray-200">
             {match.tossWon && (
-              <div className="px-3 sm:px-4 py-2 rounded-lg bg-blue-50 border border-blue-200">
+              <div className="px-2 lg:px-4 py-1.5 sm:py-2 rounded-lg bg-gradient-to-r from-blue-100 to-blue-50 border-2 border-blue-300 shadow-sm">
                 <span className="text-xs text-gray-600 block mb-1">Toss</span>
                 <span className="text-sm font-semibold text-gray-900">
                   {match.elected
@@ -299,7 +310,7 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
               </div>
             )}
             {match.round && (
-              <div className="px-3 sm:px-4 py-2 rounded-lg bg-purple-50 border border-purple-200">
+              <div className="px-2 lg:px-4 py-1.5 sm:py-2 rounded-lg bg-gradient-to-r from-indigo-100 to-indigo-50 border-2 border-indigo-300 shadow-sm">
                 <span className="text-xs text-gray-600 block mb-1">Round</span>
                 <span className="text-sm font-semibold text-gray-900 truncate">{match.round}</span>
               </div>
@@ -310,8 +321,11 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
 
       {/* Batting Scorecard */}
       {match.batting && match.batting.length > 0 && (
-        <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-600 px-4 sm:px-6 py-3 sm:py-4">
+        <Card
+          padding="none"
+          className="rounded-none sm:rounded-2xl border-2 border-primary-200/60 bg-gradient-to-br from-white via-primary-50/30 to-white shadow-xl overflow-hidden"
+        >
+          <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-600 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 shadow-lg">
             <div className="flex items-center gap-2 sm:gap-3 text-white">
               <span className="font-bold text-base sm:text-lg">Batting Scorecard</span>
             </div>
@@ -337,17 +351,27 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                             <th className="text-left py-2 px-2 font-semibold text-gray-700">
                               Batter
                             </th>
-                            <th className="text-right py-2 px-2 font-semibold text-gray-700">R</th>
-                            <th className="text-right py-2 px-2 font-semibold text-gray-700">B</th>
-                            <th className="text-right py-2 px-2 font-semibold text-gray-700">4s</th>
-                            <th className="text-right py-2 px-2 font-semibold text-gray-700">6s</th>
-                            <th className="text-right py-2 px-2 font-semibold text-gray-700">SR</th>
+                            <th className="text-right py-1.5 sm:py-2 px-1.5 lg:px-2 font-semibold text-gray-700">
+                              R
+                            </th>
+                            <th className="text-right py-1.5 sm:py-2 px-1.5 lg:px-2 font-semibold text-gray-700">
+                              B
+                            </th>
+                            <th className="text-right py-1.5 sm:py-2 px-1.5 lg:px-2 font-semibold text-gray-700">
+                              4s
+                            </th>
+                            <th className="text-right py-1.5 sm:py-2 px-1.5 lg:px-2 font-semibold text-gray-700">
+                              6s
+                            </th>
+                            <th className="text-right py-1.5 sm:py-2 px-1.5 lg:px-2 font-semibold text-gray-700">
+                              SR
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           {teamBatting.map((batter, idx) => (
                             <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
-                              <td className="py-2 px-2">
+                              <td className="py-1.5 sm:py-2 px-1.5 lg:px-2">
                                 <span className="font-medium text-gray-900">
                                   {batter.playerName ||
                                     (batter.playerId ? `Player ${batter.playerId}` : 'Unknown')}
@@ -391,8 +415,11 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
 
       {/* Bowling Scorecard */}
       {match.bowling && match.bowling.length > 0 && (
-        <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-secondary-600 via-secondary-700 to-secondary-600 px-4 sm:px-6 py-3 sm:py-4">
+        <Card
+          padding="none"
+          className="rounded-none sm:rounded-2xl border-2 border-secondary-200/60 bg-gradient-to-br from-white via-secondary-50/30 to-white shadow-xl overflow-hidden"
+        >
+          <div className="bg-gradient-to-r from-secondary-600 via-secondary-700 to-secondary-600 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 shadow-lg">
             <div className="flex items-center gap-2 sm:gap-3 text-white">
               <span className="font-bold text-base sm:text-lg">Bowling Scorecard</span>
             </div>
@@ -430,7 +457,7 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                         <tbody>
                           {teamBowling.map((bowler, idx) => (
                             <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
-                              <td className="py-2 px-2">
+                              <td className="py-1.5 sm:py-2 px-1.5 lg:px-2">
                                 <span className="font-medium text-gray-900">
                                   {bowler.playerName ||
                                     (bowler.playerId ? `Player ${bowler.playerId}` : 'Unknown')}
@@ -466,8 +493,11 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
 
       {/* Partnership Info */}
       {match.partnership && (
-        <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-green-600 via-green-700 to-green-600 px-4 sm:px-6 py-3 sm:py-4">
+        <Card
+          padding="none"
+          className="rounded-none sm:rounded-2xl border-2 border-green-200/60 bg-gradient-to-br from-white via-green-50/30 to-white shadow-xl overflow-hidden"
+        >
+          <div className="bg-gradient-to-r from-green-600 via-green-700 to-emerald-700 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 shadow-lg">
             <div className="flex items-center gap-2 sm:gap-3 text-white">
               <span className="font-bold text-base sm:text-lg">Match Highlights</span>
             </div>
