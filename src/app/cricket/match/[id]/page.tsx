@@ -316,7 +316,6 @@ export default function MatchDetailPage() {
               tabs={[
                 { id: 'live', label: match.status === 'completed' ? 'Summary' : 'Live' },
                 { id: 'scorecard', label: 'Scorecard' },
-                ...(match.status === 'live' ? [{ id: 'commentary', label: 'Commentary' }] : []),
               ]}
               defaultTab="live"
             >
@@ -363,9 +362,6 @@ export default function MatchDetailPage() {
                       )}
                     </div>
                   );
-                }
-                if (activeTab === 'commentary' && match.status === 'live') {
-                  return <LazyMatchCommentary matchId={matchId} />;
                 }
                 return null;
               }}

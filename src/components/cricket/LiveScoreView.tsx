@@ -3,7 +3,10 @@
 import { Card } from '@/components/ui/Card';
 import { formatTime } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { RefreshCw, Filter } from 'lucide-react';
+import { logger } from '@/lib/logger';
+import { getErrorMessage } from '@/lib/errors';
 
 interface LiveScoreViewProps {
   match: {
@@ -43,7 +46,7 @@ interface LiveScoreViewProps {
     target?: number;
     currentBatters?: Array<{
       playerId?: string;
-      playerName: string;
+      playerName?: string; // Made optional - API may not provide names
       runs: number;
       balls: number;
       fours: number;
@@ -53,7 +56,7 @@ interface LiveScoreViewProps {
     }>;
     currentBowlers?: Array<{
       playerId?: string;
-      playerName: string;
+      playerName?: string; // Made optional - API may not provide names
       overs: number;
       maidens: number;
       runs: number;
@@ -73,6 +76,19 @@ interface LiveScoreViewProps {
       fowScore?: number;
       fowBalls?: number;
     };
+    liveData?: {
+      currentOver?: number;
+      requiredRunRate?: number;
+      currentRunRate?: number;
+      runsRemaining?: number;
+      ballsRemaining?: number;
+      oversRemaining?: number;
+    };
+    result?: {
+      resultText?: string;
+      winner?: string;
+      dataSource?: string;
+    };
   };
 }
 
@@ -80,14 +96,17 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
   const isLive = match.status === 'live';
   const isCompleted = match.status === 'completed';
   const [previousScore, setPreviousScore] = useState<{ home?: number; away?: number } | null>(null);
-  const [scoreChanged, setScoreChanged] = useState<{ home: boolean; away: boolean }>({ home: false, away: false });
+  const [scoreChanged, setScoreChanged] = useState<{ home: boolean; away: boolean }>({
+    home: false,
+    away: false,
+  });
 
   // Track score changes for animation
   useEffect(() => {
     if (isLive && match.currentScore) {
       const currentHome = match.currentScore.home?.runs;
       const currentAway = match.currentScore.away?.runs;
-      
+
       if (previousScore) {
         if (currentHome !== previousScore.home) {
           setScoreChanged({ ...scoreChanged, home: true });
@@ -98,12 +117,34 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
           setTimeout(() => setScoreChanged({ ...scoreChanged, away: false }), 1000);
         }
       }
-      
+
       setPreviousScore({ home: currentHome, away: currentAway });
     }
   }, [match.currentScore, isLive]);
 
-  if (!isLive && !isCompleted) {
+  // For completed matches, show a message that this is the completed match view
+  // (This component should not be used for completed matches, but handle gracefully)
+  if (isCompleted) {
+    return (
+      <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-6 py-4">
+          <div className="flex items-center gap-3 text-white">
+            <span className="font-bold text-lg">Match Completed</span>
+          </div>
+        </div>
+        <div className="p-6 text-center text-gray-600">
+          <p className="text-lg font-semibold mb-2">This match has ended</p>
+          {match.result?.resultText && (
+            <p className="text-base font-bold text-primary-700 mb-2">{match.result.resultText}</p>
+          )}
+          <p className="text-sm">{formatTime(new Date(match.startTime))}</p>
+        </div>
+      </Card>
+    );
+  }
+
+  // For upcoming matches
+  if (!isLive) {
     return (
       <Card className="rounded-2xl border border-gray-200 bg-white shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 px-6 py-4">
@@ -113,9 +154,7 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
         </div>
         <div className="p-6 text-center text-gray-600">
           <p className="text-lg font-semibold mb-2">Match hasn't started yet</p>
-          <p className="text-sm">
-            {formatTime(new Date(match.startTime))}
-          </p>
+          <p className="text-sm">{formatTime(new Date(match.startTime))}</p>
         </div>
       </Card>
     );
@@ -124,36 +163,25 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
   const homeScore = match.currentScore?.home;
   const awayScore = match.currentScore?.away;
 
-  // Calculate required run rate if chasing
-  const calculateRRR = () => {
-    if (!isLive || !homeScore || !awayScore || !match.target) return null;
-    
-    const runsNeeded = match.target - awayScore.runs;
-    const ballsRemaining = (20 * 6) - ((awayScore.overs * 6) + awayScore.balls);
-    
-    if (ballsRemaining <= 0) return null;
-    
-    return ((runsNeeded / ballsRemaining) * 6).toFixed(2);
-  };
+  // CRITICAL: Do not calculate run rates locally - only use API-provided data
+  // Use liveData from API if available, otherwise undefined
+  const requiredRR =
+    match.liveData?.requiredRunRate !== undefined && match.liveData?.requiredRunRate !== null
+      ? match.liveData.requiredRunRate.toFixed(2)
+      : undefined;
+  const currentRR =
+    match.liveData?.currentRunRate !== undefined && match.liveData?.currentRunRate !== null
+      ? match.liveData.currentRunRate.toFixed(2)
+      : undefined;
 
-  const requiredRR = calculateRRR();
-  const currentRR = homeScore && awayScore && awayScore.overs > 0
-    ? ((awayScore.runs / ((awayScore.overs * 6) + awayScore.balls)) * 6).toFixed(2)
-    : null;
-
-  // Determine if run rate is good (green) or poor (red)
-  const getRRColor = (rr: string | null, required: string | null) => {
+  // Determine if run rate is good (green) or poor (red) - only if both values are available
+  const getRRColor = (rr: string | undefined, required: string | undefined) => {
     if (!rr || !required) return 'text-gray-900';
     const rrNum = parseFloat(rr);
     const reqNum = parseFloat(required);
     if (rrNum >= reqNum * 0.95) return 'text-green-600 font-bold';
     if (rrNum >= reqNum * 0.85) return 'text-yellow-600';
     return 'text-red-600';
-  };
-
-  const getRRBadge = (rr: string | null, required: string | null) => {
-    // Icon removed - return null
-    return null;
   };
 
   return (
@@ -179,12 +207,14 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
               <span className="text-xl sm:text-2xl flex-shrink-0">{match.teams.home.flag}</span>
               <div className="min-w-0 flex-1">
-                <h3 className="font-bold text-base sm:text-lg text-secondary-900 truncate">{match.teams.home.name}</h3>
+                <h3 className="font-bold text-base sm:text-lg text-secondary-900 truncate">
+                  {match.teams.home.name}
+                </h3>
                 <p className="text-xs text-gray-600">{match.teams.home.shortName}</p>
               </div>
             </div>
             {homeScore && (
-              <motion.div 
+              <motion.div
                 className="text-right flex-shrink-0"
                 animate={scoreChanged.home ? { scale: [1, 1.1, 1] } : {}}
                 transition={{ duration: 0.3 }}
@@ -196,12 +226,13 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
                       className="text-primary-600"
-                    >
-                    </motion.span>
+                    ></motion.span>
                   )}
                   {homeScore.runs}
                   {homeScore.wickets !== undefined && (
-                    <span className="text-lg sm:text-xl text-gray-600 font-normal">/{homeScore.wickets}</span>
+                    <span className="text-lg sm:text-xl text-gray-600 font-normal">
+                      /{homeScore.wickets}
+                    </span>
                   )}
                 </div>
                 {homeScore.overs > 0 && (
@@ -220,12 +251,14 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
               <span className="text-xl sm:text-2xl flex-shrink-0">{match.teams.away.flag}</span>
               <div className="min-w-0 flex-1">
-                <h3 className="font-bold text-base sm:text-lg text-secondary-900 truncate">{match.teams.away.name}</h3>
+                <h3 className="font-bold text-base sm:text-lg text-secondary-900 truncate">
+                  {match.teams.away.name}
+                </h3>
                 <p className="text-xs text-gray-600">{match.teams.away.shortName}</p>
               </div>
             </div>
             {awayScore && (
-              <motion.div 
+              <motion.div
                 className="text-right flex-shrink-0"
                 animate={scoreChanged.away ? { scale: [1, 1.1, 1] } : {}}
                 transition={{ duration: 0.3 }}
@@ -237,12 +270,13 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
                       className="text-primary-600"
-                    >
-                    </motion.span>
+                    ></motion.span>
                   )}
                   {awayScore.runs}
                   {awayScore.wickets !== undefined && (
-                    <span className="text-lg sm:text-xl text-gray-600 font-normal">/{awayScore.wickets}</span>
+                    <span className="text-lg sm:text-xl text-gray-600 font-normal">
+                      /{awayScore.wickets}
+                    </span>
                   )}
                 </div>
                 {awayScore.overs > 0 && (
@@ -257,30 +291,44 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
           {/* Live Match Info - Cricinfo Style */}
           {isLive && awayScore && (
             <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
-              {/* Target and Run Rates */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {/* Target, Runs Remaining, and Run Rates */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 {match.target && (
                   <div className="px-4 py-2 rounded-lg bg-primary-50 border border-primary-200">
                     <span className="text-xs text-gray-600 block">Target</span>
                     <span className="text-sm font-bold text-primary-700">{match.target} runs</span>
                   </div>
                 )}
+                {match.liveData?.runsRemaining !== undefined &&
+                  match.liveData.runsRemaining !== null && (
+                    <div className="px-4 py-2 rounded-lg bg-orange-50 border border-orange-200">
+                      <span className="text-xs text-gray-600 block">Runs Remaining</span>
+                      <span className="text-sm font-bold text-orange-700">
+                        {match.liveData.runsRemaining} runs
+                      </span>
+                    </div>
+                  )}
                 {requiredRR && (
                   <div className="px-4 py-2 rounded-lg bg-gray-50 border border-gray-200">
                     <span className="text-xs text-gray-600 block mb-0.5">Required RR</span>
-                    <span className="text-sm font-bold text-gray-900 tabular-nums">{requiredRR}</span>
+                    <span className="text-sm font-bold text-gray-900 tabular-nums">
+                      {requiredRR}
+                    </span>
                   </div>
                 )}
                 {currentRR && (
-                  <div className={`px-4 py-2 rounded-lg border ${getRRColor(currentRR, requiredRR || null).includes('green') ? 'bg-green-50 border-green-200' : getRRColor(currentRR, requiredRR || null).includes('red') ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'}`}>
+                  <div
+                    className={`px-4 py-2 rounded-lg border ${getRRColor(currentRR, requiredRR).includes('green') ? 'bg-green-50 border-green-200' : getRRColor(currentRR, requiredRR).includes('red') ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'}`}
+                  >
                     <div className="flex items-center justify-between gap-2">
                       <div>
                         <span className="text-xs text-gray-600 block mb-0.5">Current RR</span>
-                        <span className={`text-sm font-bold tabular-nums ${getRRColor(currentRR, requiredRR || null)}`}>
+                        <span
+                          className={`text-sm font-bold tabular-nums ${getRRColor(currentRR, requiredRR)}`}
+                        >
                           {currentRR}
                         </span>
                       </div>
-                      {getRRBadge(currentRR, requiredRR || null)}
                     </div>
                   </div>
                 )}
@@ -290,15 +338,25 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
               {match.currentBatters && match.currentBatters.length > 0 ? (
                 <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
                   <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                    <span className="text-xs sm:text-sm font-semibold text-gray-700">Current Batters</span>
+                    <span className="text-xs sm:text-sm font-semibold text-gray-700">
+                      Current Batters
+                    </span>
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
                     {match.currentBatters.map((batter, idx) => (
-                      <div key={batter.playerId || idx} className="flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                      <div
+                        key={batter.playerId || idx}
+                        className="flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                      >
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5 sm:gap-2">
-                            <span className="font-semibold text-xs sm:text-sm text-gray-900 truncate">{batter.playerName}</span>
-                            <span className="text-xs px-1 sm:px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium flex-shrink-0">*</span>
+                            <span className="font-semibold text-xs sm:text-sm text-gray-900 truncate">
+                              {batter.playerName ||
+                                (batter.playerId ? `Player ${batter.playerId}` : '')}
+                            </span>
+                            <span className="text-xs px-1 sm:px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium flex-shrink-0">
+                              *
+                            </span>
                           </div>
                           <div className="text-xs text-gray-600 mt-0.5 sm:mt-1 flex flex-wrap gap-x-1.5">
                             <span className="font-medium">{batter.runs}</span>
@@ -308,7 +366,10 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                             <span>•</span>
                             <span>{batter.sixes}x6</span>
                             <span>•</span>
-                            <span>SR <span className="font-semibold">{batter.strikeRate.toFixed(1)}</span></span>
+                            <span>
+                              SR{' '}
+                              <span className="font-semibold">{batter.strikeRate.toFixed(1)}</span>
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -329,20 +390,8 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
                     <span className="text-xs text-gray-600">Partnership</span>
                     <span className="text-xs sm:text-sm font-semibold text-gray-900 break-words">
-                      {match.partnership.runs} runs, {match.partnership.balls} balls (RR: {match.partnership.runRate})
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Last Wicket */}
-              {match.lastWicket && (
-                <div className="px-3 sm:px-4 py-2 rounded-lg bg-orange-50 border border-orange-200">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
-                    <span className="text-xs text-gray-600">Last Wicket</span>
-                    <span className="text-xs sm:text-sm font-semibold text-gray-900 break-words">
-                      {match.lastWicket.playerName} {match.lastWicket.runs} ({match.lastWicket.balls}b)
-                      {match.lastWicket.fowScore !== undefined && ` • FOW: ${match.lastWicket.fowScore}/${match.currentScore?.away?.wickets || 0}`}
+                      {match.partnership.runs} runs, {match.partnership.balls} balls (RR:{' '}
+                      {match.partnership.runRate})
                     </span>
                   </div>
                 </div>
@@ -352,13 +401,21 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
               {match.currentBowlers && match.currentBowlers.length > 0 ? (
                 <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
                   <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                    <span className="text-xs sm:text-sm font-semibold text-gray-700">Current Bowlers</span>
+                    <span className="text-xs sm:text-sm font-semibold text-gray-700">
+                      Current Bowlers
+                    </span>
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
                     {match.currentBowlers.map((bowler, idx) => (
-                      <div key={bowler.playerId || idx} className="flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                      <div
+                        key={bowler.playerId || idx}
+                        className="flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                      >
                         <div className="flex-1 min-w-0">
-                          <span className="font-semibold text-xs sm:text-sm text-gray-900 truncate block">{bowler.playerName}</span>
+                          <span className="font-semibold text-xs sm:text-sm text-gray-900 truncate block">
+                            {bowler.playerName ||
+                              (bowler.playerId ? `Player ${bowler.playerId}` : '')}
+                          </span>
                           <div className="text-xs text-gray-600 mt-0.5 sm:mt-1 flex flex-wrap gap-x-1.5">
                             <span className="font-medium">{bowler.overs.toFixed(1)}</span>
                             <span>-{bowler.maidens}-</span>
@@ -366,7 +423,10 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                             <span>-</span>
                             <span className="font-semibold text-primary-700">{bowler.wickets}</span>
                             <span>•</span>
-                            <span>Econ <span className="font-semibold">{bowler.economy.toFixed(2)}</span></span>
+                            <span>
+                              Econ{' '}
+                              <span className="font-semibold">{bowler.economy.toFixed(2)}</span>
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -387,6 +447,9 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
                   <p className="text-xs sm:text-sm text-blue-700 break-words">{match.matchNote}</p>
                 </div>
               )}
+
+              {/* Live Commentary - Cricinfo Style */}
+              <LiveCommentary matchId={match.matchId} />
             </div>
           )}
         </div>
@@ -395,3 +458,467 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
   );
 }
 
+// Full Commentary Component for Live Tab (MatchCommentary style)
+interface CommentaryEntry {
+  ball: string;
+  commentary: string;
+  over: number;
+  ballNumber: number;
+  runs: number;
+  wickets?: number;
+  batsman?: string;
+  bowler?: string;
+  timestamp?: string;
+  scoreboard?: string; // S1 for first innings, S2 for second innings
+}
+
+interface CommentaryData {
+  firstInnings: CommentaryEntry[];
+  secondInnings: CommentaryEntry[];
+  all: CommentaryEntry[];
+}
+
+function LiveCommentary({ matchId }: { matchId: string }) {
+  const [commentaryData, setCommentaryData] = useState<CommentaryData>({
+    firstInnings: [],
+    secondInnings: [],
+    all: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [filterOver, setFilterOver] = useState<number | null>(null);
+  const commentaryEndRef = useRef<HTMLDivElement>(null);
+
+  // Helper function to extract integer over number (handle decimals like 19.6 -> 19)
+  const getOverNumber = (over: number | undefined | null): number | null => {
+    if (over === undefined || over === null || isNaN(over)) {
+      return null;
+    }
+    const overInt = Math.floor(over);
+    return overInt > 0 ? overInt : null;
+  };
+
+  // Helper function to filter and normalize commentary entries
+  const normalizeCommentary = (entries: CommentaryEntry[]): CommentaryEntry[] => {
+    return (
+      entries
+        .map((entry) => {
+          const overNum = getOverNumber(entry.over);
+          // More lenient validation - allow ballNumber 0-6 (inclusive)
+          if (overNum === null) {
+            return null;
+          }
+          // Allow ballNumber to be undefined or 0-6
+          const ballNum = entry.ballNumber;
+          if (ballNum !== undefined && ballNum !== null && (ballNum < 0 || ballNum > 6)) {
+            return null;
+          }
+          return {
+            ...entry,
+            over: overNum,
+            ballNumber: ballNum !== undefined && ballNum !== null ? ballNum : 0,
+          };
+        })
+        .filter((entry): entry is CommentaryEntry => entry !== null)
+        // Ensure newest is always at top (sort by over desc, then ballNumber desc)
+        .sort((a, b) => {
+          if (a.over !== b.over) return b.over - a.over;
+          return b.ballNumber - a.ballNumber;
+        })
+    );
+  };
+
+  // Normalize commentary for each innings
+  const validFirstInnings = normalizeCommentary(commentaryData.firstInnings);
+  const validSecondInnings = normalizeCommentary(commentaryData.secondInnings);
+  const validAllCommentary = normalizeCommentary(commentaryData.all);
+
+  // Get unique overs for filter (from all commentary)
+  const uniqueOvers = Array.from(new Set(validAllCommentary.map((c) => c.over))).sort(
+    (a, b) => b - a
+  );
+
+  const fetchCommentary = async (isAutoRefresh = false) => {
+    try {
+      // Only show loading state on initial load or manual refresh, not on auto-refresh
+      if (!isAutoRefresh) {
+        setError(null);
+        if (isInitialLoad) {
+          setLoading(true);
+        }
+      }
+
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${base}/api/v1/cricket/matches/${matchId}/commentary`, {
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        if (!isAutoRefresh) {
+          throw new Error('Failed to load commentary');
+        }
+        return; // Silently fail on auto-refresh
+      }
+
+      const json = await response.json();
+
+      if (json.success && json.data) {
+        // Handle new structure with innings separated
+        if (json.data.firstInnings !== undefined && json.data.secondInnings !== undefined) {
+          // New structure: { firstInnings: [], secondInnings: [], all: [] }
+          setCommentaryData({
+            firstInnings: json.data.firstInnings || [],
+            secondInnings: json.data.secondInnings || [],
+            all: json.data.all || [],
+          });
+        } else if (Array.isArray(json.data)) {
+          // Legacy structure: array of commentary entries
+          // Group by scoreboard if available, otherwise use all
+          const firstInnings: CommentaryEntry[] = [];
+          const secondInnings: CommentaryEntry[] = [];
+          const all: CommentaryEntry[] = [];
+
+          json.data.forEach((entry: CommentaryEntry) => {
+            all.push(entry);
+            if (entry.scoreboard === 'S1') {
+              firstInnings.push(entry);
+            } else if (entry.scoreboard === 'S2') {
+              secondInnings.push(entry);
+            }
+          });
+
+          setCommentaryData({
+            firstInnings,
+            secondInnings,
+            all,
+          });
+        } else {
+          setCommentaryData({
+            firstInnings: [],
+            secondInnings: [],
+            all: [],
+          });
+        }
+      }
+    } catch (err: unknown) {
+      // Only show errors on initial load or manual refresh, not on auto-refresh
+      if (!isAutoRefresh) {
+        logger.error('Error fetching commentary', err, 'LiveCommentary');
+        setError(getErrorMessage(err));
+      }
+    } finally {
+      if (!isAutoRefresh) {
+        setLoading(false);
+        setIsInitialLoad(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Initial load
+    fetchCommentary(false);
+
+    if (autoRefresh) {
+      // Auto-refresh silently in background
+      const interval = setInterval(() => {
+        fetchCommentary(true); // Pass true to indicate auto-refresh
+      }, 15000); // Refresh every 15 seconds
+      return () => clearInterval(interval);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchId, autoRefresh]);
+
+  // Auto-scroll to top (where latest commentary is) when new commentary arrives during auto-refresh
+  // Only scroll if user hasn't manually scrolled away from top
+  useEffect(() => {
+    if (autoRefresh && validAllCommentary.length > 0) {
+      const container = document.querySelector('[data-commentary-container]') as HTMLElement;
+      if (container) {
+        // Only auto-scroll if user is near the top (within 100px) - don't interrupt if they're reading older commentary
+        const isNearTop = container.scrollTop < 100;
+        if (isNearTop) {
+          // Small delay to ensure DOM is updated
+          setTimeout(() => {
+            container.scrollTop = 0;
+          }, 50);
+        }
+      }
+    }
+  }, [validAllCommentary.length, autoRefresh]);
+
+  // Always show the commentary section, even if loading or empty
+  return (
+    <div className="mt-4 pt-4 border-t border-gray-200">
+      <div className="px-4 sm:px-6 py-2 sm:py-3 border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="font-semibold text-sm sm:text-base text-gray-800">
+              Ball-by-Ball Commentary
+            </span>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            {uniqueOvers.length > 0 && (
+              <div className="relative">
+                <select
+                  value={filterOver || ''}
+                  onChange={(e) => setFilterOver(e.target.value ? parseInt(e.target.value) : null)}
+                  className="text-xs sm:text-sm font-medium px-2 sm:px-3 py-1.5 sm:py-2 rounded-md bg-white border border-gray-300 text-gray-700 appearance-none pr-6 sm:pr-8 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                >
+                  <option value="">All Overs</option>
+                  {uniqueOvers.map((over) => (
+                    <option key={over} value={over} className="text-gray-900">
+                      {over}.0 - {over}.6
+                    </option>
+                  ))}
+                </select>
+                <Filter className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 pointer-events-none text-gray-500" />
+              </div>
+            )}
+            <button
+              onClick={() => setAutoRefresh(!autoRefresh)}
+              className="text-xs sm:text-sm font-medium hover:text-primary-600 transition-colors px-2 sm:px-3 py-1.5 sm:py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 touch-target"
+            >
+              {autoRefresh ? 'Auto: ON' : 'Auto: OFF'}
+            </button>
+            <button
+              onClick={() => fetchCommentary(false)}
+              className="p-2 sm:p-2.5 rounded-md hover:bg-gray-100 transition-colors border border-gray-300 bg-white touch-target"
+              title="Refresh commentary"
+            >
+              <RefreshCw
+                className={`h-4 w-4 sm:h-5 sm:w-5 text-gray-600 ${loading && !isInitialLoad ? 'animate-spin' : ''}`}
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        data-commentary-container
+        className="max-h-[600px] overflow-y-auto scrollbar-hide bg-white"
+      >
+        {loading && isInitialLoad && validAllCommentary.length === 0 ? (
+          <div className="p-6 sm:p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600 text-sm">Loading commentary...</p>
+          </div>
+        ) : error ? (
+          <div className="p-6 sm:p-8 text-center">
+            <div className="mb-4 text-red-600">
+              <p className="font-semibold text-sm sm:text-base">{error}</p>
+            </div>
+            <button
+              onClick={() => fetchCommentary(false)}
+              className="px-4 sm:px-6 py-2 sm:py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold text-sm sm:text-base shadow-md touch-target"
+            >
+              Retry
+            </button>
+          </div>
+        ) : validAllCommentary.length === 0 ? (
+          <div className="p-6 sm:p-8 text-center">
+            <div className="mb-4 text-gray-500">
+              <p className="font-semibold text-sm sm:text-base">No commentary available yet.</p>
+              <p className="text-xs sm:text-sm mt-2 text-gray-400">
+                Commentary will appear here once the match starts.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {/* Second Innings (if exists) - Show first as it's the current/latest */}
+            {validSecondInnings.length > 0 && (
+              <div className="border-b border-gray-200">
+                <div className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-50">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-800 flex items-center gap-2">
+                    <span className="inline-block w-1.5 h-1.5 bg-primary-600 rounded-full"></span>
+                    2nd Innings
+                  </h3>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  <AnimatePresence>
+                    {(filterOver !== null
+                      ? validSecondInnings.filter((c) => c.over === filterOver)
+                      : validSecondInnings
+                    ).map((entry, index) => {
+                      const isBoundary = entry.runs === 4 || entry.runs === 6;
+                      const isWicket = entry.wickets && entry.wickets > 0;
+
+                      return (
+                        <motion.div
+                          key={`2nd-${entry.over}.${entry.ballNumber}-${index}`}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className={`p-3 sm:p-4 sm:p-5 hover:bg-primary-50/50 transition-colors border-l-4 ${
+                            isWicket
+                              ? 'border-l-red-500 bg-red-50/30'
+                              : isBoundary
+                                ? 'border-l-primary-500 bg-primary-50/30'
+                                : 'border-l-transparent hover:border-l-primary-400'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3 sm:gap-4">
+                            <div className="flex-shrink-0 w-16 sm:w-20 text-right">
+                              <div className="text-sm sm:text-base font-bold text-secondary-900 tabular-nums">
+                                {entry.over}.{entry.ballNumber}
+                              </div>
+                              {entry.timestamp && (
+                                <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 font-medium">
+                                  {formatTime(entry.timestamp)}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
+                                {entry.runs > 0 && (
+                                  <span
+                                    className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-xs font-bold border ${
+                                      entry.runs === 6
+                                        ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                                        : entry.runs === 4
+                                          ? 'bg-blue-100 text-blue-800 border-blue-300'
+                                          : 'bg-primary-100 text-primary-800 border-primary-200'
+                                    }`}
+                                  >
+                                    {entry.runs} {entry.runs === 1 ? 'run' : 'runs'}
+                                  </span>
+                                )}
+                                {isWicket && (
+                                  <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-red-100 text-red-800 text-xs font-bold border border-red-300 animate-pulse">
+                                    🎯 Wicket!
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-gray-800 leading-relaxed font-medium text-sm sm:text-base">
+                                {entry.commentary}
+                              </p>
+                              {(entry.batsman || entry.bowler) && (
+                                <div className="mt-2 text-[10px] sm:text-xs text-gray-600 font-medium flex flex-wrap gap-x-2">
+                                  {entry.batsman && (
+                                    <span className="text-secondary-700">
+                                      Batting: {entry.batsman}
+                                    </span>
+                                  )}
+                                  {entry.batsman && entry.bowler && (
+                                    <span className="text-gray-400">•</span>
+                                  )}
+                                  {entry.bowler && (
+                                    <span className="text-secondary-700">
+                                      Bowling: {entry.bowler}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
+
+            {/* First Innings - Show below second innings */}
+            {validFirstInnings.length > 0 && (
+              <div className="border-b border-gray-200">
+                <div className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-50">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-800 flex items-center gap-2">
+                    <span className="inline-block w-1.5 h-1.5 bg-gray-500 rounded-full"></span>
+                    1st Innings
+                  </h3>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  <AnimatePresence>
+                    {(filterOver !== null
+                      ? validFirstInnings.filter((c) => c.over === filterOver)
+                      : validFirstInnings
+                    ).map((entry, index) => {
+                      const isBoundary = entry.runs === 4 || entry.runs === 6;
+                      const isWicket = entry.wickets && entry.wickets > 0;
+
+                      return (
+                        <motion.div
+                          key={`1st-${entry.over}.${entry.ballNumber}-${index}`}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className={`p-3 sm:p-4 sm:p-5 hover:bg-gray-50/50 transition-colors border-l-4 ${
+                            isWicket
+                              ? 'border-l-red-500 bg-red-50/30'
+                              : isBoundary
+                                ? 'border-l-primary-500 bg-primary-50/30'
+                                : 'border-l-transparent hover:border-l-primary-400'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3 sm:gap-4">
+                            <div className="flex-shrink-0 w-16 sm:w-20 text-right">
+                              <div className="text-sm sm:text-base font-bold text-secondary-900 tabular-nums">
+                                {entry.over}.{entry.ballNumber}
+                              </div>
+                              {entry.timestamp && (
+                                <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 font-medium">
+                                  {formatTime(entry.timestamp)}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
+                                {entry.runs > 0 && (
+                                  <span
+                                    className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-xs font-bold border ${
+                                      entry.runs === 6
+                                        ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                                        : entry.runs === 4
+                                          ? 'bg-blue-100 text-blue-800 border-blue-300'
+                                          : 'bg-primary-100 text-primary-800 border-primary-200'
+                                    }`}
+                                  >
+                                    {entry.runs} {entry.runs === 1 ? 'run' : 'runs'}
+                                  </span>
+                                )}
+                                {isWicket && (
+                                  <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-red-100 text-red-800 text-xs font-bold border border-red-300 animate-pulse">
+                                    🎯 Wicket!
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-gray-800 leading-relaxed font-medium text-sm sm:text-base">
+                                {entry.commentary}
+                              </p>
+                              {(entry.batsman || entry.bowler) && (
+                                <div className="mt-2 text-[10px] sm:text-xs text-gray-600 font-medium flex flex-wrap gap-x-2">
+                                  {entry.batsman && (
+                                    <span className="text-secondary-700">
+                                      Batting: {entry.batsman}
+                                    </span>
+                                  )}
+                                  {entry.batsman && entry.bowler && (
+                                    <span className="text-gray-400">•</span>
+                                  )}
+                                  {entry.bowler && (
+                                    <span className="text-secondary-700">
+                                      Bowling: {entry.bowler}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
