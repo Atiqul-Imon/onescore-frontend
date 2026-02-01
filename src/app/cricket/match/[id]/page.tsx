@@ -178,62 +178,129 @@ export default function MatchDetailPage() {
         setError(null);
 
         const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const response = await fetch(`${base}/api/v1/cricket/matches/${matchId}`, {
-          cache: 'no-store',
-          next: { revalidate: 30 },
-        });
 
-        // Check status first
-        if (response.status === 404) {
-          notFound();
-          return;
-        }
+        // Check if this is a local match (starts with "LOCAL-")
+        const isLocalMatchId = matchId.startsWith('LOCAL-');
 
-        if (!response.ok) {
-          // Try to get error message from response
-          try {
-            const errorJson = await response.json();
-            throw new Error(errorJson.message || 'Failed to load match details');
-          } catch {
-            throw new Error(`Failed to load match details (${response.status})`);
-          }
-        }
+        let matchData = null;
+        let lastError: Error | null = null;
 
-        const json = await response.json();
+        // Strategy: For local match IDs, try local endpoint first, then official
+        // For non-local IDs, try official first, then local as fallback
 
-        // Handle case where response indicates not found
-        if (!json.success || json.statusCode === 404) {
-          notFound();
-          return;
-        }
-
-        // Handle case where data might be at root level (TransformInterceptor wraps it)
-        const matchData = json.data || json;
-
-        // Check if we have actual match data
-        if (!matchData || (!matchData.matchId && !matchData._id && !matchData.id)) {
-          // Try local matches API as fallback
+        if (isLocalMatchId) {
+          // Try local matches API first for local match IDs
           try {
             const localResponse = await fetch(`${base}/api/v1/cricket/local/matches/${matchId}`, {
               cache: 'no-store',
+              next: { revalidate: 30 },
             });
+
             if (localResponse.ok) {
               const localJson = await localResponse.json();
               if (localJson.success && localJson.data) {
-                setMatch(localJson.data);
-                return;
+                matchData = localJson.data;
+              } else {
+                lastError = new Error('Local match data is invalid');
               }
+            } else if (localResponse.status === 404) {
+              // Local match not found - try official endpoint as fallback
+              lastError = new Error('Local match not found');
+            } else {
+              lastError = new Error(`Failed to load local match (${localResponse.status})`);
             }
-          } catch {
-            // Ignore local match fetch errors
+          } catch (localErr: any) {
+            console.error('Error fetching local match:', localErr);
+            lastError = localErr;
           }
-          throw new Error('Match data is invalid or empty');
         }
 
-        setMatch(matchData);
+        // If not found in local matches (or not a local match ID), try official endpoint
+        if (!matchData) {
+          try {
+            const response = await fetch(`${base}/api/v1/cricket/matches/${matchId}`, {
+              cache: 'no-store',
+              next: { revalidate: 30 },
+            });
+
+            if (response.ok) {
+              const json = await response.json();
+
+              // Handle case where response indicates not found
+              if (!json.success || json.statusCode === 404) {
+                // If this is not a local match ID, show not found
+                if (!isLocalMatchId) {
+                  notFound();
+                  return;
+                }
+                // If it is a local match ID, we already tried local endpoint
+                throw lastError || new Error('Match not found');
+              }
+
+              // Handle case where data might be at root level (TransformInterceptor wraps it)
+              matchData = json.data || json;
+
+              // Check if we have actual match data
+              if (!matchData || (!matchData.matchId && !matchData._id && !matchData.id)) {
+                throw new Error('Match data is invalid or empty');
+              }
+            } else if (response.status === 404) {
+              // If official endpoint returns 404
+              if (!isLocalMatchId) {
+                // For non-local IDs, try local endpoint as fallback
+                try {
+                  const localResponse = await fetch(
+                    `${base}/api/v1/cricket/local/matches/${matchId}`,
+                    {
+                      cache: 'no-store',
+                    }
+                  );
+                  if (localResponse.ok) {
+                    const localJson = await localResponse.json();
+                    if (localJson.success && localJson.data) {
+                      matchData = localJson.data;
+                    } else {
+                      notFound();
+                      return;
+                    }
+                  } else {
+                    notFound();
+                    return;
+                  }
+                } catch {
+                  notFound();
+                  return;
+                }
+              } else {
+                // For local match IDs, we already tried local endpoint, so show not found
+                notFound();
+                return;
+              }
+            } else {
+              throw new Error(`Failed to load match details (${response.status})`);
+            }
+          } catch (officialErr: any) {
+            // If we have a lastError from local match attempt, use that
+            if (lastError && isLocalMatchId) {
+              throw lastError;
+            }
+            throw officialErr;
+          }
+        }
+
+        if (matchData) {
+          setMatch(matchData);
+        } else {
+          throw lastError || new Error('Match data not found');
+        }
       } catch (err: any) {
         console.error('Error fetching match details:', err);
-        setError(err.message || 'Failed to load match details');
+        // Don't show error if it's a 404 - let notFound() handle it
+        if (err.message && !err.message.includes('404') && !err.message.includes('not found')) {
+          setError(err.message || 'Failed to load match details');
+        } else {
+          notFound();
+        }
       } finally {
         setLoading(false);
       }

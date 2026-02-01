@@ -1,9 +1,9 @@
 'use client';
 
 import { Card } from '@/components/ui/Card';
-import { Users, MapPin, Shield, Clock, CheckCircle2, Award } from 'lucide-react';
+import { Users, MapPin, Shield, Clock, Award } from 'lucide-react';
 import { CricketMatch } from '@/store/slices/cricketSlice';
-import { isLocalMatch, isMatchVerified, getLocationDisplay } from '@/lib/cricket/match-utils';
+import { isLocalMatch, getLocationDisplay } from '@/lib/cricket/match-utils';
 import { formatDistanceToNow } from 'date-fns';
 
 interface CommunityMatchInfoProps {
@@ -13,7 +13,6 @@ interface CommunityMatchInfoProps {
 export function CommunityMatchInfo({ match }: CommunityMatchInfoProps) {
   if (!isLocalMatch(match)) return null;
 
-  const verified = isMatchVerified(match);
   const scorerInfo = match.scorerInfo;
   const location = getLocationDisplay(match);
   const lastUpdate = scorerInfo?.lastUpdate
@@ -48,13 +47,6 @@ export function CommunityMatchInfo({ match }: CommunityMatchInfoProps) {
               <p className="text-xs text-gray-600">Scored by community members</p>
             </div>
           </div>
-
-          {verified && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-100 text-green-700 border border-green-200">
-              <CheckCircle2 className="w-4 h-4" />
-              <span className="text-xs font-medium">Verified</span>
-            </div>
-          )}
         </div>
 
         <div className="space-y-3">

@@ -50,6 +50,11 @@ const navSections: NavSection[] = [
       { label: 'Newsroom', href: '/admin/news', icon: <Newspaper className="h-4 w-4" /> },
       { label: 'Teams', href: '/admin/teams', icon: <Trophy className="h-4 w-4" /> },
       { label: 'Media', href: '/admin/media', icon: <ImageIcon className="h-4 w-4" /> },
+      {
+        label: 'Local Matches',
+        href: '/admin/local-matches',
+        icon: <Trophy className="h-4 w-4" />,
+      },
     ],
   },
   {
