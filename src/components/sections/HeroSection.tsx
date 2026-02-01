@@ -10,8 +10,6 @@ import { formatDate } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { handleApiError, getErrorMessage } from '@/lib/errors';
 import type { Article, LiveMatch } from './HeroSectionWrapper';
-import { useLocalMatches } from '@/hooks/useLocalMatches';
-import { transformLocalMatch } from '@/lib/cricket/match-utils';
 import { CommunityMatchBadge } from '@/components/cricket/CommunityMatchBadge';
 import { CricketMatch } from '@/store/slices/cricketSlice';
 
@@ -65,18 +63,6 @@ export function HeroSection({
   const [secondaryArticles, setSecondaryArticles] = useState<Article[]>(
     initialSecondaryArticles || []
   );
-
-  // Fetch local matches (live and completed)
-  const { matches: localLiveMatches } = useLocalMatches({
-    status: 'live',
-    limit: 10,
-    enabled: true,
-  });
-  const { matches: localCompletedMatches } = useLocalMatches({
-    status: 'completed',
-    limit: 10,
-    enabled: true,
-  });
 
   const fetchHeroData = useCallback(async () => {
     try {
@@ -146,38 +132,59 @@ export function HeroSection({
         allLiveMatches = [...allLiveMatches, ...footballLiveMatches];
       }
 
-      // Transform and add local live matches
-      const transformedLocalLive: LiveMatch[] = localLiveMatches.map((localMatch) => ({
-        _id: localMatch._id,
-        matchId: localMatch.matchId,
-        teams: {
-          home: {
-            name: localMatch.teams.home.name,
-            shortName: localMatch.teams.home.shortName,
-            flag: localMatch.teams.home.flag,
-          },
-          away: {
-            name: localMatch.teams.away.name,
-            shortName: localMatch.teams.away.shortName,
-            flag: localMatch.teams.away.flag,
-          },
-        },
-        venue: {
-          name: localMatch.venue.name,
-          city: localMatch.venue.city,
-        },
-        status: localMatch.status as 'live' | 'completed' | 'upcoming',
-        startTime: localMatch.startTime,
-        currentScore: localMatch.currentScore,
-        format: localMatch.format,
-        series: localMatch.series,
-        isLocalMatch: true,
-        matchType: localMatch.matchType,
-        scorerInfo: localMatch.scorerInfo,
-        isVerified: localMatch.isVerified,
-      }));
+      // Fetch local live matches
+      let localLiveMatches: LiveMatch[] = [];
+      try {
+        const localLiveRes = await fetch(
+          `${base}/api/v1/cricket/local/matches?status=live&limit=10`,
+          {
+            cache: 'no-store',
+            next: { revalidate: 30 },
+          }
+        );
+        if (localLiveRes.ok) {
+          const localData = await localLiveRes.json();
+          if (localData.success && Array.isArray(localData.data)) {
+            localLiveMatches = localData.data.map((localMatch: any) => ({
+              _id: localMatch._id || localMatch.matchId,
+              matchId: localMatch.matchId,
+              teams: {
+                home: {
+                  name: localMatch.teams.home.name,
+                  shortName: localMatch.teams.home.shortName,
+                  flag: localMatch.teams.home.flag || '',
+                },
+                away: {
+                  name: localMatch.teams.away.name,
+                  shortName: localMatch.teams.away.shortName,
+                  flag: localMatch.teams.away.flag || '',
+                },
+              },
+              venue: {
+                name: localMatch.venue.name,
+                city: localMatch.venue.city,
+              },
+              status: localMatch.status as 'live' | 'completed' | 'upcoming',
+              startTime:
+                typeof localMatch.startTime === 'string'
+                  ? localMatch.startTime
+                  : new Date(localMatch.startTime).toISOString(),
+              currentScore: localMatch.currentScore,
+              format: localMatch.format,
+              series: localMatch.series,
+              isLocalMatch: true,
+              matchType: localMatch.matchType,
+              scorerInfo: localMatch.scorerInfo,
+              isVerified: localMatch.isVerified,
+            }));
+          }
+        }
+      } catch (localError) {
+        logger.error('Failed to fetch local live matches', localError, 'HeroSection');
+      }
 
-      allLiveMatches = [...allLiveMatches, ...transformedLocalLive];
+      // Add local live matches
+      allLiveMatches = [...allLiveMatches, ...localLiveMatches];
 
       // Sort live matches: live first, then by start time
       if (allLiveMatches.length > 0) {
@@ -232,38 +239,58 @@ export function HeroSection({
             completedMatches = [...completedMatches, ...footballCompleted];
           }
 
-          // Transform and add local completed matches
-          const transformedLocalCompleted: LiveMatch[] = localCompletedMatches.map(
-            (localMatch) => ({
-              _id: localMatch._id,
-              matchId: localMatch.matchId,
-              teams: {
-                home: {
-                  name: localMatch.teams.home.name,
-                  shortName: localMatch.teams.home.shortName,
-                  flag: localMatch.teams.home.flag,
-                },
-                away: {
-                  name: localMatch.teams.away.name,
-                  shortName: localMatch.teams.away.shortName,
-                  flag: localMatch.teams.away.flag,
-                },
-              },
-              venue: {
-                name: localMatch.venue.name,
-                city: localMatch.venue.city,
-              },
-              status: 'completed' as const,
-              startTime: localMatch.startTime,
-              currentScore: localMatch.currentScore,
-              format: localMatch.format,
-              series: localMatch.series,
-              isLocalMatch: true,
-              matchType: localMatch.matchType,
-              scorerInfo: localMatch.scorerInfo,
-              isVerified: localMatch.isVerified,
-            })
-          );
+          // Fetch local completed matches
+          let localCompletedMatches: LiveMatch[] = [];
+          try {
+            const localCompletedRes = await fetch(
+              `${base}/api/v1/cricket/local/matches?status=completed&limit=${remainingSlots}`,
+              {
+                next: { revalidate: 600 },
+              }
+            );
+            if (localCompletedRes.ok) {
+              const localData = await localCompletedRes.json();
+              if (localData.success && Array.isArray(localData.data)) {
+                localCompletedMatches = localData.data.map((localMatch: any) => ({
+                  _id: localMatch._id || localMatch.matchId,
+                  matchId: localMatch.matchId,
+                  teams: {
+                    home: {
+                      name: localMatch.teams.home.name,
+                      shortName: localMatch.teams.home.shortName,
+                      flag: localMatch.teams.home.flag || '',
+                    },
+                    away: {
+                      name: localMatch.teams.away.name,
+                      shortName: localMatch.teams.away.shortName,
+                      flag: localMatch.teams.away.flag || '',
+                    },
+                  },
+                  venue: {
+                    name: localMatch.venue.name,
+                    city: localMatch.venue.city,
+                  },
+                  status: 'completed' as const,
+                  startTime:
+                    typeof localMatch.startTime === 'string'
+                      ? localMatch.startTime
+                      : new Date(localMatch.startTime).toISOString(),
+                  currentScore: localMatch.currentScore,
+                  format: localMatch.format,
+                  series: localMatch.series,
+                  isLocalMatch: true,
+                  matchType: localMatch.matchType,
+                  scorerInfo: localMatch.scorerInfo,
+                  isVerified: localMatch.isVerified,
+                }));
+              }
+            }
+          } catch (localError) {
+            logger.error('Failed to fetch local completed matches', localError, 'HeroSection');
+          }
+
+          // localCompletedMatches is already transformed above
+          const transformedLocalCompleted: LiveMatch[] = localCompletedMatches;
 
           completedMatches = [...completedMatches, ...transformedLocalCompleted];
 
