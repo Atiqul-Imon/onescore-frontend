@@ -45,25 +45,25 @@ export function UpcomingFixturesSection() {
   const fetchFixtures = async () => {
     try {
       setLoading(true);
-      
+
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      
+
       // Fetch both cricket and football fixtures
       const [cricketRes, footballRes] = await Promise.allSettled([
         fetch(`${base}/api/v1/cricket/matches/fixtures?limit=10`, { cache: 'no-store' }),
         fetch(`${base}/api/v1/football/matches/fixtures?limit=10`, { cache: 'no-store' }),
       ]);
-      
+
       let allFixtures: Fixture[] = [];
-      
+
       // Process cricket fixtures
       if (cricketRes.status === 'fulfilled' && cricketRes.value.ok) {
         const cricketJson = await cricketRes.value.json();
         if (cricketJson.success && cricketJson.data) {
-          const cricketData = Array.isArray(cricketJson.data) 
-            ? cricketJson.data 
+          const cricketData = Array.isArray(cricketJson.data)
+            ? cricketJson.data
             : cricketJson.data.fixtures || [];
-          
+
           const cricketFixtures = cricketData
             .filter((match: any) => match.format && !match.league)
             .map((match: any) => ({
@@ -73,12 +73,12 @@ export function UpcomingFixturesSection() {
                 home: {
                   name: match.teams.home.name,
                   shortName: match.teams.home.shortName,
-                  flag: match.teams.home.flag || '🏏',
+                  flag: match.teams.home.flag || '',
                 },
                 away: {
                   name: match.teams.away.name,
                   shortName: match.teams.away.shortName,
-                  flag: match.teams.away.flag || '🏏',
+                  flag: match.teams.away.flag || '',
                 },
               },
               venue: {
@@ -93,15 +93,15 @@ export function UpcomingFixturesSection() {
           allFixtures = [...allFixtures, ...cricketFixtures];
         }
       }
-      
+
       // Process football fixtures
       if (footballRes.status === 'fulfilled' && footballRes.value.ok) {
         const footballJson = await footballRes.value.json();
         if (footballJson.success && footballJson.data) {
-          const footballData = Array.isArray(footballJson.data) 
-            ? footballJson.data 
+          const footballData = Array.isArray(footballJson.data)
+            ? footballJson.data
             : footballJson.data.fixtures || [];
-          
+
           const footballFixtures = footballData
             .filter((match: any) => match.league && !match.format)
             .map((match: any) => ({
@@ -130,14 +130,14 @@ export function UpcomingFixturesSection() {
           allFixtures = [...allFixtures, ...footballFixtures];
         }
       }
-      
+
       // Sort by start time (upcoming first)
       allFixtures.sort((a, b) => {
         const dateA = new Date(a.startTime).getTime();
         const dateB = new Date(b.startTime).getTime();
         return dateA - dateB;
       });
-      
+
       setFixtures(allFixtures);
     } catch (error) {
       console.error('Error fetching fixtures:', error);
@@ -147,7 +147,7 @@ export function UpcomingFixturesSection() {
     }
   };
 
-  const filteredFixtures = fixtures.filter(fixture => {
+  const filteredFixtures = fixtures.filter((fixture) => {
     if (selectedFilter === 'all') return true;
     if (selectedFilter === 'cricket') return fixture.format;
     if (selectedFilter === 'football') return fixture.league;
@@ -157,7 +157,7 @@ export function UpcomingFixturesSection() {
   const filters = [
     { id: 'all', label: 'All Sports' },
     { id: 'cricket', label: 'Cricket' },
-    { id: 'football', label: 'Football' }
+    { id: 'football', label: 'Football' },
   ];
 
   const filterButtonClass = (id: string) =>
@@ -213,7 +213,8 @@ export function UpcomingFixturesSection() {
           </div>
           <h2 className="heading-2 mt-5 text-gray-900">Upcoming Fixtures</h2>
           <p className="section-lede mt-4 text-gray-600">
-            Plan your viewing schedule with marquee matchups curated from cricket and football calendars.
+            Plan your viewing schedule with marquee matchups curated from cricket and football
+            calendars.
           </p>
         </motion.div>
 
@@ -259,7 +260,10 @@ export function UpcomingFixturesSection() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Card variant="interactive" className="h-full rounded-2xl border border-gray-100 bg-white/90 p-6 shadow-lg">
+                <Card
+                  variant="interactive"
+                  className="h-full rounded-2xl border border-gray-100 bg-white/90 p-6 shadow-lg"
+                >
                   <div className="flex h-full flex-col gap-5">
                     <div className="flex items-center justify-between text-sm font-semibold text-gray-900">
                       <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-primary-600">

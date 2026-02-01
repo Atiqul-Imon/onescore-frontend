@@ -45,85 +45,85 @@ export function CricketFixtures() {
         series: 'ICC World Test Championship',
         teams: {
           home: { name: 'India', shortName: 'IND', flag: '🇮🇳' },
-          away: { name: 'England', shortName: 'ENG', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' }
+          away: { name: 'England', shortName: 'ENG', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
         },
-        venue: { name: 'Lord\'s Cricket Ground', city: 'London', country: 'England' },
+        venue: { name: "Lord's Cricket Ground", city: 'London', country: 'England' },
         format: 'test',
         startTime: '2024-01-20T10:30:00Z',
         status: 'upcoming',
         description: '2nd Test Match',
-        seriesType: 'championship'
+        seriesType: 'championship',
       },
       {
         id: '2',
         series: 'Pakistan Super League',
         teams: {
-          home: { name: 'Karachi Kings', shortName: 'KK', flag: '🏏' },
-          away: { name: 'Lahore Qalandars', shortName: 'LQ', flag: '🏏' }
+          home: { name: 'Karachi Kings', shortName: 'KK', flag: '' },
+          away: { name: 'Lahore Qalandars', shortName: 'LQ', flag: '' },
         },
         venue: { name: 'National Stadium', city: 'Karachi', country: 'Pakistan' },
         format: 't20',
         startTime: '2024-01-22T14:00:00Z',
         status: 'upcoming',
         description: 'Match 15',
-        seriesType: 't20'
+        seriesType: 't20',
       },
       {
         id: '3',
         series: 'Big Bash League',
         teams: {
           home: { name: 'Sydney Sixers', shortName: 'SYS', flag: '🇦🇺' },
-          away: { name: 'Melbourne Stars', shortName: 'MLS', flag: '🇦🇺' }
+          away: { name: 'Melbourne Stars', shortName: 'MLS', flag: '🇦🇺' },
         },
         venue: { name: 'Sydney Cricket Ground', city: 'Sydney', country: 'Australia' },
         format: 't20',
         startTime: '2024-01-24T18:30:00Z',
         status: 'upcoming',
         description: 'Match 28',
-        seriesType: 't20'
+        seriesType: 't20',
       },
       {
         id: '4',
         series: 'India vs Australia ODI Series',
         teams: {
           home: { name: 'India', shortName: 'IND', flag: '🇮🇳' },
-          away: { name: 'Australia', shortName: 'AUS', flag: '🇦🇺' }
+          away: { name: 'Australia', shortName: 'AUS', flag: '🇦🇺' },
         },
         venue: { name: 'Wankhede Stadium', city: 'Mumbai', country: 'India' },
         format: 'odi',
         startTime: '2024-01-26T14:30:00Z',
         status: 'upcoming',
         description: '3rd ODI',
-        seriesType: 'odi'
+        seriesType: 'odi',
       },
       {
         id: '5',
         series: 'T20 World Cup',
         teams: {
           home: { name: 'West Indies', shortName: 'WI', flag: '🇯🇲' },
-          away: { name: 'New Zealand', shortName: 'NZ', flag: '🇳🇿' }
+          away: { name: 'New Zealand', shortName: 'NZ', flag: '🇳🇿' },
         },
         venue: { name: 'Kensington Oval', city: 'Bridgetown', country: 'Barbados' },
         format: 't20i',
         startTime: '2024-01-28T20:00:00Z',
         status: 'upcoming',
         description: 'Group Stage Match',
-        seriesType: 'world-cup'
+        seriesType: 'world-cup',
       },
       {
         id: '6',
         series: 'County Championship',
         teams: {
           home: { name: 'Yorkshire', shortName: 'YOR', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-          away: { name: 'Lancashire', shortName: 'LAN', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' }
+          away: { name: 'Lancashire', shortName: 'LAN', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
         },
         venue: { name: 'Headingley', city: 'Leeds', country: 'England' },
         format: 'test',
         startTime: '2024-01-30T11:00:00Z',
         status: 'upcoming',
         description: 'Division 1 Match',
-        seriesType: 'test'
-      }
+        seriesType: 'test',
+      },
     ];
 
     setTimeout(() => {
@@ -132,16 +132,17 @@ export function CricketFixtures() {
     }, 1000);
   }, []);
 
-  const filteredFixtures = selectedFormat === 'all' 
-    ? fixtures 
-    : fixtures.filter(fixture => fixture.format === selectedFormat);
+  const filteredFixtures =
+    selectedFormat === 'all'
+      ? fixtures
+      : fixtures.filter((fixture) => fixture.format === selectedFormat);
 
   const formatOptions = [
     { value: 'all', label: 'All Formats' },
     { value: 'test', label: 'Test' },
     { value: 'odi', label: 'ODI' },
     { value: 't20i', label: 'T20I' },
-    { value: 't20', label: 'T20' }
+    { value: 't20', label: 'T20' },
   ];
 
   if (loading) {
@@ -172,7 +173,8 @@ export function CricketFixtures() {
           </div>
           <h2 className="heading-2 mt-5">Upcoming Cricket Fixtures</h2>
           <p className="section-lede mt-3 text-gray-600">
-            Build your watchlist with marquee matchups, refreshed every morning from our fixture engine.
+            Build your watchlist with marquee matchups, refreshed every morning from our fixture
+            engine.
           </p>
         </motion.div>
 
@@ -215,10 +217,8 @@ export function CricketFixtures() {
                     {fixture.format.toUpperCase()}
                   </span>
                 </div>
-                
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {fixture.series}
-                </h3>
+
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{fixture.series}</h3>
                 <p className="text-sm text-gray-600">{fixture.description}</p>
               </div>
 
@@ -230,12 +230,8 @@ export function CricketFixtures() {
                     <div className="flex items-center space-x-3">
                       <span className="text-2xl">{fixture.teams.home.flag}</span>
                       <div>
-                        <div className="font-semibold text-gray-900">
-                          {fixture.teams.home.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {fixture.teams.home.shortName}
-                        </div>
+                        <div className="font-semibold text-gray-900">{fixture.teams.home.name}</div>
+                        <div className="text-sm text-gray-500">{fixture.teams.home.shortName}</div>
                       </div>
                     </div>
                     <div className="text-right">
@@ -250,12 +246,8 @@ export function CricketFixtures() {
                     <div className="flex items-center space-x-3">
                       <span className="text-2xl">{fixture.teams.away.flag}</span>
                       <div>
-                        <div className="font-semibold text-gray-900">
-                          {fixture.teams.away.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {fixture.teams.away.shortName}
-                        </div>
+                        <div className="font-semibold text-gray-900">{fixture.teams.away.name}</div>
+                        <div className="text-sm text-gray-500">{fixture.teams.away.shortName}</div>
                       </div>
                     </div>
                     <div className="text-right">
@@ -279,12 +271,15 @@ export function CricketFixtures() {
               {/* Fixture Footer */}
               <div className="px-6 py-4 bg-gray-50 rounded-b-xl">
                 <div className="flex items-center justify-between">
-                <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center text-sm text-gray-600">
                     <Clock className="w-4 h-4 mr-1" />
                     <span>{new Date(fixture.startTime).toLocaleDateString()}</span>
                   </div>
                   <div className="text-sm text-gray-500">
-                    {new Date(fixture.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(fixture.startTime).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </div>
                 </div>
                 <div className="mt-2">

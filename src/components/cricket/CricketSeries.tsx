@@ -56,17 +56,33 @@ export function CricketSeries() {
           { name: 'India', flag: '🇮🇳', shortName: 'IND' },
           { name: 'Australia', flag: '🇦🇺', shortName: 'AUS' },
           { name: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', shortName: 'ENG' },
-          { name: 'South Africa', flag: '🇿🇦', shortName: 'SA' }
+          { name: 'South Africa', flag: '🇿🇦', shortName: 'SA' },
         ],
         matches: { total: 24, completed: 18, remaining: 6 },
         currentStandings: [
           { team: 'India', flag: '🇮🇳', points: 72, played: 12, won: 8, lost: 2, netRunRate: 1.2 },
-          { team: 'Australia', flag: '🇦🇺', points: 68, played: 12, won: 7, lost: 3, netRunRate: 0.8 },
+          {
+            team: 'Australia',
+            flag: '🇦🇺',
+            points: 68,
+            played: 12,
+            won: 7,
+            lost: 3,
+            netRunRate: 0.8,
+          },
           { team: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', points: 64, played: 12, won: 6, lost: 4, netRunRate: 0.5 },
-          { team: 'South Africa', flag: '🇿🇦', points: 60, played: 12, won: 6, lost: 4, netRunRate: 0.3 }
+          {
+            team: 'South Africa',
+            flag: '🇿🇦',
+            points: 60,
+            played: 12,
+            won: 6,
+            lost: 4,
+            netRunRate: 0.3,
+          },
         ],
         prize: 'Test Championship Trophy',
-        description: 'The ultimate test of cricket excellence'
+        description: 'The ultimate test of cricket excellence',
       },
       {
         id: '2',
@@ -77,20 +93,52 @@ export function CricketSeries() {
         startDate: '2024-01-15',
         endDate: '2024-03-15',
         teams: [
-          { name: 'Karachi Kings', flag: '🏏', shortName: 'KK' },
-          { name: 'Lahore Qalandars', flag: '🏏', shortName: 'LQ' },
-          { name: 'Islamabad United', flag: '🏏', shortName: 'IU' },
-          { name: 'Peshawar Zalmi', flag: '🏏', shortName: 'PZ' }
+          { name: 'Karachi Kings', flag: '', shortName: 'KK' },
+          { name: 'Lahore Qalandars', flag: '', shortName: 'LQ' },
+          { name: 'Islamabad United', flag: '', shortName: 'IU' },
+          { name: 'Peshawar Zalmi', flag: '', shortName: 'PZ' },
         ],
         matches: { total: 34, completed: 12, remaining: 22 },
         currentStandings: [
-          { team: 'Lahore Qalandars', flag: '🏏', points: 16, played: 8, won: 5, lost: 2, netRunRate: 0.8 },
-          { team: 'Karachi Kings', flag: '🏏', points: 14, played: 8, won: 4, lost: 3, netRunRate: 0.5 },
-          { team: 'Islamabad United', flag: '🏏', points: 12, played: 8, won: 3, lost: 4, netRunRate: -0.2 },
-          { team: 'Peshawar Zalmi', flag: '🏏', points: 10, played: 8, won: 2, lost: 5, netRunRate: -0.8 }
+          {
+            team: 'Lahore Qalandars',
+            flag: '',
+            points: 16,
+            played: 8,
+            won: 5,
+            lost: 2,
+            netRunRate: 0.8,
+          },
+          {
+            team: 'Karachi Kings',
+            flag: '',
+            points: 14,
+            played: 8,
+            won: 4,
+            lost: 3,
+            netRunRate: 0.5,
+          },
+          {
+            team: 'Islamabad United',
+            flag: '',
+            points: 12,
+            played: 8,
+            won: 3,
+            lost: 4,
+            netRunRate: -0.2,
+          },
+          {
+            team: 'Peshawar Zalmi',
+            flag: '',
+            points: 10,
+            played: 8,
+            won: 2,
+            lost: 5,
+            netRunRate: -0.8,
+          },
         ],
         prize: 'PSL Trophy',
-        description: 'Pakistan\'s premier T20 league'
+        description: "Pakistan's premier T20 league",
       },
       {
         id: '3',
@@ -104,18 +152,50 @@ export function CricketSeries() {
           { name: 'Sydney Sixers', flag: '🇦🇺', shortName: 'SYS' },
           { name: 'Melbourne Stars', flag: '🇦🇺', shortName: 'MLS' },
           { name: 'Perth Scorchers', flag: '🇦🇺', shortName: 'PER' },
-          { name: 'Brisbane Heat', flag: '🇦🇺', shortName: 'BH' }
+          { name: 'Brisbane Heat', flag: '🇦🇺', shortName: 'BH' },
         ],
         matches: { total: 56, completed: 28, remaining: 28 },
         currentStandings: [
-          { team: 'Perth Scorchers', flag: '🇦🇺', points: 20, played: 14, won: 10, lost: 3, netRunRate: 1.1 },
-          { team: 'Sydney Sixers', flag: '🇦🇺', points: 18, played: 14, won: 9, lost: 4, netRunRate: 0.8 },
-          { team: 'Melbourne Stars', flag: '🇦🇺', points: 14, played: 14, won: 7, lost: 6, netRunRate: 0.2 },
-          { team: 'Brisbane Heat', flag: '🇦🇺', points: 12, played: 14, won: 6, lost: 7, netRunRate: -0.3 }
+          {
+            team: 'Perth Scorchers',
+            flag: '🇦🇺',
+            points: 20,
+            played: 14,
+            won: 10,
+            lost: 3,
+            netRunRate: 1.1,
+          },
+          {
+            team: 'Sydney Sixers',
+            flag: '🇦🇺',
+            points: 18,
+            played: 14,
+            won: 9,
+            lost: 4,
+            netRunRate: 0.8,
+          },
+          {
+            team: 'Melbourne Stars',
+            flag: '🇦🇺',
+            points: 14,
+            played: 14,
+            won: 7,
+            lost: 6,
+            netRunRate: 0.2,
+          },
+          {
+            team: 'Brisbane Heat',
+            flag: '🇦🇺',
+            points: 12,
+            played: 14,
+            won: 6,
+            lost: 7,
+            netRunRate: -0.3,
+          },
         ],
         prize: 'BBL Trophy',
-        description: 'Australia\'s premier T20 competition'
-      }
+        description: "Australia's premier T20 competition",
+      },
     ];
 
     setTimeout(() => {
@@ -152,7 +232,8 @@ export function CricketSeries() {
           </div>
           <h2 className="heading-2 mt-5">Cricket Series & Tournaments</h2>
           <p className="section-lede mt-3 text-gray-600">
-            Follow the biggest competitions on every continent with live ladders, fixtures, and trophy stakes.
+            Follow the biggest competitions on every continent with live ladders, fixtures, and
+            trophy stakes.
           </p>
         </motion.div>
 
@@ -179,7 +260,7 @@ export function CricketSeries() {
                     <span className="text-sm font-medium">Ongoing</span>
                   </div>
                 </div>
-                
+
                 <h3 className="text-xl font-bold mb-2">{seriesItem.name}</h3>
                 <p className="text-green-100 text-sm">{seriesItem.description}</p>
               </div>
@@ -188,15 +269,21 @@ export function CricketSeries() {
               <div className="p-6">
                 <div className="grid grid-cols-3 gap-4 mb-6">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900">{seriesItem.matches.total}</div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {seriesItem.matches.total}
+                    </div>
                     <div className="text-sm text-gray-500">Total Matches</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{seriesItem.matches.completed}</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {seriesItem.matches.completed}
+                    </div>
                     <div className="text-sm text-gray-500">Completed</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{seriesItem.matches.remaining}</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {seriesItem.matches.remaining}
+                    </div>
                     <div className="text-sm text-gray-500">Remaining</div>
                   </div>
                 </div>
@@ -207,7 +294,10 @@ export function CricketSeries() {
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">Current Standings</h4>
                     <div className="space-y-2">
                       {seriesItem.currentStandings.slice(0, 4).map((team, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                        >
                           <div className="flex items-center space-x-2">
                             <span className="text-lg">{team.flag}</span>
                             <span className="font-medium text-gray-900">{team.team}</span>
@@ -227,7 +317,10 @@ export function CricketSeries() {
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">Participating Teams</h4>
                   <div className="grid grid-cols-2 gap-2">
                     {seriesItem.teams.map((team, idx) => (
-                      <div key={idx} className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
+                      <div
+                        key={idx}
+                        className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg"
+                      >
                         <span className="text-lg">{team.flag}</span>
                         <span className="text-sm font-medium text-gray-900">{team.shortName}</span>
                       </div>
@@ -250,7 +343,10 @@ export function CricketSeries() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center text-sm text-gray-600">
                     <Calendar className="w-4 h-4 mr-1" />
-                    <span>{new Date(seriesItem.startDate).toLocaleDateString()} - {new Date(seriesItem.endDate).toLocaleDateString()}</span>
+                    <span>
+                      {new Date(seriesItem.startDate).toLocaleDateString()} -{' '}
+                      {new Date(seriesItem.endDate).toLocaleDateString()}
+                    </span>
                   </div>
                   {seriesItem.detailUrl ? (
                     <Link

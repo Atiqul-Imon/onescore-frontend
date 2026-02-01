@@ -214,7 +214,6 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
         <div className="border-b-2 border-gray-200 pb-3 sm:pb-4">
           <div className="flex items-center justify-between mb-2 gap-2 sm:gap-3">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-              <span className="text-xl sm:text-2xl flex-shrink-0">{match.teams.home.flag}</span>
               <div className="min-w-0 flex-1">
                 <h3 className="font-bold text-base sm:text-lg text-secondary-900 truncate">
                   {match.teams.home.name}
@@ -258,7 +257,6 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
         <div>
           <div className="flex items-center justify-between mb-2 gap-2 sm:gap-3">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-              <span className="text-xl sm:text-2xl flex-shrink-0">{match.teams.away.flag}</span>
               <div className="min-w-0 flex-1">
                 <h3 className="font-bold text-base sm:text-lg text-secondary-900 truncate">
                   {match.teams.away.name}

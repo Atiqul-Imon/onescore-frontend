@@ -22,7 +22,10 @@ export default function LoginPage() {
       const res = await fetch(`${base}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          emailOrPhone: form.email,
+          password: form.password,
+        }),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -30,17 +33,22 @@ export default function LoginPage() {
         return;
       }
       dispatch(loginSuccess(json.data));
-      
+
       // Store token in localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('token', json.data.token);
         localStorage.setItem('refreshToken', json.data.refreshToken);
         localStorage.setItem('user', JSON.stringify(json.data.user));
       }
-      
+
       toast.success('Login successful!');
       // Redirect to admin if admin role, otherwise home
-      if (json.data.user.role === 'admin' || json.data.user.role === 'moderator' || json.data.user.role === 'editor' || json.data.user.role === 'writer') {
+      if (
+        json.data.user.role === 'admin' ||
+        json.data.user.role === 'moderator' ||
+        json.data.user.role === 'editor' ||
+        json.data.user.role === 'writer'
+      ) {
         router.push('/admin');
       } else {
         router.push('/');
@@ -82,12 +90,7 @@ export default function LoginPage() {
               placeholder="••••••••"
             />
 
-            <Button
-              type="submit"
-              isLoading={loading}
-              fullWidth
-              size="lg"
-            >
+            <Button type="submit" isLoading={loading} fullWidth size="lg">
               Sign In
             </Button>
           </form>
@@ -102,7 +105,9 @@ export default function LoginPage() {
           <div className="mt-8 pt-6 border-t border-gray-200">
             <p className="text-xs text-gray-500 text-center">
               Admin access: Use your admin credentials to access the admin panel at{' '}
-              <Link href="/admin" className="text-primary-600 hover:underline">/admin</Link>
+              <Link href="/admin" className="text-primary-600 hover:underline">
+                /admin
+              </Link>
             </p>
           </div>
         </Card>
@@ -110,4 +115,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

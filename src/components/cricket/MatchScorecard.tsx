@@ -123,7 +123,6 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
         <div className="border-b-2 border-gray-200 pb-6">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-4">
-              <span className="text-3xl">{match.teams.home.flag}</span>
               <div>
                 <Link
                   href={`/cricket/match/${match.matchId}/team/${encodeURIComponent(match.teams.home.name.toLowerCase().replace(/\s+/g, '-'))}`}
@@ -167,7 +166,6 @@ export function MatchScorecard({ match }: MatchScorecardProps) {
         <div>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-4">
-              <span className="text-3xl">{match.teams.away.flag}</span>
               <div>
                 <Link
                   href={`/cricket/match/${match.matchId}/team/${encodeURIComponent(match.teams.away.name.toLowerCase().replace(/\s+/g, '-'))}`}

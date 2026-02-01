@@ -10,6 +10,10 @@ import { formatDate } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { handleApiError, getErrorMessage } from '@/lib/errors';
 import type { Article, LiveMatch } from './HeroSectionWrapper';
+import { useLocalMatches } from '@/hooks/useLocalMatches';
+import { transformLocalMatch } from '@/lib/cricket/match-utils';
+import { CommunityMatchBadge } from '@/components/cricket/CommunityMatchBadge';
+import { CricketMatch } from '@/store/slices/cricketSlice';
 
 interface HeroSectionProps {
   /** Featured article to display prominently */
@@ -61,6 +65,18 @@ export function HeroSection({
   const [secondaryArticles, setSecondaryArticles] = useState<Article[]>(
     initialSecondaryArticles || []
   );
+
+  // Fetch local matches (live and completed)
+  const { matches: localLiveMatches } = useLocalMatches({
+    status: 'live',
+    limit: 10,
+    enabled: true,
+  });
+  const { matches: localCompletedMatches } = useLocalMatches({
+    status: 'completed',
+    limit: 10,
+    enabled: true,
+  });
 
   const fetchHeroData = useCallback(async () => {
     try {
@@ -130,6 +146,39 @@ export function HeroSection({
         allLiveMatches = [...allLiveMatches, ...footballLiveMatches];
       }
 
+      // Transform and add local live matches
+      const transformedLocalLive: LiveMatch[] = localLiveMatches.map((localMatch) => ({
+        _id: localMatch._id,
+        matchId: localMatch.matchId,
+        teams: {
+          home: {
+            name: localMatch.teams.home.name,
+            shortName: localMatch.teams.home.shortName,
+            flag: localMatch.teams.home.flag,
+          },
+          away: {
+            name: localMatch.teams.away.name,
+            shortName: localMatch.teams.away.shortName,
+            flag: localMatch.teams.away.flag,
+          },
+        },
+        venue: {
+          name: localMatch.venue.name,
+          city: localMatch.venue.city,
+        },
+        status: localMatch.status as 'live' | 'completed' | 'upcoming',
+        startTime: localMatch.startTime,
+        currentScore: localMatch.currentScore,
+        format: localMatch.format,
+        series: localMatch.series,
+        isLocalMatch: true,
+        matchType: localMatch.matchType,
+        scorerInfo: localMatch.scorerInfo,
+        isVerified: localMatch.isVerified,
+      }));
+
+      allLiveMatches = [...allLiveMatches, ...transformedLocalLive];
+
       // Sort live matches: live first, then by start time
       if (allLiveMatches.length > 0) {
         allLiveMatches.sort((a, b) => {
@@ -182,6 +231,41 @@ export function HeroSection({
               .map((match: LiveMatch) => ({ ...match, status: 'completed' as const }));
             completedMatches = [...completedMatches, ...footballCompleted];
           }
+
+          // Transform and add local completed matches
+          const transformedLocalCompleted: LiveMatch[] = localCompletedMatches.map(
+            (localMatch) => ({
+              _id: localMatch._id,
+              matchId: localMatch.matchId,
+              teams: {
+                home: {
+                  name: localMatch.teams.home.name,
+                  shortName: localMatch.teams.home.shortName,
+                  flag: localMatch.teams.home.flag,
+                },
+                away: {
+                  name: localMatch.teams.away.name,
+                  shortName: localMatch.teams.away.shortName,
+                  flag: localMatch.teams.away.flag,
+                },
+              },
+              venue: {
+                name: localMatch.venue.name,
+                city: localMatch.venue.city,
+              },
+              status: 'completed' as const,
+              startTime: localMatch.startTime,
+              currentScore: localMatch.currentScore,
+              format: localMatch.format,
+              series: localMatch.series,
+              isLocalMatch: true,
+              matchType: localMatch.matchType,
+              scorerInfo: localMatch.scorerInfo,
+              isVerified: localMatch.isVerified,
+            })
+          );
+
+          completedMatches = [...completedMatches, ...transformedLocalCompleted];
 
           if (completedMatches.length > 0) {
             // Sort by start time (most recent first)
@@ -347,22 +431,30 @@ export function HeroSection({
                         className="group relative rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] p-3 sm:p-4 lg:p-5 transition-all duration-300 hover:border hover:border-white/20 hover:bg-white/10 hover:shadow-lg hover:shadow-primary-500/10 overflow-hidden min-w-0"
                       >
                         {/* Status indicator badge */}
-                        {isLive && (
-                          <div className="absolute top-2 right-2 flex items-center gap-1 sm:gap-1.5 rounded-full bg-red-500 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-lg z-10">
-                            <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
-                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                              <span className="relative inline-flex h-full w-full rounded-full bg-red-500"></span>
-                            </span>
-                            <span className="hidden sm:inline">LIVE</span>
-                            <span className="sm:hidden">LIVE</span>
-                          </div>
-                        )}
-                        {match.status === 'completed' && !isLive && (
-                          <div className="absolute top-2 right-2 flex items-center gap-1 sm:gap-1.5 rounded-full bg-gray-600 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-lg z-10">
-                            <span className="hidden sm:inline">COMPLETED</span>
-                            <span className="sm:hidden">DONE</span>
-                          </div>
-                        )}
+                        <div className="absolute top-2 right-2 flex flex-col items-end gap-1.5 z-10">
+                          {isLive && (
+                            <div className="flex items-center gap-1 sm:gap-1.5 rounded-full bg-red-500 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-lg">
+                              <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                                <span className="relative inline-flex h-full w-full rounded-full bg-red-500"></span>
+                              </span>
+                              <span className="hidden sm:inline">LIVE</span>
+                              <span className="sm:hidden">LIVE</span>
+                            </div>
+                          )}
+                          {match.status === 'completed' && !isLive && (
+                            <div className="flex items-center gap-1 sm:gap-1.5 rounded-full bg-gray-600 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-lg">
+                              <span className="hidden sm:inline">COMPLETED</span>
+                              <span className="sm:hidden">DONE</span>
+                            </div>
+                          )}
+                          {/* Community Match Badge */}
+                          {(match as any).isLocalMatch && (
+                            <div className="scale-90 origin-top-right">
+                              <CommunityMatchBadge match={match as any as CricketMatch} compact />
+                            </div>
+                          )}
+                        </div>
 
                         {/* Match format/tournament */}
                         <div className="flex items-center justify-between text-xs font-medium text-white/60 mb-2 sm:mb-3 gap-2">
@@ -423,7 +515,7 @@ export function HeroSection({
                               >
                                 <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
                                   <span className="text-xl sm:text-2xl flex-shrink-0">
-                                    {team.flag || ''}
+                                    {team.flag && team.flag !== '🏏' ? team.flag : ''}
                                   </span>
                                   <div className="min-w-0 flex-1 overflow-hidden">
                                     <p className="text-xs sm:text-sm font-bold text-white truncate">
