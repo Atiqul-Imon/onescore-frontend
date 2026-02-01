@@ -9,6 +9,9 @@ import { MatchInfo } from '@/components/cricket/MatchInfo';
 import { LiveScoreView } from '@/components/cricket/LiveScoreView';
 import { CompletedMatchView } from '@/components/cricket/CompletedMatchView';
 import { MatchHeader } from '@/components/cricket/MatchHeader';
+import { CommunityMatchInfo } from '@/components/cricket/CommunityMatchInfo';
+import { useLocalMatch } from '@/hooks/useLocalMatches';
+import { isLocalMatch } from '@/lib/cricket/match-utils';
 import { Tabs } from '@/components/ui/Tabs';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import {
@@ -160,6 +163,11 @@ export default function MatchDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const { socket, isConnected } = useSocket();
 
+  // Try to fetch as local match if official API fails
+  const { match: localMatch, loading: localLoading } = useLocalMatch(
+    error && error.includes('404') ? matchId : null
+  );
+
   // Initial fetch and WebSocket setup
   useEffect(() => {
     if (!matchId) return;
@@ -204,6 +212,21 @@ export default function MatchDetailPage() {
 
         // Check if we have actual match data
         if (!matchData || (!matchData.matchId && !matchData._id && !matchData.id)) {
+          // Try local matches API as fallback
+          try {
+            const localResponse = await fetch(`${base}/api/v1/cricket/local/matches/${matchId}`, {
+              cache: 'no-store',
+            });
+            if (localResponse.ok) {
+              const localJson = await localResponse.json();
+              if (localJson.success && localJson.data) {
+                setMatch(localJson.data);
+                return;
+              }
+            }
+          } catch {
+            // Ignore local match fetch errors
+          }
           throw new Error('Match data is invalid or empty');
         }
 
@@ -303,23 +326,35 @@ export default function MatchDetailPage() {
     window.location.reload();
   };
 
+  // Check if this is a local match
+  const isLocal = match && (isLocalMatch(match as any) || localMatch);
+  const displayMatch = localMatch && !match ? localMatch : match;
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Enhanced Match Header */}
-      <MatchHeader match={match} onRefresh={handleRefresh} />
+      <MatchHeader match={displayMatch} onRefresh={handleRefresh} />
 
       {/* Main Content */}
       <div className="w-full px-0 lg:px-8">
         <div className="max-w-[1400px] mx-auto py-2 sm:py-4 lg:py-8">
+          {/* Community Match Info - Show for local matches */}
+          {isLocal && displayMatch && (
+            <div className="mb-4 sm:mb-6">
+              <CommunityMatchInfo match={displayMatch as any} />
+            </div>
+          )}
           {/* Main Content Grid */}
           <div
-            className={`grid gap-4 sm:gap-6 ${match.status === 'completed' ? 'lg:grid-cols-1' : 'lg:grid-cols-3'}`}
+            className={`grid gap-4 sm:gap-6 ${displayMatch?.status === 'completed' ? 'lg:grid-cols-1' : 'lg:grid-cols-3'}`}
           >
             {/* Left Column - Tabs with Scorecard, Stats & Commentary */}
-            <div className={match.status === 'completed' ? 'lg:col-span-1' : 'lg:col-span-2'}>
+            <div
+              className={displayMatch?.status === 'completed' ? 'lg:col-span-1' : 'lg:col-span-2'}
+            >
               <Tabs
                 tabs={[
-                  { id: 'live', label: match.status === 'completed' ? 'Summary' : 'Live' },
+                  { id: 'live', label: displayMatch?.status === 'completed' ? 'Summary' : 'Live' },
                   { id: 'scorecard', label: 'Scorecard' },
                 ]}
                 defaultTab="live"
@@ -327,24 +362,25 @@ export default function MatchDetailPage() {
                 {(activeTab) => {
                   if (activeTab === 'live') {
                     // Show completed match view for completed matches, live view for live matches
-                    if (match.status === 'completed') {
-                      return <CompletedMatchView match={match} />;
+                    if (displayMatch?.status === 'completed') {
+                      return <CompletedMatchView match={displayMatch} />;
                     }
                     // Live tab: Show clean, focused live score view
-                    return <LiveScoreView match={match} />;
+                    return <LiveScoreView match={displayMatch} />;
                   }
                   if (activeTab === 'scorecard') {
                     // Scorecard tab: Show detailed statistics
                     // Use currentBatters/currentBowlers as fallback for live matches
+                    const matchData = displayMatch as MatchDetails;
                     const battingData =
-                      match.batting ||
-                      (match.currentBatters
-                        ? match.currentBatters.map((b: any) => ({
+                      matchData?.batting ||
+                      (matchData?.currentBatters
+                        ? matchData.currentBatters.map((b: any) => ({
                             ...b,
                             isOut: false, // Current batters are not out
                           }))
                         : undefined);
-                    const bowlingData = match.bowling || match.currentBowlers;
+                    const bowlingData = matchData?.bowling || matchData?.currentBowlers;
 
                     return (
                       <div className="space-y-4 sm:space-y-6 overflow-x-hidden">
@@ -352,14 +388,14 @@ export default function MatchDetailPage() {
                           <LazyMatchStats
                             batting={battingData}
                             bowling={bowlingData}
-                            teams={match.teams}
+                            teams={matchData?.teams}
                             matchId={matchId}
                           />
                         ) : (
                           <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-600">
                             <p className="mb-2">Player statistics are not available yet.</p>
                             <p className="text-sm text-gray-500">
-                              {match.status === 'live'
+                              {matchData?.status === 'live'
                                 ? 'Statistics will appear as players bat and bowl during the match.'
                                 : 'Statistics will be available once the match progresses.'}
                             </p>
@@ -374,9 +410,9 @@ export default function MatchDetailPage() {
             </div>
 
             {/* Right Column - Match Info (Only for live/upcoming matches) */}
-            {match.status !== 'completed' && (
+            {displayMatch?.status !== 'completed' && (
               <div className="lg:col-span-1">
-                <MatchInfo match={match} />
+                <MatchInfo match={displayMatch} />
               </div>
             )}
           </div>

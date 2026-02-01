@@ -1,7 +1,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, ArrowUpRight, Award, CalendarDays, Newspaper, Trophy, Users, Flame, Star } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  Award,
+  CalendarDays,
+  Newspaper,
+  Trophy,
+  Users,
+  Flame,
+  Star,
+} from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { FEATURED_CRICKET_TEAM_SLUGS } from '@/lib/cricket/teams';
 import { TeamMatchStats } from '@/components/cricket/TeamMatchStats';
@@ -15,7 +25,7 @@ type TeamDetailPayload = {
     flag: string;
     heroImage?: string;
     summary?: string;
-  firstTestYear?: number;
+    firstTestYear?: number;
     board?: string;
     coach?: string;
     captains?: { test?: string; odi?: string; t20?: string };
@@ -28,11 +38,31 @@ type TeamDetailPayload = {
       role: string;
       spotlight?: string;
       image?: string;
-      stats?: { matches?: number; runs?: number; wickets?: number; average?: number; strikeRate?: number };
+      stats?: {
+        matches?: number;
+        runs?: number;
+        wickets?: number;
+        average?: number;
+        strikeRate?: number;
+      };
     }>;
     statLeaders?: {
-      batting?: Array<{ name: string; runs?: number; innings?: number; average?: number; strikeRate?: number; description?: string }>;
-      bowling?: Array<{ name: string; wickets?: number; innings?: number; average?: number; economy?: number; description?: string }>;
+      batting?: Array<{
+        name: string;
+        runs?: number;
+        innings?: number;
+        average?: number;
+        strikeRate?: number;
+        description?: string;
+      }>;
+      bowling?: Array<{
+        name: string;
+        wickets?: number;
+        innings?: number;
+        average?: number;
+        economy?: number;
+        description?: string;
+      }>;
     };
     recordLinks?: Array<{ label: string; format?: string; url?: string }>;
     timeline?: Array<{ year: number; title: string; description?: string }>;
@@ -105,14 +135,20 @@ const TEAM_NAME_MAP: Record<string, string> = {
 };
 
 function buildPlaceholderTeam(slug: string): TeamDetailPayload {
-  const name = TEAM_NAME_MAP[slug] || slug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+  const name =
+    TEAM_NAME_MAP[slug] || slug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
   return {
     team: {
       slug,
       name,
-      shortName: name.split(' ').map((word) => word[0]).join('').slice(0, 3).toUpperCase(),
+      shortName: name
+        .split(' ')
+        .map((word) => word[0])
+        .join('')
+        .slice(0, 3)
+        .toUpperCase(),
       matchKey: slug,
-      flag: '🏏',
+      flag: '',
       summary: `${name} team hub placeholder. Connect the backend to see live data.`,
       board: `${name} Cricket Board`,
       coach: 'TBD',
@@ -189,7 +225,10 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
     <div className="bg-slate-950 text-white">
       <section className="relative overflow-hidden" style={gradientStyle}>
         <Container size="2xl" className="relative py-16 sm:py-20">
-          <Link href="/cricket/teams" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-white/70 transition-standard hover:text-white">
+          <Link
+            href="/cricket/teams"
+            className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-white/70 transition-standard hover:text-white"
+          >
             <ArrowLeft className="h-4 w-4" />
             All teams
           </Link>
@@ -198,7 +237,9 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
               <div className="flex items-center gap-4">
                 <span className="text-4xl">{team.flag}</span>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.4em] text-white/60">{team.shortName}</p>
+                  <p className="text-xs uppercase tracking-[0.4em] text-white/60">
+                    {team.shortName}
+                  </p>
                   <h1 className="heading-1 !text-white">{team.name}</h1>
                 </div>
               </div>
@@ -216,15 +257,24 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
                   <p className="text-xs uppercase tracking-[0.3em] text-white/60">Fan pulse</p>
                   <p className="text-white font-semibold">
                     {stats.fanPulse?.rating?.toFixed(1) ?? '4.0'} / 5
-                    <span className="ml-1 text-white/70">({stats.fanPulse?.votes ?? '—'} votes)</span>
+                    <span className="ml-1 text-white/70">
+                      ({stats.fanPulse?.votes ?? '—'} votes)
+                    </span>
                   </p>
                 </div>
               </div>
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 {(['test', 'odi', 't20'] as const).map((format) => (
-                  <div key={format} className="rounded-2xl border border-white/20 bg-white/10 p-4 text-center">
-                    <p className="text-xs uppercase tracking-[0.4em] text-white/60">{format.toUpperCase()}</p>
-                    <p className="mt-2 text-3xl font-semibold text-white">#{stats.ranking?.[format] ?? '—'}</p>
+                  <div
+                    key={format}
+                    className="rounded-2xl border border-white/20 bg-white/10 p-4 text-center"
+                  >
+                    <p className="text-xs uppercase tracking-[0.4em] text-white/60">
+                      {format.toUpperCase()}
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-white">
+                      #{stats.ranking?.[format] ?? '—'}
+                    </p>
                     <p className="text-xs text-white/70">ICC ranking</p>
                   </div>
                 ))}
@@ -247,7 +297,8 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
               <div className="mt-6 space-y-4 text-sm text-white/80">
                 <div className="flex items-center gap-3">
                   <Users className="h-4 w-4 text-primary-300" />
-                  Captains: Tests {team.captains?.test ?? '—'} · ODIs {team.captains?.odi ?? '—'} · T20Is {team.captains?.t20 ?? '—'}
+                  Captains: Tests {team.captains?.test ?? '—'} · ODIs {team.captains?.odi ?? '—'} ·
+                  T20Is {team.captains?.t20 ?? '—'}
                 </div>
                 <div className="flex items-center gap-3">
                   <CalendarDays className="h-4 w-4 text-primary-300" />
@@ -257,7 +308,9 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
                   <Trophy className="h-4 w-4 text-primary-300" />
                   ICC titles: {stats.iccTitles?.length ?? 0}
                 </div>
-                <p className="text-xs text-white/60">Updated {new Date(data!.updatedAt).toLocaleString()}</p>
+                <p className="text-xs text-white/60">
+                  Updated {new Date(data!.updatedAt).toLocaleString()}
+                </p>
               </div>
             </div>
           </div>
@@ -267,11 +320,16 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
       <section className="section-padding bg-white text-slate-900">
         <Container size="2xl" className="grid gap-10 lg:grid-cols-[1.7fr,1fr]">
           <div className="space-y-8">
-            <SectionHeading icon={<Newspaper className="h-4 w-4" />} title="Top stories" subtitle="Latest editorial coverage" />
+            <SectionHeading
+              icon={<Newspaper className="h-4 w-4" />}
+              title="Top stories"
+              subtitle="Latest editorial coverage"
+            />
             <div className="grid gap-6">
               {news.items.length === 0 ? (
                 <div className="rounded-3xl border border-slate-100 bg-slate-50 p-6 text-sm text-slate-600">
-                  No recent news yet. We'll publish the latest updates as soon as the newsroom tags this team.
+                  No recent news yet. We'll publish the latest updates as soon as the newsroom tags
+                  this team.
                 </div>
               ) : (
                 news.items.map((article) => (
@@ -281,17 +339,32 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
                     className="group flex flex-col gap-4 rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition-standard hover:border-primary-200 hover:shadow-md sm:flex-row"
                   >
                     <div className="flex-1">
-                      <p className="text-xs uppercase tracking-[0.3em] text-primary-600">{article.type.replace('_', ' ')}</p>
-                      <h2 className="mt-2 text-lg font-semibold text-slate-900 group-hover:text-primary-700">{article.title}</h2>
+                      <p className="text-xs uppercase tracking-[0.3em] text-primary-600">
+                        {article.type.replace('_', ' ')}
+                      </p>
+                      <h2 className="mt-2 text-lg font-semibold text-slate-900 group-hover:text-primary-700">
+                        {article.title}
+                      </h2>
                       <p className="mt-2 text-sm text-slate-600 line-clamp-3">{article.summary}</p>
                       <div className="mt-3 text-xs text-slate-500">
-                        {article.publishedAt && new Date(article.publishedAt).toLocaleString(undefined, { dateStyle: 'medium' })}
-                        {article.readingTimeMinutes ? ` • ${article.readingTimeMinutes} min read` : null}
+                        {article.publishedAt &&
+                          new Date(article.publishedAt).toLocaleString(undefined, {
+                            dateStyle: 'medium',
+                          })}
+                        {article.readingTimeMinutes
+                          ? ` • ${article.readingTimeMinutes} min read`
+                          : null}
                       </div>
                     </div>
                     {article.heroImage && (
                       <div className="relative h-32 w-full overflow-hidden rounded-2xl bg-slate-100 sm:h-40 sm:w-44">
-                        <Image src={article.heroImage} alt={article.title} fill sizes="200px" className="object-cover" />
+                        <Image
+                          src={article.heroImage}
+                          alt={article.title}
+                          fill
+                          sizes="200px"
+                          className="object-cover"
+                        />
                       </div>
                     )}
                   </Link>
@@ -299,29 +372,58 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
               )}
             </div>
 
-            <SectionHeading icon={<CalendarDays className="h-4 w-4" />} title="Fixtures & results" subtitle="Synced from Onescore match lake" />
+            <SectionHeading
+              icon={<CalendarDays className="h-4 w-4" />}
+              title="Fixtures & results"
+              subtitle="Synced from Onescore match lake"
+            />
             <div className="grid gap-6 lg:grid-cols-2">
-              <FixtureColumn title="Upcoming fixtures" matches={fixtures.upcoming} emptyMessage="All caught up for now." />
-              <FixtureColumn title="Recent results" matches={fixtures.results} emptyMessage="No recent matches recorded." />
+              <FixtureColumn
+                title="Upcoming fixtures"
+                matches={fixtures.upcoming}
+                emptyMessage="All caught up for now."
+              />
+              <FixtureColumn
+                title="Recent results"
+                matches={fixtures.results}
+                emptyMessage="No recent matches recorded."
+              />
             </div>
 
-            <SectionHeading icon={<Star className="h-4 w-4" />} title="Key performers" subtitle="Editorial spotlight + stat leaders" />
+            <SectionHeading
+              icon={<Star className="h-4 w-4" />}
+              title="Key performers"
+              subtitle="Editorial spotlight + stat leaders"
+            />
             <div className="grid gap-6 md:grid-cols-2">
               <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                 <h3 className="text-base font-semibold text-slate-900">Key players</h3>
                 <div className="mt-4 space-y-4">
-                {stats.keyPlayers?.length ? (
+                  {stats.keyPlayers?.length ? (
                     stats.keyPlayers.map((player) => (
-                      <div key={player.name} className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                      <div
+                        key={player.name}
+                        className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-4"
+                      >
                         <div className="flex-1">
                           <p className="text-sm font-semibold text-slate-900">{player.name}</p>
-                          <p className="text-xs text-slate-500 uppercase tracking-[0.3em]">{player.role}</p>
+                          <p className="text-xs text-slate-500 uppercase tracking-[0.3em]">
+                            {player.role}
+                          </p>
                           <p className="mt-2 text-sm text-slate-600">{player.spotlight}</p>
                           <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-500">
-                            {player.stats?.matches && <StatTile label="Matches" value={player.stats.matches} />}
-                            {player.stats?.runs && <StatTile label="Runs" value={player.stats.runs} />}
-                            {player.stats?.wickets && <StatTile label="Wickets" value={player.stats.wickets} />}
-                            {player.stats?.average && <StatTile label="Average" value={player.stats.average} />}
+                            {player.stats?.matches && (
+                              <StatTile label="Matches" value={player.stats.matches} />
+                            )}
+                            {player.stats?.runs && (
+                              <StatTile label="Runs" value={player.stats.runs} />
+                            )}
+                            {player.stats?.wickets && (
+                              <StatTile label="Wickets" value={player.stats.wickets} />
+                            )}
+                            {player.stats?.average && (
+                              <StatTile label="Average" value={player.stats.average} />
+                            )}
                           </div>
                         </div>
                       </div>
@@ -334,9 +436,11 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
 
               <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm space-y-6">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-primary-600">Batting leaders</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-primary-600">
+                    Batting leaders
+                  </p>
                   <div className="mt-3 space-y-3">
-                {stats.statLeaders?.batting?.length ? (
+                    {stats.statLeaders?.batting?.length ? (
                       stats.statLeaders.batting.map((leader) => (
                         <LeaderRow key={`bat-${leader.name}`} leader={leader} />
                       ))
@@ -346,9 +450,11 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-blue-600">Bowling leaders</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-blue-600">
+                    Bowling leaders
+                  </p>
                   <div className="mt-3 space-y-3">
-                {stats.statLeaders?.bowling?.length ? (
+                    {stats.statLeaders?.bowling?.length ? (
                       stats.statLeaders.bowling.map((leader) => (
                         <LeaderRow key={`bowl-${leader.name}`} leader={leader} />
                       ))
@@ -363,11 +469,19 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
 
           <aside className="space-y-8">
             <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-              <SectionHeading icon={<Award className="h-4 w-4 text-slate-500" />} title="ICC cabinet" subtitle="Trophies & milestones" compact />
+              <SectionHeading
+                icon={<Award className="h-4 w-4 text-slate-500" />}
+                title="ICC cabinet"
+                subtitle="Trophies & milestones"
+                compact
+              />
               <div className="mt-4 space-y-3">
                 {stats.iccTitles?.length ? (
                   stats.iccTitles.map((title) => (
-                    <div key={`${title.name}-${title.year}`} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm">
+                    <div
+                      key={`${title.name}-${title.year}`}
+                      className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm"
+                    >
                       <div>
                         <p className="font-semibold text-slate-900">{title.name}</p>
                         <p className="text-xs text-slate-500">{title.result ?? 'Champions'}</p>
@@ -382,12 +496,22 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
             </div>
 
             <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-              <SectionHeading icon={<Flame className="h-4 w-4 text-slate-500" />} title="Timeline" subtitle="Key chapters" compact />
+              <SectionHeading
+                icon={<Flame className="h-4 w-4 text-slate-500" />}
+                title="Timeline"
+                subtitle="Key chapters"
+                compact
+              />
               <div className="mt-4 space-y-4">
                 {timeline?.length ? (
                   timeline.map((event) => (
-                    <div key={`${event.year}-${event.title}`} className="border-l-2 border-slate-200 pl-4">
-                      <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{event.year}</p>
+                    <div
+                      key={`${event.year}-${event.title}`}
+                      className="border-l-2 border-slate-200 pl-4"
+                    >
+                      <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                        {event.year}
+                      </p>
                       <p className="text-sm font-semibold text-slate-900">{event.title}</p>
                       <p className="text-xs text-slate-600">{event.description}</p>
                     </div>
@@ -399,7 +523,12 @@ export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
             </div>
 
             <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-              <SectionHeading icon={<Trophy className="h-4 w-4 text-slate-500" />} title="Record index" subtitle="Quick links" compact />
+              <SectionHeading
+                icon={<Trophy className="h-4 w-4 text-slate-500" />}
+                title="Record index"
+                subtitle="Quick links"
+                compact
+              />
               <div className="mt-4 space-y-3">
                 {stats.recordLinks?.length ? (
                   stats.recordLinks.map((record) => (
@@ -454,7 +583,15 @@ function SectionHeading({ icon, title, subtitle, compact }: SectionHeadingProps)
   );
 }
 
-function FixtureColumn({ title, matches, emptyMessage }: { title: string; matches: CricketMatch[]; emptyMessage: string }) {
+function FixtureColumn({
+  title,
+  matches,
+  emptyMessage,
+}: {
+  title: string;
+  matches: CricketMatch[];
+  emptyMessage: string;
+}) {
   return (
     <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
       <h3 className="text-base font-semibold text-slate-900">{title}</h3>
@@ -463,10 +600,18 @@ function FixtureColumn({ title, matches, emptyMessage }: { title: string; matche
           <p className="text-sm text-slate-500">{emptyMessage}</p>
         ) : (
           matches.map((match) => (
-            <div key={match._id} className="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-sm text-slate-700">
+            <div
+              key={match._id}
+              className="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-sm text-slate-700"
+            >
               <div className="flex items-center justify-between text-xs text-slate-500">
                 <span className="uppercase tracking-[0.3em]">{match.format.toUpperCase()}</span>
-                <span>{new Date(match.startTime).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                <span>
+                  {new Date(match.startTime).toLocaleString(undefined, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  })}
+                </span>
               </div>
               <div className="mt-2 flex items-center justify-between font-semibold text-slate-900">
                 <span>{match.teams.home.shortName}</span>
@@ -474,7 +619,10 @@ function FixtureColumn({ title, matches, emptyMessage }: { title: string; matche
                 <span>{match.teams.away.shortName}</span>
               </div>
               {match.venue?.name && (
-                <p className="text-xs text-slate-500">{match.venue.name}{match.venue.city ? `, ${match.venue.city}` : ''}</p>
+                <p className="text-xs text-slate-500">
+                  {match.venue.name}
+                  {match.venue.city ? `, ${match.venue.city}` : ''}
+                </p>
               )}
             </div>
           ))
@@ -484,7 +632,11 @@ function FixtureColumn({ title, matches, emptyMessage }: { title: string; matche
   );
 }
 
-function LeaderRow({ leader }: { leader: Record<string, any> & { name: string; description?: string } }) {
+function LeaderRow({
+  leader,
+}: {
+  leader: Record<string, any> & { name: string; description?: string };
+}) {
   return (
     <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-sm text-slate-700">
       <p className="font-semibold text-slate-900">{leader.name}</p>
@@ -500,7 +652,7 @@ function LeaderRow({ leader }: { leader: Record<string, any> & { name: string; d
   );
 }
 
-function StatTile({ label, value }:{ label: string; value?: number }) {
+function StatTile({ label, value }: { label: string; value?: number }) {
   if (value === undefined || value === null) return null;
   return (
     <div>
@@ -509,4 +661,3 @@ function StatTile({ label, value }:{ label: string; value?: number }) {
     </div>
   );
 }
-

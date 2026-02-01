@@ -23,6 +23,7 @@ export interface CricketMatch {
     city: string;
     country: string;
     capacity?: number;
+    address?: string;
   };
   status: 'live' | 'completed' | 'upcoming' | 'cancelled';
   format: 'test' | 'odi' | 't20i' | 't20' | 'first-class' | 'list-a';
@@ -70,6 +71,36 @@ export interface CricketMatch {
     overs?: number;
     economy?: number;
   }>;
+  // Local match fields
+  isLocalMatch?: boolean;
+  matchType?: 'international' | 'franchise' | 'local' | 'hyper-local';
+  localLocation?: {
+    country: string;
+    state?: string;
+    city: string;
+    district?: string;
+    area?: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
+  localLeague?: {
+    id: string;
+    name: string;
+    level: 'national' | 'state' | 'district' | 'city' | 'ward' | 'club';
+    season: string;
+    year: number;
+  };
+  scorerInfo?: {
+    scorerId: string;
+    scorerName: string;
+    scorerType: 'official' | 'volunteer' | 'community';
+    lastUpdate: string;
+    verificationStatus: 'pending' | 'verified' | 'rejected';
+  };
+  isVerified?: boolean;
+  matchNote?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -168,16 +199,16 @@ export const cricketSlice = createSlice({
       state.currentMatch = action.payload;
     },
     updateMatch: (state, action: PayloadAction<CricketMatch>) => {
-      const index = state.matches.findIndex(match => match._id === action.payload._id);
+      const index = state.matches.findIndex((match) => match._id === action.payload._id);
       if (index !== -1) {
         state.matches[index] = action.payload;
       }
-      
-      const liveIndex = state.liveMatches.findIndex(match => match._id === action.payload._id);
+
+      const liveIndex = state.liveMatches.findIndex((match) => match._id === action.payload._id);
       if (liveIndex !== -1) {
         state.liveMatches[liveIndex] = action.payload;
       }
-      
+
       if (state.currentMatch && state.currentMatch._id === action.payload._id) {
         state.currentMatch = action.payload;
       }
@@ -185,50 +216,66 @@ export const cricketSlice = createSlice({
     setSeries: (state, action: PayloadAction<string[]>) => {
       state.series = action.payload;
     },
-    setTeams: (state, action: PayloadAction<Array<{
-      id: string;
-      name: string;
-      shortName: string;
-      flag: string;
-      matchCount: number;
-    }>>) => {
+    setTeams: (
+      state,
+      action: PayloadAction<
+        Array<{
+          id: string;
+          name: string;
+          shortName: string;
+          flag: string;
+          matchCount: number;
+        }>
+      >
+    ) => {
       state.teams = action.payload;
     },
-    setPlayers: (state, action: PayloadAction<Array<{
-      id: string;
-      name: string;
-      role: string;
-      team: string;
-      totalRuns: number;
-      totalWickets: number;
-      matchCount: number;
-    }>>) => {
+    setPlayers: (
+      state,
+      action: PayloadAction<
+        Array<{
+          id: string;
+          name: string;
+          role: string;
+          team: string;
+          totalRuns: number;
+          totalWickets: number;
+          matchCount: number;
+        }>
+      >
+    ) => {
       state.players = action.payload;
     },
-    setStats: (state, action: PayloadAction<{
-      totalMatches: number;
-      liveMatches: number;
-      completedMatches: number;
-      upcomingMatches: number;
-      totalRuns: number;
-      totalWickets: number;
-    }>) => {
+    setStats: (
+      state,
+      action: PayloadAction<{
+        totalMatches: number;
+        liveMatches: number;
+        completedMatches: number;
+        upcomingMatches: number;
+        totalRuns: number;
+        totalWickets: number;
+      }>
+    ) => {
       state.stats = action.payload;
     },
-    setPagination: (state, action: PayloadAction<{
-      current: number;
-      pages: number;
-      total: number;
-      limit: number;
-    }>) => {
+    setPagination: (
+      state,
+      action: PayloadAction<{
+        current: number;
+        pages: number;
+        total: number;
+        limit: number;
+      }>
+    ) => {
       state.pagination = action.payload;
     },
     addMatch: (state, action: PayloadAction<CricketMatch>) => {
       state.matches.unshift(action.payload);
     },
     removeMatch: (state, action: PayloadAction<string>) => {
-      state.matches = state.matches.filter(match => match._id !== action.payload);
-      state.liveMatches = state.liveMatches.filter(match => match._id !== action.payload);
+      state.matches = state.matches.filter((match) => match._id !== action.payload);
+      state.liveMatches = state.liveMatches.filter((match) => match._id !== action.payload);
     },
     clearMatches: (state) => {
       state.matches = [];

@@ -33,6 +33,18 @@ export type LiveMatch = {
   format?: string;
   league?: string;
   venue?: { name: string; city: string };
+  series?: string;
+  // Local match fields
+  isLocalMatch?: boolean;
+  matchType?: 'international' | 'franchise' | 'local' | 'hyper-local';
+  scorerInfo?: {
+    scorerId: string;
+    scorerName: string;
+    scorerType: 'official' | 'volunteer' | 'community';
+    lastUpdate: string;
+    verificationStatus: 'pending' | 'verified' | 'rejected';
+  };
+  isVerified?: boolean;
 };
 
 async function fetchHeroData() {

@@ -209,7 +209,6 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                       >
                         <td className="py-2 sm:py-3 px-2 lg:px-4">
                           <div className="flex items-center gap-2 sm:gap-3">
-                            <span className="text-xl sm:text-2xl">{teamData.flag}</span>
                             <div>
                               <div className="font-bold text-gray-900">{inning.team}</div>
                               <div className="text-xs text-gray-600">
@@ -243,7 +242,6 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
               <div className="rounded-xl bg-gradient-to-br from-green-100 via-emerald-50 to-green-100 border-2 border-green-300 shadow-md px-2 lg:px-5 py-3 sm:py-4 lg:py-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <span className="text-2xl sm:text-3xl">{winner.flag}</span>
                     <div>
                       <h3 className="font-bold text-base sm:text-lg text-gray-900">
                         {winner.name}
@@ -271,7 +269,6 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
               <div className="rounded-xl bg-gradient-to-br from-blue-100 via-indigo-50 to-blue-100 border-2 border-blue-300 shadow-md px-2 lg:px-5 py-3 sm:py-4 lg:py-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <span className="text-2xl sm:text-3xl">{loser.flag}</span>
                     <div>
                       <h3 className="font-bold text-base sm:text-lg text-gray-900">{loser.name}</h3>
                       <p className="text-xs sm:text-sm text-gray-600">{loser.shortName}</p>
@@ -341,7 +338,6 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                 return (
                   <div key={team.name} className="space-y-2">
                     <div className="flex items-center gap-2 mb-3 pb-2 border-b-2 border-gray-200">
-                      <span className="text-xl">{team.flag}</span>
                       <h3 className="font-bold text-base sm:text-lg text-gray-900">{team.name}</h3>
                     </div>
                     <div className="overflow-x-auto">
@@ -435,7 +431,6 @@ export function CompletedMatchView({ match }: CompletedMatchViewProps) {
                 return (
                   <div key={team.name} className="space-y-2">
                     <div className="flex items-center gap-2 mb-3 pb-2 border-b-2 border-gray-200">
-                      <span className="text-xl">{team.flag}</span>
                       <h3 className="font-bold text-base sm:text-lg text-gray-900">{team.name}</h3>
                     </div>
                     <div className="overflow-x-auto">

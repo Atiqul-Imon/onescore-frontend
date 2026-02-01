@@ -171,7 +171,6 @@ export function MatchInfo({ match }: MatchInfoProps) {
           </h3>
           <div className="space-y-2 sm:space-y-3">
             <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl bg-primary-50 border border-primary-100">
-              <span className="text-xl sm:text-2xl flex-shrink-0">{match.teams.home.flag}</span>
               <div className="min-w-0 flex-1">
                 <p className="font-bold text-gray-900 text-sm sm:text-base truncate">
                   {match.teams.home.name}
@@ -182,7 +181,6 @@ export function MatchInfo({ match }: MatchInfoProps) {
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl bg-primary-50 border border-primary-100">
-              <span className="text-xl sm:text-2xl flex-shrink-0">{match.teams.away.flag}</span>
               <div className="min-w-0 flex-1">
                 <p className="font-bold text-gray-900 text-sm sm:text-base truncate">
                   {match.teams.away.name}

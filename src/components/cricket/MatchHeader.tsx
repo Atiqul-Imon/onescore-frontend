@@ -169,9 +169,6 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
               {/* Home Team Score */}
               <div className="flex items-center justify-between bg-white/5 backdrop-blur-sm rounded-xl px-4 sm:px-6 py-3 sm:py-4 border border-white/10">
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                  <span className="text-2xl sm:text-3xl flex-shrink-0">
-                    {match.teams.home.flag}
-                  </span>
                   <div className="min-w-0 flex-1">
                     <h3 className="font-bold text-base sm:text-lg text-white truncate">
                       {match.teams.home.name}
@@ -201,9 +198,6 @@ export function MatchHeader({ match, onRefresh }: MatchHeaderProps) {
               {/* Away Team Score */}
               <div className="flex items-center justify-between bg-white/5 backdrop-blur-sm rounded-xl px-4 sm:px-6 py-3 sm:py-4 border border-white/10">
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                  <span className="text-2xl sm:text-3xl flex-shrink-0">
-                    {match.teams.away.flag}
-                  </span>
                   <div className="min-w-0 flex-1">
                     <h3 className="font-bold text-base sm:text-lg text-white truncate">
                       {match.teams.away.name}

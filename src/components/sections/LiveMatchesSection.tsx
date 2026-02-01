@@ -9,6 +9,10 @@ import { ErrorState, ErrorStateCompact } from '@/components/ui/ErrorState';
 import { EmptyStateNoMatches } from '@/components/ui/EmptyState';
 import { Container, Button, Card } from '@/components/ui';
 import { formatTime, formatRelativeTime } from '@/lib/utils';
+import { useLocalMatches } from '@/hooks/useLocalMatches';
+import { mergeMatches, transformLocalMatch } from '@/lib/cricket/match-utils';
+import { CommunityMatchBadge } from '@/components/cricket/CommunityMatchBadge';
+import { CricketMatch } from '@/store/slices/cricketSlice';
 
 interface Match {
   _id: string;
@@ -57,6 +61,18 @@ export function LiveMatchesSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showingUpcoming, setShowingUpcoming] = useState(false);
+
+  // Fetch local matches (live and completed)
+  const { matches: localLiveMatches, loading: localLiveLoading } = useLocalMatches({
+    status: 'live',
+    limit: 10,
+    enabled: true,
+  });
+  const { matches: localCompletedMatches, loading: localCompletedLoading } = useLocalMatches({
+    status: 'completed',
+    limit: 10,
+    enabled: true,
+  });
 
   const fetchMatches = useCallback(async () => {
     try {
@@ -162,8 +178,42 @@ export function LiveMatchesSection() {
         console.error('Error fetching upcoming matches:', upcomingError);
       }
 
-      // Combine live and upcoming matches
-      const combinedMatches = [...allLiveMatches, ...upcomingMatches];
+      // Transform and merge local live matches
+      const transformedLocalLiveMatches: Match[] = localLiveMatches.map((localMatch) => ({
+        _id: localMatch._id,
+        matchId: localMatch.matchId,
+        teams: {
+          home: {
+            name: localMatch.teams.home.name,
+            shortName: localMatch.teams.home.shortName,
+            flag: localMatch.teams.home.flag,
+          },
+          away: {
+            name: localMatch.teams.away.name,
+            shortName: localMatch.teams.away.shortName,
+            flag: localMatch.teams.away.flag,
+          },
+        },
+        venue: {
+          name: localMatch.venue.name,
+          city: localMatch.venue.city,
+        },
+        status: localMatch.status as 'live' | 'completed' | 'upcoming',
+        startTime: localMatch.startTime,
+        currentScore: localMatch.currentScore,
+        format: localMatch.format,
+        isLocalMatch: true,
+        matchType: localMatch.matchType,
+        scorerInfo: localMatch.scorerInfo,
+        isVerified: localMatch.isVerified,
+      }));
+
+      // Combine live, upcoming, and local live matches
+      const combinedMatches = [
+        ...allLiveMatches,
+        ...upcomingMatches,
+        ...transformedLocalLiveMatches,
+      ];
 
       if (combinedMatches.length > 0) {
         // Sort: live matches first, then by start time
@@ -221,8 +271,47 @@ export function LiveMatchesSection() {
               return dateB - dateA;
             });
 
-          if (cricketResults.length > 0) {
-            setMatches(cricketResults);
+          // Transform and add local completed matches
+          const transformedLocalCompleted: Match[] = localCompletedMatches.map((localMatch) => ({
+            _id: localMatch._id,
+            matchId: localMatch.matchId,
+            teams: {
+              home: {
+                name: localMatch.teams.home.name,
+                shortName: localMatch.teams.home.shortName,
+                flag: localMatch.teams.home.flag,
+              },
+              away: {
+                name: localMatch.teams.away.name,
+                shortName: localMatch.teams.away.shortName,
+                flag: localMatch.teams.away.flag,
+              },
+            },
+            venue: {
+              name: localMatch.venue.name,
+              city: localMatch.venue.city,
+            },
+            status: 'completed' as const,
+            startTime: localMatch.startTime,
+            currentScore: localMatch.currentScore,
+            format: localMatch.format,
+            isLocalMatch: true,
+            matchType: localMatch.matchType,
+            scorerInfo: localMatch.scorerInfo,
+            isVerified: localMatch.isVerified,
+          }));
+
+          // Merge official and local completed matches
+          const allCompletedMatches = [...cricketResults, ...transformedLocalCompleted].sort(
+            (a: Match, b: Match) => {
+              const dateA = new Date(a.startTime || 0).getTime();
+              const dateB = new Date(b.startTime || 0).getTime();
+              return dateB - dateA;
+            }
+          );
+
+          if (allCompletedMatches.length > 0) {
+            setMatches(allCompletedMatches);
             setShowingUpcoming(false);
             setLoading(false);
             return;
@@ -408,30 +497,42 @@ export function LiveMatchesSection() {
                     : `/football/match/${match.matchId}`
                   : null);
 
+              const isLocal = (match as any).isLocalMatch;
+              const borderColor = isLocal ? 'border-indigo-200' : 'border-gray-100';
+
               const CardContent = (
                 <Card
                   variant="interactive"
-                  className={`h-full rounded-2xl border border-gray-100 bg-white/90 p-4 sm:p-6 shadow-lg ring-1 ${statusAccentRing[match.status]} ${detailUrl ? 'cursor-pointer' : ''}`}
+                  className={`h-full rounded-2xl border ${borderColor} bg-white/90 p-4 sm:p-6 shadow-lg ring-1 ${statusAccentRing[match.status]} ${detailUrl ? 'cursor-pointer' : ''}`}
                 >
                   <div className="flex flex-col gap-4 sm:gap-5">
                     <div className="flex items-center justify-between gap-2 sm:gap-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-full border px-2 sm:px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses[match.status] || statusBadgeClasses['upcoming']}`}
-                      >
-                        {match.status === 'live' && <span className="live-dot bg-red-500" />}
-                        <span className="hidden xs:inline">
-                          {statusPillLabel[match.status] || statusPillLabel['upcoming']}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span
+                          className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-full border px-2 sm:px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses[match.status] || statusBadgeClasses['upcoming']}`}
+                        >
+                          {match.status === 'live' && <span className="live-dot bg-red-500" />}
+                          <span className="hidden xs:inline">
+                            {statusPillLabel[match.status] || statusPillLabel['upcoming']}
+                          </span>
+                          <span className="xs:hidden">
+                            {match.status === 'live'
+                              ? 'LIVE'
+                              : match.status === 'upcoming'
+                                ? 'UP'
+                                : match.status === 'completed'
+                                  ? 'COMP'
+                                  : 'END'}
+                          </span>
                         </span>
-                        <span className="xs:hidden">
-                          {match.status === 'live'
-                            ? 'LIVE'
-                            : match.status === 'upcoming'
-                              ? 'UP'
-                              : match.status === 'completed'
-                                ? 'COMP'
-                                : 'END'}
-                        </span>
-                      </span>
+                        {(match as any).isLocalMatch && (
+                          <CommunityMatchBadge
+                            match={match as any as CricketMatch}
+                            compact
+                            className="flex-shrink-0"
+                          />
+                        )}
+                      </div>
                       <div className="text-right text-xs sm:text-sm text-gray-500 flex-shrink-0">
                         <div className="hidden sm:block">{formatTime(match.startTime)}</div>
                         <div className="text-xs text-gray-400">
@@ -474,7 +575,6 @@ export function LiveMatchesSection() {
                             className="flex items-center justify-between gap-2 sm:gap-3"
                           >
                             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                              <span className="text-xl sm:text-2xl flex-shrink-0">{team.flag}</span>
                               <div className="min-w-0 flex-1">
                                 <div className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                                   {team.name}

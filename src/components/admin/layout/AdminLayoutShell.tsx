@@ -82,13 +82,13 @@ export function AdminLayoutShell({ children }: { children: ReactNode }) {
           <div key={section.title} className="space-y-3">
             <p className="text-xs uppercase tracking-[0.3em] text-white/40">{section.title}</p>
             <div className="space-y-1">
-              {section.items.map((item) => {
+              {section.items.map((item, index) => {
                 const isActive =
                   pathname === item.href ||
                   (item.href !== '/admin' && pathname.startsWith(item.href));
                 return (
                   <Link
-                    key={item.href}
+                    key={`${section.title}-${item.label}-${index}`}
                     href={item.href}
                     className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
                       isActive
