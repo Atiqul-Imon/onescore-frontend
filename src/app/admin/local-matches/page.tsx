@@ -18,6 +18,10 @@ import {
   Trophy,
   AlertCircle,
   CheckCircle2,
+  MoreVertical,
+  Play,
+  Square,
+  Ban,
 } from 'lucide-react';
 import { getAuthHeaders } from '@/lib/auth';
 
@@ -73,6 +77,7 @@ export default function LocalMatchesPage() {
   });
   const [showFilters, setShowFilters] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
   const loadMatches = useCallback(async () => {
     setLoading(true);
@@ -112,6 +117,39 @@ export default function LocalMatchesPage() {
   useEffect(() => {
     loadMatches();
   }, [loadMatches]);
+
+  const handleStatusUpdate = async (
+    matchId: string,
+    newStatus: 'live' | 'completed' | 'upcoming' | 'cancelled'
+  ) => {
+    if (!confirm(`Are you sure you want to change the match status to "${newStatus}"?`)) {
+      return;
+    }
+
+    setUpdatingStatusId(matchId);
+    try {
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${base}/api/v1/admin/local-matches/${matchId}/status`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        loadMatches();
+      } else {
+        alert('Failed to update match status');
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+      alert('Error updating match status');
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  };
 
   const handleDelete = async (matchId: string) => {
     if (!confirm('Are you sure you want to delete this match? This action cannot be undone.')) {
@@ -427,6 +465,62 @@ export default function LocalMatchesPage() {
                         >
                           <Eye className="h-4 w-4" />
                         </Link>
+
+                        {/* Status Change Dropdown */}
+                        <div className="relative group">
+                          <button
+                            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
+                            title="Change Status"
+                            disabled={updatingStatusId === match.matchId}
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
+                          <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                            <div className="py-1">
+                              <button
+                                onClick={() => handleStatusUpdate(match.matchId, 'live')}
+                                disabled={
+                                  match.status === 'live' || updatingStatusId === match.matchId
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                              >
+                                <Play className="h-4 w-4 text-red-600" />
+                                Set Live
+                              </button>
+                              <button
+                                onClick={() => handleStatusUpdate(match.matchId, 'completed')}
+                                disabled={
+                                  match.status === 'completed' || updatingStatusId === match.matchId
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                              >
+                                <CheckCircle className="h-4 w-4 text-gray-600" />
+                                Mark Completed
+                              </button>
+                              <button
+                                onClick={() => handleStatusUpdate(match.matchId, 'upcoming')}
+                                disabled={
+                                  match.status === 'upcoming' || updatingStatusId === match.matchId
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                              >
+                                <Calendar className="h-4 w-4 text-blue-600" />
+                                Set Upcoming
+                              </button>
+                              <button
+                                onClick={() => handleStatusUpdate(match.matchId, 'cancelled')}
+                                disabled={
+                                  match.status === 'cancelled' || updatingStatusId === match.matchId
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-yellow-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                              >
+                                <Ban className="h-4 w-4 text-yellow-600" />
+                                Cancel Match
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
                         <button
                           onClick={() => handleVerify(match.matchId, !match.isVerified)}
                           className={`rounded-lg p-2 ${
