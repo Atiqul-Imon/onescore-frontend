@@ -17,6 +17,9 @@ import {
   AlertCircle,
   CheckCircle,
   Eye,
+  Play,
+  Square,
+  Ban,
 } from 'lucide-react';
 import { getAuthHeaders } from '@/lib/auth';
 
@@ -76,6 +79,7 @@ export default function LocalMatchDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     loadMatch();
@@ -130,6 +134,42 @@ export default function LocalMatchDetailPage() {
       alert('Error updating verification status');
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handleStatusUpdate = async (newStatus: 'live' | 'completed' | 'upcoming' | 'cancelled') => {
+    if (!match) return;
+
+    if (
+      !confirm(
+        `Are you sure you want to change the match status from "${match.status}" to "${newStatus}"?`
+      )
+    ) {
+      return;
+    }
+
+    setUpdatingStatus(true);
+    try {
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${base}/api/v1/admin/local-matches/${matchId}/status`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        loadMatch();
+      } else {
+        alert('Failed to update match status');
+      }
+    } catch (err) {
+      console.error('Error updating status:', err);
+      alert('Error updating match status');
+    } finally {
+      setUpdatingStatus(false);
     }
   };
 
@@ -252,6 +292,61 @@ export default function LocalMatchDetailPage() {
               Pending Verification
             </span>
           )}
+        </div>
+      </div>
+
+      {/* Status Control */}
+      <div className="rounded-lg border border-slate-200 bg-white p-4">
+        <h2 className="mb-4 text-lg font-semibold text-slate-900">Match Status Control</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <button
+            onClick={() => handleStatusUpdate('live')}
+            disabled={match.status === 'live' || updatingStatus}
+            className={`flex flex-col items-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-medium transition-all ${
+              match.status === 'live'
+                ? 'border-red-500 bg-red-50 text-red-700'
+                : 'border-slate-300 bg-white text-slate-700 hover:border-red-300 hover:bg-red-50 disabled:opacity-50'
+            }`}
+          >
+            <Play className="h-5 w-5" />
+            Set Live
+          </button>
+          <button
+            onClick={() => handleStatusUpdate('completed')}
+            disabled={match.status === 'completed' || updatingStatus}
+            className={`flex flex-col items-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-medium transition-all ${
+              match.status === 'completed'
+                ? 'border-gray-500 bg-gray-50 text-gray-700'
+                : 'border-slate-300 bg-white text-slate-700 hover:border-gray-300 hover:bg-gray-50 disabled:opacity-50'
+            }`}
+          >
+            <CheckCircle className="h-5 w-5" />
+            Mark Completed
+          </button>
+          <button
+            onClick={() => handleStatusUpdate('upcoming')}
+            disabled={match.status === 'upcoming' || updatingStatus}
+            className={`flex flex-col items-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-medium transition-all ${
+              match.status === 'upcoming'
+                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                : 'border-slate-300 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50 disabled:opacity-50'
+            }`}
+          >
+            <Calendar className="h-5 w-5" />
+            Set Upcoming
+          </button>
+          <button
+            onClick={() => handleStatusUpdate('cancelled')}
+            disabled={match.status === 'cancelled' || updatingStatus}
+            className={`flex flex-col items-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-medium transition-all ${
+              match.status === 'cancelled'
+                ? 'border-yellow-500 bg-yellow-50 text-yellow-700'
+                : 'border-slate-300 bg-white text-slate-700 hover:border-yellow-300 hover:bg-yellow-50 disabled:opacity-50'
+            }`}
+          >
+            <Ban className="h-5 w-5" />
+            Cancel Match
+          </button>
         </div>
       </div>
 
