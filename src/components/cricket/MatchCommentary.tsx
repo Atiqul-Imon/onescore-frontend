@@ -9,15 +9,19 @@ import { logger } from '@/lib/logger';
 import { getErrorMessage } from '@/lib/errors';
 
 interface CommentaryEntry {
-  ball: string;
+  ball?: string | number | null;
   commentary: string;
   over: number;
-  ballNumber: number;
-  runs: number;
+  ballNumber?: number | null;
+  runs?: number;
   wickets?: number;
   batsman?: string;
   bowler?: string;
   timestamp?: string;
+  source?: 'sportsmonk' | 'in-house';
+  commentaryType?: 'pre-ball' | 'ball' | 'post-ball';
+  authorName?: string;
+  order?: number;
 }
 
 interface MatchCommentaryProps {
@@ -33,7 +37,7 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
   const commentaryEndRef = useRef<HTMLDivElement>(null);
 
   // Get unique overs for filter
-  const uniqueOvers = Array.from(new Set(commentary.map(c => c.over))).sort((a, b) => b - a);
+  const uniqueOvers = Array.from(new Set(commentary.map((c) => c.over))).sort((a, b) => b - a);
 
   const fetchCommentary = async () => {
     try {
@@ -48,12 +52,37 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
       }
 
       const json = await response.json();
-      
+
       if (json.success && json.data) {
+        // Handle new merged structure: { firstInnings: [], secondInnings: [], all: [] }
+        let entries: CommentaryEntry[] = [];
+
+        if (json.data.all && Array.isArray(json.data.all)) {
+          entries = json.data.all;
+        } else if (Array.isArray(json.data)) {
+          entries = json.data;
+        }
+
         // Sort by over and ball number (newest first)
-        const sorted = (json.data as CommentaryEntry[]).sort((a, b) => {
+        const sorted = entries.sort((a, b) => {
           if (a.over !== b.over) return b.over - a.over;
-          return b.ballNumber - a.ballNumber;
+          const ballA =
+            typeof a.ballNumber === 'number'
+              ? a.ballNumber
+              : typeof a.ball === 'number'
+                ? a.ball
+                : typeof a.ball === 'string'
+                  ? parseInt(a.ball) || 0
+                  : 0;
+          const ballB =
+            typeof b.ballNumber === 'number'
+              ? b.ballNumber
+              : typeof b.ball === 'number'
+                ? b.ball
+                : typeof b.ball === 'string'
+                  ? parseInt(b.ball) || 0
+                  : 0;
+          return ballB - ballA;
         });
         setCommentary(sorted);
       }
@@ -109,8 +138,10 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
                   className="text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-white/10 border border-white/20 text-white appearance-none pr-6 sm:pr-8 focus:outline-none focus:ring-2 focus:ring-white/50"
                 >
                   <option value="">All Overs</option>
-                  {uniqueOvers.map(over => (
-                    <option key={over} value={over} className="text-gray-900">{over}.0 - {over}.6</option>
+                  {uniqueOvers.map((over) => (
+                    <option key={over} value={over} className="text-gray-900">
+                      {over}.0 - {over}.6
+                    </option>
                   ))}
                 </select>
                 <Filter className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 pointer-events-none" />
@@ -150,38 +181,52 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
           <div className="p-6 sm:p-8 text-center">
             <div className="mb-4 text-gray-500">
               <p className="font-semibold text-sm sm:text-base">No commentary available yet.</p>
-              <p className="text-xs sm:text-sm mt-2 text-gray-400">Commentary will appear here once the match starts.</p>
+              <p className="text-xs sm:text-sm mt-2 text-gray-400">
+                Commentary will appear here once the match starts.
+              </p>
             </div>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
             <AnimatePresence>
-              {(filterOver !== null 
-                ? commentary.filter(c => c.over === filterOver)
+              {(filterOver !== null
+                ? commentary.filter((c) => c.over === filterOver)
                 : commentary
               ).map((entry, index) => {
-                const isBoundary = entry.runs === 4 || entry.runs === 6;
+                const isBoundary = entry.runs && (entry.runs === 4 || entry.runs === 6);
                 const isWicket = entry.wickets && entry.wickets > 0;
-                
+                const isInHouse = entry.source === 'in-house';
+                const ballNum = entry.ballNumber ?? entry.ball ?? 0;
+                const commentaryType = entry.commentaryType || 'ball';
+
                 return (
                   <motion.div
-                    key={`${entry.over}.${entry.ballNumber}-${index}`}
+                    key={`${entry.over}.${ballNum}-${commentaryType}-${index}`}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
                     className={`p-3 sm:p-4 sm:p-5 hover:bg-primary-50/50 transition-colors border-l-4 ${
-                      isWicket 
-                        ? 'border-l-red-500 bg-red-50/30' 
-                        : isBoundary 
-                        ? 'border-l-primary-500 bg-primary-50/30' 
-                        : 'border-l-transparent hover:border-l-primary-400'
+                      isWicket
+                        ? 'border-l-red-500 bg-red-50/30'
+                        : isBoundary
+                          ? 'border-l-primary-500 bg-primary-50/30'
+                          : isInHouse
+                            ? 'border-l-amber-500 bg-amber-50/20'
+                            : 'border-l-transparent hover:border-l-primary-400'
                     }`}
                   >
                     <div className="flex items-start gap-3 sm:gap-4">
                       <div className="flex-shrink-0 w-16 sm:w-20 text-right">
                         <div className="text-sm sm:text-base font-bold text-secondary-900 tabular-nums">
-                          {entry.over}.{entry.ballNumber}
+                          {entry.over}
+                          {commentaryType === 'pre-ball' ? (
+                            <span className="text-xs text-gray-500"> (pre)</span>
+                          ) : commentaryType === 'post-ball' ? (
+                            <span className="text-xs text-gray-500">.{ballNum} (post)</span>
+                          ) : (
+                            <span>.{ballNum}</span>
+                          )}
                         </div>
                         {entry.timestamp && (
                           <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 font-medium">
@@ -191,14 +236,27 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
-                          {entry.runs > 0 && (
-                            <span className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-xs font-bold border ${
-                              entry.runs === 6
-                                ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
-                                : entry.runs === 4
-                                ? 'bg-blue-100 text-blue-800 border-blue-300'
-                                : 'bg-primary-100 text-primary-800 border-primary-200'
-                            }`}>
+                          {isInHouse && (
+                            <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300 flex items-center gap-1">
+                              🏠 In-House
+                              {commentaryType === 'pre-ball' && (
+                                <span className="text-[10px]">Pre-Ball</span>
+                              )}
+                              {commentaryType === 'post-ball' && (
+                                <span className="text-[10px]">Post-Ball</span>
+                              )}
+                            </span>
+                          )}
+                          {entry.runs !== undefined && entry.runs > 0 && (
+                            <span
+                              className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-xs font-bold border ${
+                                entry.runs === 6
+                                  ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                                  : entry.runs === 4
+                                    ? 'bg-blue-100 text-blue-800 border-blue-300'
+                                    : 'bg-primary-100 text-primary-800 border-primary-200'
+                              }`}
+                            >
                               {entry.runs} {entry.runs === 1 ? 'run' : 'runs'}
                             </span>
                           )}
@@ -208,12 +266,30 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
                             </span>
                           )}
                         </div>
-                        <p className="text-gray-800 leading-relaxed font-medium text-sm sm:text-base">{entry.commentary}</p>
-                        {(entry.batsman || entry.bowler) && (
+                        <p className="text-gray-800 leading-relaxed font-medium text-sm sm:text-base">
+                          {entry.commentary}
+                        </p>
+                        {(entry.batsman || entry.bowler || entry.authorName) && (
                           <div className="mt-2 text-[10px] sm:text-xs text-gray-600 font-medium flex flex-wrap gap-x-2">
-                            {entry.batsman && <span className="text-secondary-700">Batting: {entry.batsman}</span>}
-                            {entry.batsman && entry.bowler && <span className="text-gray-400">•</span>}
-                            {entry.bowler && <span className="text-secondary-700">Bowling: {entry.bowler}</span>}
+                            {entry.batsman && (
+                              <span className="text-secondary-700">Batting: {entry.batsman}</span>
+                            )}
+                            {entry.batsman && entry.bowler && (
+                              <span className="text-gray-400">•</span>
+                            )}
+                            {entry.bowler && (
+                              <span className="text-secondary-700">Bowling: {entry.bowler}</span>
+                            )}
+                            {entry.authorName && (
+                              <>
+                                {(entry.batsman || entry.bowler) && (
+                                  <span className="text-gray-400">•</span>
+                                )}
+                                <span className="text-amber-700 font-semibold">
+                                  — {entry.authorName}
+                                </span>
+                              </>
+                            )}
                           </div>
                         )}
                       </div>
@@ -229,4 +305,3 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
     </Card>
   );
 }
-

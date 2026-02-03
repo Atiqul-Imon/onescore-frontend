@@ -18,6 +18,7 @@ import {
   Newspaper,
   Trophy,
   PenSquare,
+  MessageSquare,
 } from 'lucide-react';
 
 type NavItem = {
@@ -54,6 +55,11 @@ const navSections: NavSection[] = [
         label: 'Local Matches',
         href: '/admin/local-matches',
         icon: <Trophy className="h-4 w-4" />,
+      },
+      {
+        label: 'Commentary',
+        href: '/admin/commentary',
+        icon: <MessageSquare className="h-4 w-4" />,
       },
     ],
   },
