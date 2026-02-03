@@ -51,13 +51,29 @@ interface CommentaryEntry {
   innings: number;
   over: number;
   ball: number | null;
+  ballNumber?: number | null;
   commentaryType: 'pre-ball' | 'ball' | 'post-ball';
   commentary: string;
-  authorId: string;
-  authorName: string;
+  authorId?: string;
+  authorName?: string;
   order: number;
   createdAt?: string;
   timestamp?: string;
+  source?: 'sportsmonk' | 'in-house';
+  runs?: number;
+  wickets?: number;
+  batsman?: string;
+  bowler?: string;
+}
+
+interface MergedCommentaryData {
+  firstInnings: CommentaryEntry[];
+  secondInnings: CommentaryEntry[];
+  all: CommentaryEntry[];
+  sources?: {
+    sportsMonk: number;
+    inHouse: number;
+  };
 }
 
 export default function CommentaryManagementDetailPage() {
@@ -65,12 +81,15 @@ export default function CommentaryManagementDetailPage() {
   const router = useRouter();
   const matchId = params.id as string;
   const [match, setMatch] = useState<Match | null>(null);
-  const [commentary, setCommentary] = useState<CommentaryEntry[]>([]);
+  const [commentary, setCommentary] = useState<CommentaryEntry[]>([]); // In-house only
+  const [mergedCommentary, setMergedCommentary] = useState<MergedCommentaryData | null>(null); // Merged (SportsMonk + in-house)
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [showMergedView, setShowMergedView] = useState(true); // Show merged commentary by default
 
   // Form state
   const [formData, setFormData] = useState({
@@ -87,12 +106,14 @@ export default function CommentaryManagementDetailPage() {
   useEffect(() => {
     loadMatch();
     loadCommentary();
+    loadMergedCommentary();
   }, [matchId]);
 
   useEffect(() => {
     if (autoRefresh && match?.status === 'live') {
       const interval = setInterval(() => {
         loadCommentary();
+        loadMergedCommentary();
         loadMatch();
       }, 30000); // Refresh every 30 seconds
       return () => clearInterval(interval);
@@ -185,6 +206,27 @@ export default function CommentaryManagementDetailPage() {
       console.error('Error loading commentary:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadMergedCommentary = async () => {
+    try {
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const response = await fetch(
+        `${base}/api/v1/cricket/matches/${matchId}/commentary?merge=true`,
+        {
+          cache: 'no-store',
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          setMergedCommentary(data.data);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading merged commentary:', err);
     }
   };
 
@@ -562,26 +604,209 @@ export default function CommentaryManagementDetailPage() {
         <div className="lg:col-span-2">
           <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
             <div className="p-6 border-b border-slate-200">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
                   <MessageSquare className="h-5 w-5" />
-                  In-House Commentary ({commentary.length})
+                  {showMergedView ? 'Merged Commentary' : 'In-House Commentary'} (
+                  {showMergedView ? mergedCommentary?.all?.length || 0 : commentary.length})
                 </h2>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setShowMergedView(!showMergedView)}
+                    className="px-3 py-1.5 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 font-semibold"
+                  >
+                    {showMergedView ? 'Show In-House Only' : 'Show Merged View'}
+                  </button>
+                </div>
+              </div>
+              {showMergedView && mergedCommentary && (
+                <div className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <span>
+                      <strong>SportsMonk:</strong> {mergedCommentary.sources?.sportsMonk || 0}{' '}
+                      entries
+                    </span>
+                    <span>
+                      <strong>In-House:</strong> {mergedCommentary.sources?.inHouse || 0} entries
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      💡 Merged view shows both SportsMonk and in-house commentary so you can see
+                      where to add your commentary
+                    </span>
+                  </div>
+                </div>
+              )}
+              {!showMergedView && (
                 <div className="text-sm text-slate-500">
                   {commentary.filter((c) => c.commentaryType === 'pre-ball').length} pre-ball •{' '}
                   {commentary.filter((c) => c.commentaryType === 'ball').length} ball •{' '}
                   {commentary.filter((c) => c.commentaryType === 'post-ball').length} post-ball
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="max-h-[800px] overflow-y-auto p-6">
-              {commentary.length === 0 ? (
+              {showMergedView ? (
+                // Show merged commentary (SportsMonk + in-house)
+                mergedCommentary && mergedCommentary.all && mergedCommentary.all.length > 0 ? (
+                  <div className="space-y-4">
+                    {mergedCommentary.all
+                      .sort((a, b) => {
+                        // Sort by timestamp (newest first)
+                        const timeA = new Date(a.timestamp || a.createdAt || 0).getTime();
+                        const timeB = new Date(b.timestamp || b.createdAt || 0).getTime();
+                        return timeB - timeA;
+                      })
+                      .map((entry, index) => {
+                        const isInHouse = entry.source === 'in-house';
+                        const ballNum = entry.ballNumber ?? entry.ball ?? 0;
+                        const commentaryType = entry.commentaryType || 'ball';
+                        const isEditing = isInHouse && editingId === (entry._id || entry.id);
+                        // Note: editText state is managed at component level, not here
+
+                        return (
+                          <div
+                            key={`${entry.over}-${ballNum}-${commentaryType}-${index}-${entry._id || entry.id}`}
+                            className={`p-4 border rounded-lg transition-colors ${
+                              isInHouse
+                                ? 'border-amber-300 bg-amber-50/30'
+                                : 'border-slate-200 bg-slate-50/50'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                  {isInHouse ? (
+                                    <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded text-xs font-semibold">
+                                      🏠 In-House
+                                      {commentaryType === 'pre-ball' && ' • Pre-Ball'}
+                                      {commentaryType === 'post-ball' && ' • Post-Ball'}
+                                    </span>
+                                  ) : (
+                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
+                                      📡 SportsMonk
+                                    </span>
+                                  )}
+                                  <span className="text-sm text-slate-600">
+                                    Over {entry.over}
+                                    {commentaryType === 'pre-ball' ? (
+                                      <span className="text-xs text-slate-500"> (pre)</span>
+                                    ) : commentaryType === 'post-ball' ? (
+                                      <span className="text-xs text-slate-500">
+                                        .{ballNum} (post)
+                                      </span>
+                                    ) : (
+                                      <span>.{ballNum}</span>
+                                    )}
+                                    {entry.runs !== undefined && entry.runs > 0 && (
+                                      <span className="ml-2 px-1.5 py-0.5 bg-green-100 text-green-800 rounded text-xs font-semibold">
+                                        {entry.runs} run{entry.runs !== 1 ? 's' : ''}
+                                      </span>
+                                    )}
+                                    {entry.wickets && entry.wickets > 0 && (
+                                      <span className="ml-2 px-1.5 py-0.5 bg-red-100 text-red-800 rounded text-xs font-semibold">
+                                        Wicket!
+                                      </span>
+                                    )}
+                                  </span>
+                                  {entry.authorName && (
+                                    <span className="text-xs text-slate-400">
+                                      by {entry.authorName}
+                                    </span>
+                                  )}
+                                </div>
+                                {isEditing ? (
+                                  <div className="space-y-2">
+                                    <textarea
+                                      value={editText}
+                                      onChange={(e) => setEditText(e.target.value)}
+                                      rows={3}
+                                      maxLength={1000}
+                                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
+                                    />
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() =>
+                                          handleUpdate(entry._id || entry.id || '', editText)
+                                        }
+                                        className="px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-semibold flex items-center gap-1"
+                                      >
+                                        <Save className="h-3 w-3" />
+                                        Save
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          setEditingId(null);
+                                          setEditText('');
+                                        }}
+                                        className="px-3 py-1.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-semibold flex items-center gap-1"
+                                      >
+                                        <X className="h-3 w-3" />
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p className="text-slate-800 leading-relaxed">
+                                    {entry.commentary}
+                                  </p>
+                                )}
+                                {(entry.batsman || entry.bowler) && (
+                                  <div className="mt-2 text-xs text-slate-500">
+                                    {entry.batsman && <span>Batting: {entry.batsman}</span>}
+                                    {entry.batsman && entry.bowler && <span> • </span>}
+                                    {entry.bowler && <span>Bowling: {entry.bowler}</span>}
+                                  </div>
+                                )}
+                                {entry.timestamp && (
+                                  <p className="text-xs text-slate-400 mt-2">
+                                    {new Date(entry.timestamp).toLocaleString()}
+                                  </p>
+                                )}
+                              </div>
+                              {isInHouse && !isEditing && (
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => {
+                                      setEditingId(entry._id || entry.id || null);
+                                      setEditText(entry.commentary);
+                                    }}
+                                    className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                                  >
+                                    <Edit className="h-4 w-4 text-slate-600" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(entry._id || entry.id || '')}
+                                    className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                  >
+                                    <Trash2 className="h-4 w-4 text-red-600" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    <div ref={commentaryEndRef} />
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <MessageSquare className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+                    <p className="text-slate-600 font-semibold">No commentary available</p>
+                    <p className="text-sm text-slate-500 mt-2">
+                      SportsMonk commentary will appear here when the match starts. Start adding
+                      your in-house commentary using the form on the left.
+                    </p>
+                  </div>
+                )
+              ) : // Show in-house commentary only
+              commentary.length === 0 ? (
                 <div className="text-center py-12">
                   <MessageSquare className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                  <p className="text-slate-600 font-semibold">No commentary yet</p>
+                  <p className="text-slate-600 font-semibold">No in-house commentary yet</p>
                   <p className="text-sm text-slate-500 mt-2">
-                    Start adding commentary using the form on the left
+                    Start adding commentary using the form on the left. Switch to "Merged View" to
+                    see SportsMonk commentary.
                   </p>
                 </div>
               ) : (
@@ -604,7 +829,6 @@ export default function CommentaryManagementDetailPage() {
                     })
                     .map((entry) => {
                       const isEditing = editingId === (entry._id || entry.id);
-                      const [editText, setEditText] = useState(entry.commentary);
 
                       return (
                         <div
@@ -652,7 +876,7 @@ export default function CommentaryManagementDetailPage() {
                                     <button
                                       onClick={() => {
                                         setEditingId(null);
-                                        setEditText(entry.commentary);
+                                        setEditText('');
                                       }}
                                       className="px-3 py-1.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-semibold flex items-center gap-1"
                                     >
@@ -673,7 +897,10 @@ export default function CommentaryManagementDetailPage() {
                             {!isEditing && (
                               <div className="flex gap-2">
                                 <button
-                                  onClick={() => setEditingId(entry._id || entry.id || null)}
+                                  onClick={() => {
+                                    setEditingId(entry._id || entry.id || null);
+                                    setEditText(entry.commentary);
+                                  }}
                                   className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                                 >
                                   <Edit className="h-4 w-4 text-slate-600" />
