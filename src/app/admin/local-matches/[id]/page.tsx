@@ -174,8 +174,21 @@ export default function LocalMatchDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this match? This action cannot be undone.')) {
-      return;
+    if (!match) return;
+
+    // Warn if deleting completed match
+    if (match.status === 'completed') {
+      if (
+        !confirm(
+          'This match is completed. Are you absolutely sure you want to delete it? This action cannot be undone.'
+        )
+      ) {
+        return;
+      }
+    } else {
+      if (!confirm('Are you sure you want to delete this match? This action cannot be undone.')) {
+        return;
+      }
     }
 
     setUpdating(true);
@@ -189,7 +202,8 @@ export default function LocalMatchDetailPage() {
       if (response.ok) {
         router.push('/admin/local-matches');
       } else {
-        alert('Failed to delete match');
+        const error = await response.json();
+        alert(error.message || 'Failed to delete match');
       }
     } catch (err) {
       console.error('Error deleting match:', err);
