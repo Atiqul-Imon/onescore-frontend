@@ -528,16 +528,20 @@ export function LiveScoreView({ match }: LiveScoreViewProps) {
 
 // Full Commentary Component for Live Tab (MatchCommentary style)
 interface CommentaryEntry {
-  ball: string;
+  ball?: string | number | null;
   commentary: string;
   over: number;
-  ballNumber: number;
-  runs: number;
+  ballNumber?: number | null;
+  runs?: number;
   wickets?: number;
   batsman?: string;
   bowler?: string;
   timestamp?: string;
   scoreboard?: string; // S1 for first innings, S2 for second innings
+  source?: 'sportsmonk' | 'in-house';
+  commentaryType?: 'pre-ball' | 'ball' | 'post-ball';
+  authorName?: string;
+  order?: number;
 }
 
 interface CommentaryData {
@@ -570,32 +574,50 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
 
   // Helper function to filter and normalize commentary entries
   const normalizeCommentary = (entries: CommentaryEntry[]): CommentaryEntry[] => {
-    return (
-      entries
-        .map((entry) => {
-          const overNum = getOverNumber(entry.over);
-          // More lenient validation - allow ballNumber 0-6 (inclusive)
-          if (overNum === null) {
-            return null;
-          }
-          // Allow ballNumber to be undefined or 0-6
-          const ballNum = entry.ballNumber;
-          if (ballNum !== undefined && ballNum !== null && (ballNum < 0 || ballNum > 6)) {
-            return null;
-          }
-          return {
-            ...entry,
-            over: overNum,
-            ballNumber: ballNum !== undefined && ballNum !== null ? ballNum : 0,
-          };
-        })
-        .filter((entry): entry is CommentaryEntry => entry !== null)
-        // Ensure newest is always at top (sort by over desc, then ballNumber desc)
-        .sort((a, b) => {
-          if (a.over !== b.over) return b.over - a.over;
-          return b.ballNumber - a.ballNumber;
-        })
-    );
+    const normalized: CommentaryEntry[] = [];
+
+    for (const entry of entries) {
+      const overNum = getOverNumber(entry.over);
+      // More lenient validation - allow ballNumber 0-6 (inclusive)
+      if (overNum === null) {
+        continue;
+      }
+      // Allow ballNumber to be undefined or 0-6, or null for pre-ball commentary
+      const ballNum = entry.ballNumber ?? entry.ball;
+      if (
+        ballNum !== undefined &&
+        ballNum !== null &&
+        typeof ballNum === 'number' &&
+        (ballNum < 0 || ballNum > 6)
+      ) {
+        continue;
+      }
+
+      normalized.push({
+        ...entry,
+        over: overNum,
+        ballNumber:
+          ballNum !== undefined && ballNum !== null
+            ? typeof ballNum === 'number'
+              ? ballNum
+              : 0
+            : 0,
+      });
+    }
+
+    // Sort by over desc, then by commentary type (pre-ball, ball, post-ball), then ballNumber desc
+    return normalized.sort((a, b) => {
+      if (a.over !== b.over) return b.over - a.over;
+      // Sort by commentary type: pre-ball (0), ball (1), post-ball (2)
+      const typeOrder: Record<string, number> = { 'pre-ball': 0, ball: 1, 'post-ball': 2 };
+      const orderA = typeOrder[a.commentaryType || 'ball'] ?? 1;
+      const orderB = typeOrder[b.commentaryType || 'ball'] ?? 1;
+      if (orderA !== orderB) return orderA - orderB;
+      // For same type, sort by ballNumber desc
+      const ballA = a.ballNumber ?? 0;
+      const ballB = b.ballNumber ?? 0;
+      return ballB - ballA;
+    });
   };
 
   // Normalize commentary for each innings
@@ -810,12 +832,16 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                       ? validSecondInnings.filter((c) => c.over === filterOver)
                       : validSecondInnings
                     ).map((entry, index) => {
-                      const isBoundary = entry.runs === 4 || entry.runs === 6;
+                      const isBoundary =
+                        entry.runs !== undefined && (entry.runs === 4 || entry.runs === 6);
                       const isWicket = entry.wickets && entry.wickets > 0;
+                      const isInHouse = entry.source === 'in-house';
+                      const ballNum = entry.ballNumber ?? entry.ball ?? 0;
+                      const commentaryType = entry.commentaryType || 'ball';
 
                       return (
                         <motion.div
-                          key={`2nd-${entry.over}.${entry.ballNumber}-${index}`}
+                          key={`2nd-${entry.over}.${ballNum}-${commentaryType}-${index}`}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0 }}
@@ -825,13 +851,22 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                               ? 'border-l-red-500 bg-red-50/30'
                               : isBoundary
                                 ? 'border-l-primary-500 bg-primary-50/30'
-                                : 'border-l-transparent hover:border-l-primary-400'
+                                : isInHouse
+                                  ? 'border-l-amber-500 bg-amber-50/20'
+                                  : 'border-l-transparent hover:border-l-primary-400'
                           }`}
                         >
                           <div className="flex items-start gap-3 sm:gap-4">
                             <div className="flex-shrink-0 w-16 sm:w-20 text-right">
                               <div className="text-sm sm:text-base font-bold text-secondary-900 tabular-nums">
-                                {entry.over}.{entry.ballNumber}
+                                {entry.over}
+                                {commentaryType === 'pre-ball' ? (
+                                  <span className="text-xs text-gray-500"> (pre)</span>
+                                ) : commentaryType === 'post-ball' ? (
+                                  <span className="text-xs text-gray-500">.{ballNum} (post)</span>
+                                ) : (
+                                  <span>.{ballNum}</span>
+                                )}
                               </div>
                               {entry.timestamp && (
                                 <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 font-medium">
@@ -841,7 +876,18 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
-                                {entry.runs > 0 && (
+                                {isInHouse && (
+                                  <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300 flex items-center gap-1">
+                                    🏠 In-House
+                                    {commentaryType === 'pre-ball' && (
+                                      <span className="text-[10px]">Pre-Ball</span>
+                                    )}
+                                    {commentaryType === 'post-ball' && (
+                                      <span className="text-[10px]">Post-Ball</span>
+                                    )}
+                                  </span>
+                                )}
+                                {entry.runs !== undefined && entry.runs > 0 && (
                                   <span
                                     className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-xs font-bold border ${
                                       entry.runs === 6
@@ -863,7 +909,7 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                               <p className="text-gray-800 leading-relaxed font-medium text-sm sm:text-base">
                                 {entry.commentary}
                               </p>
-                              {(entry.batsman || entry.bowler) && (
+                              {(entry.batsman || entry.bowler || entry.authorName) && (
                                 <div className="mt-2 text-[10px] sm:text-xs text-gray-600 font-medium flex flex-wrap gap-x-2">
                                   {entry.batsman && (
                                     <span className="text-secondary-700">
@@ -877,6 +923,16 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                                     <span className="text-secondary-700">
                                       Bowling: {entry.bowler}
                                     </span>
+                                  )}
+                                  {entry.authorName && (
+                                    <>
+                                      {(entry.batsman || entry.bowler) && (
+                                        <span className="text-gray-400">•</span>
+                                      )}
+                                      <span className="text-amber-700 font-semibold">
+                                        — {entry.authorName}
+                                      </span>
+                                    </>
                                   )}
                                 </div>
                               )}
@@ -905,12 +961,16 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                       ? validFirstInnings.filter((c) => c.over === filterOver)
                       : validFirstInnings
                     ).map((entry, index) => {
-                      const isBoundary = entry.runs === 4 || entry.runs === 6;
+                      const isBoundary =
+                        entry.runs !== undefined && (entry.runs === 4 || entry.runs === 6);
                       const isWicket = entry.wickets && entry.wickets > 0;
+                      const isInHouse = entry.source === 'in-house';
+                      const ballNum = entry.ballNumber ?? entry.ball ?? 0;
+                      const commentaryType = entry.commentaryType || 'ball';
 
                       return (
                         <motion.div
-                          key={`1st-${entry.over}.${entry.ballNumber}-${index}`}
+                          key={`1st-${entry.over}.${ballNum}-${commentaryType}-${index}`}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0 }}
@@ -920,13 +980,22 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                               ? 'border-l-red-500 bg-red-50/30'
                               : isBoundary
                                 ? 'border-l-primary-500 bg-primary-50/30'
-                                : 'border-l-transparent hover:border-l-primary-400'
+                                : isInHouse
+                                  ? 'border-l-amber-500 bg-amber-50/20'
+                                  : 'border-l-transparent hover:border-l-primary-400'
                           }`}
                         >
                           <div className="flex items-start gap-3 sm:gap-4">
                             <div className="flex-shrink-0 w-16 sm:w-20 text-right">
                               <div className="text-sm sm:text-base font-bold text-secondary-900 tabular-nums">
-                                {entry.over}.{entry.ballNumber}
+                                {entry.over}
+                                {commentaryType === 'pre-ball' ? (
+                                  <span className="text-xs text-gray-500"> (pre)</span>
+                                ) : commentaryType === 'post-ball' ? (
+                                  <span className="text-xs text-gray-500">.{ballNum} (post)</span>
+                                ) : (
+                                  <span>.{ballNum}</span>
+                                )}
                               </div>
                               {entry.timestamp && (
                                 <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 font-medium">
@@ -936,7 +1005,18 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
-                                {entry.runs > 0 && (
+                                {isInHouse && (
+                                  <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300 flex items-center gap-1">
+                                    🏠 In-House
+                                    {commentaryType === 'pre-ball' && (
+                                      <span className="text-[10px]">Pre-Ball</span>
+                                    )}
+                                    {commentaryType === 'post-ball' && (
+                                      <span className="text-[10px]">Post-Ball</span>
+                                    )}
+                                  </span>
+                                )}
+                                {entry.runs !== undefined && entry.runs > 0 && (
                                   <span
                                     className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-xs font-bold border ${
                                       entry.runs === 6
@@ -958,7 +1038,7 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                               <p className="text-gray-800 leading-relaxed font-medium text-sm sm:text-base">
                                 {entry.commentary}
                               </p>
-                              {(entry.batsman || entry.bowler) && (
+                              {(entry.batsman || entry.bowler || entry.authorName) && (
                                 <div className="mt-2 text-[10px] sm:text-xs text-gray-600 font-medium flex flex-wrap gap-x-2">
                                   {entry.batsman && (
                                     <span className="text-secondary-700">
@@ -972,6 +1052,16 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                                     <span className="text-secondary-700">
                                       Bowling: {entry.bowler}
                                     </span>
+                                  )}
+                                  {entry.authorName && (
+                                    <>
+                                      {(entry.batsman || entry.bowler) && (
+                                        <span className="text-gray-400">•</span>
+                                      )}
+                                      <span className="text-amber-700 font-semibold">
+                                        — {entry.authorName}
+                                      </span>
+                                    </>
                                   )}
                                 </div>
                               )}
