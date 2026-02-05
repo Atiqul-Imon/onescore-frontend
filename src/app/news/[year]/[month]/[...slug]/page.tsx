@@ -1,490 +1,345 @@
-'use client';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { ArticleContent } from '@/components/news/ArticleContent';
+import Script from 'next/script';
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import Image from 'next/image';
-import { formatDate } from '@/lib/utils';
-import { ArticleReactions } from '@/components/news/ArticleReactions';
-import { ArticleComments } from '@/components/news/ArticleComments';
-import { RelatedArticles } from '@/components/news/RelatedArticles';
-import { Container } from '@/components/ui/Container';
-import {
-  Clock,
-  User,
-  Calendar,
-  Tag,
-  Share2,
-  BookOpen,
-  TrendingUp,
-  Loader2,
-  AlertCircle,
-  Newspaper,
-} from 'lucide-react';
-import Link from 'next/link';
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
 
-export default function ArticlePage() {
-  const params = useParams();
-  const [article, setArticle] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-  useEffect(() => {
-    async function load() {
-      try {
-        setLoading(true);
-        setError(null);
-        const year = params.year as string;
-        const month = params.month as string;
-        const slug = params.slug as string[];
-        const articleSlug = slug.join('/');
-        const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+interface PageProps {
+  params: {
+    year: string;
+    month: string;
+    slug: string[];
+  };
+}
 
-        // Try structured route first (works better with NestJS routing)
-        let res = await fetch(`${base}/api/v1/news/slug/${year}/${month}/${articleSlug}`, {
-          cache: 'no-store',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+async function getArticle(year: string, month: string, slug: string[]) {
+  const articleSlug = slug.join('/');
 
-        // If structured route fails, try with encoded slug
-        if (!res.ok && res.status === 404) {
-          const fullSlug = `news/${year}/${month}/${articleSlug}`;
-          res = await fetch(`${base}/api/v1/news/slug/${encodeURIComponent(fullSlug)}`, {
-            cache: 'no-store',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-        }
+  try {
+    // Try structured route first
+    let res = await fetch(`${apiBase}/api/v1/news/slug/${year}/${month}/${articleSlug}`, {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-        if (!res.ok) {
-          if (res.status === 404) {
-            setArticle(null);
-            setError('Article not found');
-            return;
-          }
-          throw new Error(`Failed to fetch article: ${res.status}`);
-        }
-
-        const data = await res.json();
-        if (data && data.data) {
-          setArticle(data.data);
-        } else if (data && !data.data && data.success) {
-          setArticle(data);
-        } else if (data && !data.success) {
-          setArticle(data);
-        } else {
-          setArticle(null);
-          setError('Article data is invalid');
-        }
-      } catch (e: any) {
-        console.error('Error loading article:', e);
-        setError(e?.message || 'Failed to load article');
-        setArticle(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, [params]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-        <Container size="lg" className="py-24">
-          <div className="flex flex-col items-center justify-center text-center">
-            <Loader2 className="h-12 w-12 animate-spin text-primary-600 mb-4" />
-            <h2 className="text-xl font-semibold text-slate-900 mb-2">Loading Article</h2>
-            <p className="text-slate-600">Please wait while we fetch the content...</p>
-          </div>
-        </Container>
-      </div>
-    );
-  }
-
-  if (error || !article) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-        <Container size="lg" className="py-24">
-          <div className="flex flex-col items-center justify-center text-center max-w-md mx-auto">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 mb-4">
-              <AlertCircle className="h-8 w-8 text-red-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Article Not Found</h2>
-            <p className="text-slate-600 mb-6">
-              {error || 'The article you are looking for does not exist or has been removed.'}
-            </p>
-            <a
-              href="/news"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/25 transition-all hover:bg-primary-700 hover:shadow-xl"
-            >
-              <BookOpen className="h-4 w-4" />
-              Browse All News
-            </a>
-          </div>
-        </Container>
-      </div>
-    );
-  }
-
-  const articleType = article.type?.replace('_', ' ') || 'Article';
-  const category = article.category || 'General';
-
-  // TrendingNewsSidebar Component
-  function TrendingNewsSidebar({
-    currentArticleId,
-    category,
-  }: {
-    currentArticleId: string;
-    category: string;
-  }) {
-    const [trendingArticles, setTrendingArticles] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-      async function loadTrending() {
-        try {
-          const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-          // Fetch trending articles, excluding current article
-          const res = await fetch(`${base}/api/v1/news/trending?limit=5`, {
-            cache: 'no-store',
-          });
-          if (res.ok) {
-            const data = await res.json();
-            const articles = data?.data || data || [];
-            // Filter out current article and limit to 4
-            const filtered = articles.filter((a: any) => a._id !== currentArticleId).slice(0, 4);
-            setTrendingArticles(filtered);
-          }
-        } catch (e) {
-          console.error('Error loading trending news:', e);
-        } finally {
-          setLoading(false);
-        }
-      }
-      loadTrending();
-    }, [currentArticleId]);
-
-    if (loading) {
-      return (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
-          </div>
-        </div>
-      );
+    // If structured route fails, try with encoded slug
+    if (!res.ok && res.status === 404) {
+      const fullSlug = `news/${year}/${month}/${articleSlug}`;
+      res = await fetch(`${apiBase}/api/v1/news/slug/${encodeURIComponent(fullSlug)}`, {
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
     }
 
-    if (trendingArticles.length === 0) {
+    if (!res.ok) {
       return null;
     }
 
-    return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-slate-900">
-          <Newspaper className="h-4 w-4" />
-          Trending News
-        </h3>
-        <div className="space-y-4">
-          {trendingArticles.map((item: any, index: number) => {
-            const slugParts = item.slug?.split('/') || [];
-            const year = slugParts[1] || '2026';
-            const month = slugParts[2] || '02';
-            const slug = slugParts.slice(3).join('/') || '';
-            const href = `/news/${year}/${month}/${slug}`;
+    const data = await res.json();
+    if (data && data.data) {
+      return data.data;
+    } else if (data && !data.data && data.success) {
+      return data;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching article:', error);
+    return null;
+  }
+}
 
-            return (
-              <Link
-                key={item._id || index}
-                href={href}
-                className="group block rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md"
-              >
-                <h4 className="mb-2 line-clamp-2 text-sm font-bold leading-snug text-slate-900 group-hover:text-primary-600 transition-colors">
-                  {item.title}
-                </h4>
-                <div className="flex items-center gap-2 text-xs text-slate-500">
-                  {item.publishedAt && (
-                    <time dateTime={item.publishedAt}>
-                      {new Date(item.publishedAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </time>
-                  )}
-                  {item.readingTimeMinutes && (
-                    <>
-                      <span>•</span>
-                      <span>{item.readingTimeMinutes} min</span>
-                    </>
-                  )}
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-        <Link
-          href="/news"
-          className="mt-4 block text-center text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
-        >
-          View All News →
-        </Link>
-      </div>
-    );
+function stripHtml(html: string): string {
+  if (!html) return '';
+  return html
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim()
+    .substring(0, 300);
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { year, month, slug } = params;
+  const article = await getArticle(year, month, slug);
+
+  if (!article) {
+    return {
+      title: 'Article Not Found | ScoreNews',
+      description: 'The article you are looking for does not exist.',
+    };
   }
 
+  const articleUrl = `${siteUrl}/news/${year}/${month}/${slug.join('/')}`;
+  const title = article.title || 'Article | ScoreNews';
+  const description = article.summary ? stripHtml(article.summary) : stripHtml(article.body || '');
+  const category = article.category || 'General';
+  const articleType = article.type?.replace('_', ' ') || 'Article';
+  const authorName = article.author?.name || 'ScoreNews Editorial';
+  const publishedTime = article.publishedAt
+    ? new Date(article.publishedAt).toISOString()
+    : new Date().toISOString();
+  const modifiedTime = article.updatedAt
+    ? new Date(article.updatedAt).toISOString()
+    : publishedTime;
+
+  // Get hero image or use default - ensure absolute URL
+  let heroImage = `${siteUrl}/og-image.jpg`; // Default fallback
+  if (article.heroImage) {
+    if (article.heroImage.startsWith('http://') || article.heroImage.startsWith('https://')) {
+      heroImage = article.heroImage;
+    } else if (article.heroImage.startsWith('//')) {
+      heroImage = `https:${article.heroImage}`;
+    } else {
+      // Relative URL - construct absolute URL
+      const imagePath = article.heroImage.startsWith('/')
+        ? article.heroImage
+        : `/${article.heroImage}`;
+      // Check if it's from API or CDN
+      if (
+        article.heroImage.includes('cloudinary') ||
+        article.heroImage.includes('imagekit') ||
+        article.heroImage.includes('cdn')
+      ) {
+        heroImage = article.heroImage.startsWith('/')
+          ? `https:${article.heroImage}`
+          : article.heroImage;
+      } else {
+        heroImage = `${apiBase}${imagePath}`;
+      }
+    }
+  }
+
+  // Build keywords from article data
+  const keywords = [
+    category.toLowerCase(),
+    articleType.toLowerCase(),
+    'cricket',
+    'sports news',
+    'scorenews',
+    ...(article.tags || []).map((tag: string) => tag.toLowerCase()),
+  ].filter(Boolean);
+
+  return {
+    title: title,
+    description: description || 'Read the latest sports news and updates on ScoreNews.',
+    keywords: keywords,
+    authors: article.author?.name ? [{ name: article.author.name }] : undefined,
+    creator: authorName,
+    publisher: 'ScoreNews',
+    category: category,
+    alternates: {
+      canonical: articleUrl,
+    },
+    openGraph: {
+      type: 'article',
+      locale: 'en_US',
+      url: articleUrl,
+      title: title,
+      description: description || 'Read the latest sports news and updates on ScoreNews.',
+      siteName: 'ScoreNews',
+      publishedTime: publishedTime,
+      modifiedTime: modifiedTime,
+      authors: article.author?.name ? [article.author.name] : undefined,
+      section: category,
+      tags: article.tags || [],
+      images: [
+        {
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+          type: 'image/jpeg',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: title,
+      description: description || 'Read the latest sports news and updates on ScoreNews.',
+      creator: '@scorenews',
+      site: '@scorenews',
+      images: [heroImage],
+    },
+    robots: {
+      index: article.state === 'published' ? true : false,
+      follow: article.state === 'published' ? true : false,
+      googleBot: {
+        index: article.state === 'published' ? true : false,
+        follow: article.state === 'published' ? true : false,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    other: {
+      'article:published_time': publishedTime,
+      'article:modified_time': modifiedTime,
+      'article:author': authorName,
+      'article:section': category,
+      'article:tag': (article.tags || []).join(', '),
+    },
+  };
+}
+
+export default async function ArticlePage({ params }: PageProps) {
+  const { year, month, slug } = params;
+  const article = await getArticle(year, month, slug);
+
+  if (!article) {
+    notFound();
+  }
+
+  const articleUrl = `${siteUrl}/news/${year}/${month}/${slug.join('/')}`;
+  const publishedTime = article.publishedAt
+    ? new Date(article.publishedAt).toISOString()
+    : new Date().toISOString();
+  const modifiedTime = article.updatedAt
+    ? new Date(article.updatedAt).toISOString()
+    : publishedTime;
+  const authorName = article.author?.name || 'ScoreNews Editorial';
+  const category = article.category || 'General';
+
+  // Get hero image URL - ensure absolute URL
+  let heroImage = `${siteUrl}/og-image.jpg`; // Default fallback
+  if (article.heroImage) {
+    if (article.heroImage.startsWith('http://') || article.heroImage.startsWith('https://')) {
+      heroImage = article.heroImage;
+    } else if (article.heroImage.startsWith('//')) {
+      heroImage = `https:${article.heroImage}`;
+    } else {
+      // Relative URL - construct absolute URL
+      const imagePath = article.heroImage.startsWith('/')
+        ? article.heroImage
+        : `/${article.heroImage}`;
+      // Check if it's from API or CDN
+      if (
+        article.heroImage.includes('cloudinary') ||
+        article.heroImage.includes('imagekit') ||
+        article.heroImage.includes('cdn')
+      ) {
+        heroImage = article.heroImage.startsWith('/')
+          ? `https:${article.heroImage}`
+          : article.heroImage;
+      } else {
+        heroImage = `${apiBase}${imagePath}`;
+      }
+    }
+  }
+
+  // Structured Data (JSON-LD) for Article
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: article.title,
+    description: article.summary || stripHtml(article.body || ''),
+    image: heroImage,
+    datePublished: publishedTime,
+    dateModified: modifiedTime,
+    author: {
+      '@type': 'Person',
+      name: authorName,
+      ...(article.author?.email && { email: article.author.email }),
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'ScoreNews',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/logo.png`,
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': articleUrl,
+    },
+    articleSection: category,
+    keywords: (article.tags || []).join(', '),
+    articleBody: stripHtml(article.body || ''),
+    wordCount: article.body ? stripHtml(article.body).split(/\s+/).length : 0,
+    timeRequired: article.readingTimeMinutes ? `PT${article.readingTimeMinutes}M` : undefined,
+    inLanguage: 'en-US',
+  };
+
+  // BreadcrumbList structured data
+  const breadcrumbStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'News',
+        item: `${siteUrl}/news`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: category,
+        item: `${siteUrl}/news?category=${encodeURIComponent(category)}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: article.title,
+        item: articleUrl,
+      },
+    ],
+  };
+
+  // Organization structured data
+  const organizationStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'ScoreNews',
+    url: siteUrl,
+    logo: `${siteUrl}/logo.png`,
+    sameAs: [
+      // Add social media links if available
+      // 'https://www.facebook.com/scorenews',
+      // 'https://twitter.com/scorenews',
+    ],
+  };
+
   return (
-    <article className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-      {/* Hero Section with Image */}
-      {article.heroImage && (
-        <div className="relative w-full h-[75vh] min-h-[600px] max-h-[900px] overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
-          <Image
-            src={article.heroImage}
-            alt={article.title}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover opacity-90"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
-
-          {/* Content Overlay */}
-          <Container
-            size="2xl"
-            className="relative h-full flex flex-col justify-end pb-12 lg:pb-16"
-          >
-            <div className="max-w-4xl">
-              {/* Category Badge */}
-              <div className="mb-6 flex flex-wrap items-center gap-3 text-sm">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-600/90 backdrop-blur-sm px-4 py-1.5 font-bold uppercase tracking-wider text-white shadow-lg">
-                  <Tag className="h-3.5 w-3.5" />
-                  {category}
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm px-4 py-1.5 font-semibold uppercase tracking-wider text-white">
-                  {articleType}
-                </span>
-              </div>
-
-              {/* Title */}
-              <h1 className="mb-6 text-4xl font-bold leading-tight text-white drop-shadow-2xl sm:text-5xl lg:text-6xl">
-                {article.title}
-              </h1>
-
-              {/* Meta Information */}
-              <div className="flex flex-wrap items-center gap-4 text-sm text-white/90">
-                {article.author?.name && (
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                      <User className="h-4 w-4" />
-                    </div>
-                    <span className="font-semibold">{article.author.name}</span>
-                  </div>
-                )}
-                {article.publishedAt && (
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <time dateTime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
-                  </div>
-                )}
-                {article.readingTimeMinutes && (
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span>{article.readingTimeMinutes} min read</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </Container>
-        </div>
-      )}
-
-      {/* Summary Section (Below Image) */}
-      {article.summary && article.heroImage && (
-        <Container size="lg" className="py-8 lg:py-12">
-          <div className="mx-auto max-w-4xl">
-            <p className="text-xl leading-relaxed text-slate-700 sm:text-2xl lg:text-3xl font-medium">
-              {article.summary}
-            </p>
-          </div>
-        </Container>
-      )}
+    <>
+      {/* Structured Data */}
+      <Script
+        id="article-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <Script
+        id="breadcrumb-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbStructuredData) }}
+      />
+      <Script
+        id="organization-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationStructuredData) }}
+      />
 
       {/* Article Content */}
-      <Container size="lg" className="py-12 lg:py-16">
-        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-12 lg:grid-cols-[1fr_280px]">
-          {/* Main Content */}
-          <div className="min-w-0">
-            {/* Header (if no hero image) */}
-            {!article.heroImage && (
-              <header className="mb-10 border-b border-slate-200 pb-8">
-                <div className="mb-6 flex flex-wrap items-center gap-3 text-sm">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-100 px-4 py-1.5 font-bold uppercase tracking-wider text-primary-700">
-                    <Tag className="h-3.5 w-3.5" />
-                    {category}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-4 py-1.5 font-semibold uppercase tracking-wider text-slate-700">
-                    {articleType}
-                  </span>
-                  {article.publishedAt && (
-                    <>
-                      <span className="text-slate-400">•</span>
-                      <div className="flex items-center gap-1.5 text-slate-600">
-                        <Calendar className="h-4 w-4" />
-                        <time dateTime={article.publishedAt}>
-                          {formatDate(article.publishedAt)}
-                        </time>
-                      </div>
-                    </>
-                  )}
-                  {article.readingTimeMinutes && (
-                    <>
-                      <span className="text-slate-400">•</span>
-                      <div className="flex items-center gap-1.5 text-slate-600">
-                        <Clock className="h-4 w-4" />
-                        <span>{article.readingTimeMinutes} min read</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                <h1 className="mb-6 text-4xl font-bold leading-tight text-slate-900 sm:text-5xl lg:text-6xl">
-                  {article.title}
-                </h1>
-
-                {article.summary && (
-                  <p className="mb-6 text-xl leading-relaxed text-slate-700 sm:text-2xl">
-                    {article.summary}
-                  </p>
-                )}
-
-                {article.author?.name && (
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg">
-                      <User className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">
-                        By {article.author.name}
-                      </p>
-                      {article.author.email && (
-                        <p className="text-xs text-slate-500">{article.author.email}</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </header>
-            )}
-
-            {/* Article Body */}
-            <div className="prose prose-lg sm:prose-xl lg:prose-2xl max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-headings:leading-tight prose-headings:tracking-tight prose-h1:text-4xl sm:prose-h1:text-5xl prose-h1:mt-12 prose-h1:mb-6 prose-h1:font-extrabold prose-h2:text-3xl sm:prose-h2:text-4xl prose-h2:mt-10 prose-h2:mb-5 prose-h2:font-bold prose-h3:text-2xl sm:prose-h3:text-3xl prose-h3:mt-8 prose-h3:mb-4 prose-h3:font-bold prose-p:text-slate-700 prose-p:leading-[1.85] prose-p:text-lg sm:prose-p:text-xl prose-p:mb-6 sm:prose-p:mb-7 prose-p:font-normal prose-p:first:mt-0 prose-a:text-primary-600 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline prose-a:decoration-2 prose-strong:text-slate-900 prose-strong:font-bold prose-ul:my-6 sm:prose-ul:my-8 prose-ul:space-y-3 prose-ul:pl-6 prose-ol:my-6 sm:prose-ol:my-8 prose-ol:space-y-3 prose-ol:pl-6 prose-li:text-slate-700 prose-li:text-lg sm:prose-li:text-xl prose-li:leading-relaxed prose-blockquote:border-l-4 prose-blockquote:border-primary-500 prose-blockquote:pl-8 prose-blockquote:pr-6 prose-blockquote:italic prose-blockquote:text-slate-700 prose-blockquote:text-xl prose-blockquote:my-8 prose-blockquote:bg-slate-50 prose-blockquote:py-4 prose-blockquote:rounded-r-xl prose-img:rounded-2xl prose-img:shadow-2xl prose-img:my-10 sm:prose-img:my-12 prose-img:w-full prose-img:h-auto prose-img:object-contain prose-code:text-base prose-code:bg-slate-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-mono prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:rounded-2xl prose-pre:p-6 sm:prose-pre:p-8 prose-pre:my-8 prose-pre:shadow-xl prose-pre:overflow-x-auto prose-hr:my-10 sm:prose-hr:my-12 prose-hr:border-slate-200">
-              <style jsx global>{`
-                .article-content p {
-                  margin-bottom: 1.5rem !important;
-                  margin-top: 0 !important;
-                }
-                .article-content p + p {
-                  margin-top: 0 !important;
-                }
-                .article-content p:first-child {
-                  margin-top: 0 !important;
-                }
-                .article-content p:last-child {
-                  margin-bottom: 0 !important;
-                }
-              `}</style>
-              <div className="article-content" dangerouslySetInnerHTML={{ __html: article.body }} />
-            </div>
-
-            {/* Tags Section */}
-            {article.tags && article.tags.length > 0 && (
-              <div className="mt-12 border-t border-slate-200 pt-8">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-semibold text-slate-600">Tags:</span>
-                  {article.tags.map((tag: string, index: number) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-200 transition-colors"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Article Actions & Comments */}
-            {article._id && (
-              <div className="mt-16 space-y-16 border-t border-slate-200 pt-12">
-                <ArticleReactions
-                  articleId={String(article._id)}
-                  initialLikes={article.likes || 0}
-                  initialDislikes={article.dislikes || 0}
-                />
-
-                <ArticleComments articleId={String(article._id)} />
-
-                <RelatedArticles articleId={String(article._id)} />
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-8 space-y-6">
-              {/* Share Section */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-slate-900">
-                  <Share2 className="h-4 w-4" />
-                  Share Article
-                </h3>
-                <div className="space-y-3">
-                  <button
-                    onClick={() => {
-                      if (typeof window !== 'undefined') {
-                        navigator.share?.({
-                          title: article.title,
-                          text: article.summary,
-                          url: window.location.href,
-                        });
-                      }
-                    }}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition-all hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700"
-                  >
-                    <Share2 className="h-4 w-4" />
-                    Share
-                  </button>
-                </div>
-              </div>
-
-              {/* Trending/Related News */}
-              <TrendingNewsSidebar currentArticleId={article._id} category={category} />
-
-              {/* Author Card */}
-              {article.author && (
-                <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm">
-                  <h3 className="mb-4 text-sm font-bold uppercase tracking-wide text-slate-900">
-                    Author
-                  </h3>
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg">
-                      <User className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900">
-                        {article.author.name || 'Admin User'}
-                      </p>
-                      {article.author.email && (
-                        <p className="text-xs text-slate-500">{article.author.email}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </aside>
-        </div>
-      </Container>
-    </article>
+      <ArticleContent article={article} />
+    </>
   );
 }
