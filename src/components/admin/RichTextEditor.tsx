@@ -2,12 +2,12 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import { getAuthHeaders } from '@/lib/auth';
 
 // Dynamically import CKEditor to avoid SSR issues
-const CKEditor = dynamic(
-  () => import('@ckeditor/ckeditor5-react').then((mod) => mod.CKEditor),
-  { ssr: false }
-);
+const CKEditor = dynamic(() => import('@ckeditor/ckeditor5-react').then((mod) => mod.CKEditor), {
+  ssr: false,
+});
 
 interface RichTextEditorProps {
   value: string;
@@ -15,7 +15,11 @@ interface RichTextEditorProps {
   placeholder?: string;
 }
 
-export function RichTextEditor({ value, onChange, placeholder = 'Write your article content...' }: RichTextEditorProps) {
+export function RichTextEditor({
+  value,
+  onChange,
+  placeholder = 'Write your article content...',
+}: RichTextEditorProps) {
   const [editorLoaded, setEditorLoaded] = useState(false);
   const [editorWrapper, setEditorWrapper] = useState<any>(null);
 
@@ -34,80 +38,96 @@ export function RichTextEditor({ value, onChange, placeholder = 'Write your arti
     }
   }, []);
 
-  const editorConfig = useMemo(() => ({
-    placeholder,
-    toolbar: {
-      items: [
-        'heading',
-        '|',
-        'bold',
-        'italic',
-        '|',
-        'bulletedList',
-        'numberedList',
-        '|',
-        'outdent',
-        'indent',
-        '|',
-        'blockQuote',
-        'insertTable',
-        'link',
-        'imageUpload',
-        'mediaEmbed',
-        '|',
-        'undo',
-        'redo'
-      ],
-      shouldNotGroupWhenFull: true
-    },
-    heading: {
-      options: [
-        { model: 'paragraph' as const, title: 'Paragraph', class: 'ck-heading_paragraph' },
-        { model: 'heading1' as const, view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
-        { model: 'heading2' as const, view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-        { model: 'heading3' as const, view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
-        { model: 'heading4' as const, view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' }
-      ]
-    },
-    image: {
-      toolbar: [
-        'imageTextAlternative',
-        'imageStyle:full',
-        'imageStyle:side',
-        'linkImage'
-      ],
-      resizeUnit: 'px' as const
-    },
-    table: {
-      contentToolbar: [
-        'tableColumn',
-        'tableRow',
-        'mergeTableCells',
-        'tableCellProperties',
-        'tableProperties'
-      ]
-    },
-    link: {
-      decorators: {
-        openInNewTab: {
-          mode: 'manual' as const,
-          label: 'Open in a new tab',
-          attributes: {
-            target: '_blank',
-            rel: 'noopener noreferrer'
-          }
-        }
-      }
-    },
-    // Simple upload adapter for images
-    simpleUpload: {
-      uploadUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/media`,
-      withCredentials: true,
-      headers: {
-        'X-CSRF-TOKEN': 'CSRF-Token',
-      }
-    }
-  }), [placeholder]);
+  const editorConfig = useMemo(
+    () => ({
+      placeholder,
+      toolbar: {
+        items: [
+          'heading',
+          '|',
+          'bold',
+          'italic',
+          '|',
+          'bulletedList',
+          'numberedList',
+          '|',
+          'outdent',
+          'indent',
+          '|',
+          'blockQuote',
+          'insertTable',
+          'link',
+          'imageUpload',
+          'mediaEmbed',
+          '|',
+          'undo',
+          'redo',
+        ],
+        shouldNotGroupWhenFull: true,
+      },
+      heading: {
+        options: [
+          { model: 'paragraph' as const, title: 'Paragraph', class: 'ck-heading_paragraph' },
+          {
+            model: 'heading1' as const,
+            view: 'h1',
+            title: 'Heading 1',
+            class: 'ck-heading_heading1',
+          },
+          {
+            model: 'heading2' as const,
+            view: 'h2',
+            title: 'Heading 2',
+            class: 'ck-heading_heading2',
+          },
+          {
+            model: 'heading3' as const,
+            view: 'h3',
+            title: 'Heading 3',
+            class: 'ck-heading_heading3',
+          },
+          {
+            model: 'heading4' as const,
+            view: 'h4',
+            title: 'Heading 4',
+            class: 'ck-heading_heading4',
+          },
+        ],
+      },
+      image: {
+        toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side', 'linkImage'],
+        resizeUnit: 'px' as const,
+      },
+      table: {
+        contentToolbar: [
+          'tableColumn',
+          'tableRow',
+          'mergeTableCells',
+          'tableCellProperties',
+          'tableProperties',
+        ],
+      },
+      link: {
+        decorators: {
+          openInNewTab: {
+            mode: 'manual' as const,
+            label: 'Open in a new tab',
+            attributes: {
+              target: '_blank',
+              rel: 'noopener noreferrer',
+            },
+          },
+        },
+      },
+      // Simple upload adapter for images
+      // Uses Next.js API route proxy to handle authentication
+      simpleUpload: {
+        uploadUrl: '/api/media',
+        withCredentials: true,
+      },
+    }),
+    [placeholder]
+  );
 
   const handleChange = (_event: any, editor: any) => {
     const data = editor.getData();

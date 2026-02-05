@@ -24,7 +24,10 @@ export function MediaPicker({ onSelect, currentUrl }: MediaPickerProps) {
     setLoading(true);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/media?type=image`, { headers: getAuthHeaders(), cache: 'no-store' });
+      const res = await fetch(`${base}/api/v1/media?type=image`, {
+        headers: getAuthHeaders(),
+        cache: 'no-store',
+      });
       if (res.ok) {
         const json = await res.json();
         setMedia(json?.data || []);
@@ -39,7 +42,7 @@ export function MediaPicker({ onSelect, currentUrl }: MediaPickerProps) {
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     setUploading(true);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -47,7 +50,7 @@ export function MediaPicker({ onSelect, currentUrl }: MediaPickerProps) {
       form.append('file', file);
       const headers = getAuthHeaders();
       delete (headers as any)['Content-Type'];
-      const res = await fetch(`${base}/api/media`, { method: 'POST', body: form, headers });
+      const res = await fetch(`${base}/api/v1/media`, { method: 'POST', body: form, headers });
       if (res.ok) {
         const json = await res.json();
         const url = json?.data?.path || json?.data?.url;
@@ -95,9 +98,17 @@ export function MediaPicker({ onSelect, currentUrl }: MediaPickerProps) {
               <div className="flex items-center gap-2">
                 <label className="px-3 py-2 bg-blue-600 text-white rounded-md cursor-pointer hover:bg-blue-700">
                   {uploading ? 'Uploading...' : 'Upload'}
-                  <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleUpload}
+                    disabled={uploading}
+                  />
                 </label>
-                <button onClick={() => setIsOpen(false)} className="px-3 py-2 border rounded-md">Close</button>
+                <button onClick={() => setIsOpen(false)} className="px-3 py-2 border rounded-md">
+                  Close
+                </button>
               </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4">
@@ -132,4 +143,3 @@ export function MediaPicker({ onSelect, currentUrl }: MediaPickerProps) {
     </>
   );
 }
-
