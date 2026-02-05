@@ -10,15 +10,15 @@ const siteUrl =
 const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     year: string;
     month: string;
     slug: string[];
-  };
+  }>;
 }
 
 async function getArticle(year: string, month: string, slug: string[]) {
-  const articleSlug = slug.join('/');
+  const articleSlug = (slug || []).join('/');
 
   try {
     // Try structured route first
@@ -72,7 +72,7 @@ function stripHtml(html: string): string {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { year, month, slug } = params;
+  const { year, month, slug } = await params;
   const article = await getArticle(year, month, slug);
 
   if (!article) {
@@ -82,7 +82,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const articleUrl = `${siteUrl}/news/${year}/${month}/${slug.join('/')}`;
+  const articleUrl = `${siteUrl}/news/${year}/${month}/${(slug || []).join('/')}`;
   const title = article.title || 'Article | ScoreNews';
   const description = article.summary ? stripHtml(article.summary) : stripHtml(article.body || '');
   const category = article.category || 'General';
@@ -195,14 +195,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ArticlePage({ params }: PageProps) {
-  const { year, month, slug } = params;
+  const { year, month, slug } = await params;
   const article = await getArticle(year, month, slug);
 
   if (!article) {
     notFound();
   }
 
-  const articleUrl = `${siteUrl}/news/${year}/${month}/${slug.join('/')}`;
+  const articleUrl = `${siteUrl}/news/${year}/${month}/${(slug || []).join('/')}`;
   const publishedTime = article.publishedAt
     ? new Date(article.publishedAt).toISOString()
     : new Date().toISOString();
