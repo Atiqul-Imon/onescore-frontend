@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useEffect, useState } from 'react';
 import { getAuthHeaders } from '@/lib/auth';
 import { AdminSurface, AdminToolbar, Button, LoadingSpinner, StatMetric } from '@/components/ui';
@@ -16,7 +16,10 @@ export default function MediaLibraryPage() {
     setError(null);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/media?type=${t}`, { headers: getAuthHeaders(), cache: 'no-store' });
+      const res = await fetch(`${base}/api/v1/media?type=${t}`, {
+        headers: getAuthHeaders(),
+        cache: 'no-store',
+      });
       const json = await res.json();
       setItems(json?.data || []);
     } catch (e: any) {
@@ -39,15 +42,17 @@ export default function MediaLibraryPage() {
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     const headers = getAuthHeaders();
     delete (headers as any)['Content-Type']; // Let browser set multipart boundary
-    const res = await fetch(`${base}/api/media`, { method: 'POST', body: form, headers });
+    const res = await fetch(`${base}/api/v1/media`, { method: 'POST', body: form, headers });
     if (res.ok) fetchMedia();
   }
 
   async function onDelete(p: string) {
     const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-    const url = new URL(`${base}/api/media`);
-    url.searchParams.set('path', p);
-    const res = await fetch(url.toString(), { method: 'DELETE', headers: getAuthHeaders() });
+    const res = await fetch(`${base}/api/v1/media`, {
+      method: 'DELETE',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: p }),
+    });
     if (res.ok) fetchMedia();
   }
 
@@ -71,22 +76,23 @@ export default function MediaLibraryPage() {
         <StatMetric label="Items loaded" value={items.length} trend={`Filtered: ${type}`} />
         <StatMetric label="Images" value={items.filter((it) => it.type === 'image').length} />
         <StatMetric label="Videos" value={items.filter((it) => it.type === 'video').length} />
-        <StatMetric label="Audio / Docs" value={items.filter((it) => it.type !== 'image' && it.type !== 'video').length} />
+        <StatMetric
+          label="Audio / Docs"
+          value={items.filter((it) => it.type !== 'image' && it.type !== 'video').length}
+        />
       </div>
 
       <AdminToolbar stackOnMobile={false}>
         <div className="flex flex-wrap gap-2">
           {(['image', 'video', 'audio', 'document'] as const).map((t) => (
-            <Button
-              key={t}
-              variant={type === t ? 'primary' : 'ghost'}
-              onClick={() => setType(t)}
-            >
+            <Button key={t} variant={type === t ? 'primary' : 'ghost'} onClick={() => setType(t)}>
               {t[0].toUpperCase() + t.slice(1)}s
             </Button>
           ))}
         </div>
-        <div className="text-xs uppercase tracking-[0.3em] text-slate-400">Showing latest uploads</div>
+        <div className="text-xs uppercase tracking-[0.3em] text-slate-400">
+          Showing latest uploads
+        </div>
       </AdminToolbar>
 
       <AdminSurface>
@@ -95,7 +101,9 @@ export default function MediaLibraryPage() {
             <LoadingSpinner />
           </div>
         ) : error ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</div>
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+            {error}
+          </div>
         ) : items.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-16 text-center text-slate-500">
             <p>No files yet. Upload to populate the library.</p>
@@ -112,12 +120,18 @@ export default function MediaLibraryPage() {
                     {it.type}
                   </div>
                 )}
-                <div className="px-4 py-2 text-sm font-medium text-slate-900 line-clamp-1">{it.name}</div>
+                <div className="px-4 py-2 text-sm font-medium text-slate-900 line-clamp-1">
+                  {it.name}
+                </div>
                 <div className="flex items-center justify-between border-t border-slate-100 px-4 py-2 text-sm">
                   <a href={it.path} target="_blank" className="text-primary-600 hover:underline">
                     Open
                   </a>
-                  <Button variant="ghost" className="text-red-600" onClick={() => onDelete(it.path)}>
+                  <Button
+                    variant="ghost"
+                    className="text-red-600"
+                    onClick={() => onDelete(it.path)}
+                  >
                     Delete
                   </Button>
                 </div>
@@ -129,5 +143,3 @@ export default function MediaLibraryPage() {
     </div>
   );
 }
-
-
