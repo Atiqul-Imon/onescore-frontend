@@ -163,10 +163,10 @@ export default function CreateArticlePage() {
         <form
           id="article-form"
           onSubmit={onSubmit}
-          className="grid grid-cols-1 gap-6 lg:grid-cols-3"
+          className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px] xl:grid-cols-[1fr_420px]"
         >
           {/* Main Content Area */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6">
             {/* Title Section */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
@@ -182,7 +182,7 @@ export default function CreateArticlePage() {
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="Enter a compelling headline..."
-                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3.5 text-lg font-semibold text-slate-900 placeholder-slate-400 transition-all focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3.5 text-lg font-semibold text-slate-900 placeholder-slate-400 transition-all focus:border-primary-500 focus:bg-white focus:outline-none"
               />
               <p className="mt-2 text-xs text-slate-500">
                 A clear, engaging title that captures the essence of your story
@@ -204,7 +204,7 @@ export default function CreateArticlePage() {
                 value={form.summary}
                 onChange={(e) => setForm({ ...form, summary: e.target.value })}
                 placeholder="Write a brief, engaging summary that will appear in previews and search results..."
-                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10 resize-none"
+                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-primary-500 focus:bg-white focus:outline-none resize-none"
               />
               <p className="mt-2 text-xs text-slate-500">
                 Keep it concise (150-200 characters recommended) for better engagement
@@ -219,18 +219,20 @@ export default function CreateArticlePage() {
                   Article Content <span className="text-red-500">*</span>
                 </label>
               </div>
-              <div className="rounded-xl border-2 border-slate-200 bg-slate-50/50 p-1 transition-all focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-primary-500/10">
-                <RichTextEditor
-                  value={form.body}
-                  onChange={(value) => setForm({ ...form, body: value })}
-                  placeholder="Start writing your article here. Use the toolbar to format text, add images, and more..."
-                />
+              <div className="rounded-xl border-2 border-slate-200 bg-slate-50/50 p-2 transition-all focus-within:border-primary-500">
+                <div className="min-h-[600px]">
+                  <RichTextEditor
+                    value={form.body}
+                    onChange={(value) => setForm({ ...form, body: value })}
+                    placeholder="Start writing your article here. Use the toolbar to format text, add images, and more..."
+                  />
+                </div>
               </div>
             </div>
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="space-y-6">
             {/* Article Metadata */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
@@ -247,7 +249,7 @@ export default function CreateArticlePage() {
                   <select
                     value={form.type}
                     onChange={(e) => setForm({ ...form, type: e.target.value })}
-                    className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-900 transition-all focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+                    className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-900 transition-all focus:border-primary-500 focus:bg-white focus:outline-none"
                   >
                     <option value="breaking">🔥 Breaking News</option>
                     <option value="match_report">📊 Match Report</option>
@@ -266,7 +268,7 @@ export default function CreateArticlePage() {
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-900 transition-all focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+                    className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-900 transition-all focus:border-primary-500 focus:bg-white focus:outline-none"
                   >
                     <option value="cricket">🏏 Cricket</option>
                     <option value="football">⚽ Football</option>

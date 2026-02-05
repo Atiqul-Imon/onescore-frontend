@@ -370,7 +370,7 @@ export default function EditArticlePage() {
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="Enter a compelling headline..."
-                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3.5 text-lg font-semibold text-slate-900 placeholder-slate-400 transition-all focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3.5 text-lg font-semibold text-slate-900 placeholder-slate-400 transition-all focus:border-primary-500 focus:bg-white focus:outline-none"
               />
             </div>
 
@@ -389,7 +389,7 @@ export default function EditArticlePage() {
                 value={form.summary}
                 onChange={(e) => setForm({ ...form, summary: e.target.value })}
                 placeholder="Write a brief, engaging summary..."
-                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10 resize-none"
+                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-primary-500 focus:bg-white focus:outline-none resize-none"
               />
             </div>
 
@@ -401,18 +401,20 @@ export default function EditArticlePage() {
                   Article Content <span className="text-red-500">*</span>
                 </label>
               </div>
-              <div className="rounded-xl border-2 border-slate-200 bg-slate-50/50 p-1 transition-all focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-primary-500/10">
-                <RichTextEditor
-                  value={form.body || ''}
-                  onChange={(value) => setForm({ ...form, body: value })}
-                  placeholder="Start writing your article here..."
-                />
+              <div className="rounded-xl border-2 border-slate-200 bg-slate-50/50 p-2 transition-all focus-within:border-primary-500">
+                <div className="min-h-[600px]">
+                  <RichTextEditor
+                    value={form.body || ''}
+                    onChange={(value) => setForm({ ...form, body: value })}
+                    placeholder="Start writing your article here..."
+                  />
+                </div>
               </div>
             </div>
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="space-y-6">
             {/* Article Metadata */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
@@ -429,7 +431,7 @@ export default function EditArticlePage() {
                   <select
                     value={form.type}
                     onChange={(e) => setForm({ ...form, type: e.target.value })}
-                    className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-900 transition-all focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+                    className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-900 transition-all focus:border-primary-500 focus:bg-white focus:outline-none"
                   >
                     <option value="breaking">🔥 Breaking News</option>
                     <option value="match_report">📊 Match Report</option>
@@ -448,7 +450,7 @@ export default function EditArticlePage() {
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-900 transition-all focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+                    className="w-full rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-900 transition-all focus:border-primary-500 focus:bg-white focus:outline-none"
                   >
                     <option value="cricket">🏏 Cricket</option>
                     <option value="football">⚽ Football</option>

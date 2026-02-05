@@ -153,19 +153,20 @@ export function RichTextEditor({
       />
       <style jsx global>{`
         .rich-text-editor .ck-editor {
-          min-height: 400px;
+          min-height: 600px;
         }
         .rich-text-editor .ck-editor__editable {
-          min-height: 400px;
+          min-height: 600px;
           font-size: 16px;
-          line-height: 1.6;
+          line-height: 1.8;
+          padding: 24px;
         }
         .rich-text-editor .ck-editor__editable.ck-focused {
           outline: none;
           box-shadow: none;
         }
         .rich-text-editor .ck-content {
-          min-height: 400px;
+          min-height: 600px;
         }
         .rich-text-editor .ck-content h1 {
           font-size: 2em;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Heart, MessageCircle } from 'lucide-react';
 
 interface ArticleReactionsProps {
   articleId: string;
@@ -9,7 +9,11 @@ interface ArticleReactionsProps {
   initialDislikes: number;
 }
 
-export function ArticleReactions({ articleId, initialLikes, initialDislikes }: ArticleReactionsProps) {
+export function ArticleReactions({
+  articleId,
+  initialLikes,
+  initialDislikes,
+}: ArticleReactionsProps) {
   const [likes, setLikes] = useState(initialLikes);
   const [dislikes, setDislikes] = useState(initialDislikes);
   const [reacted, setReacted] = useState<'like' | 'dislike' | null>(null);
@@ -20,7 +24,9 @@ export function ArticleReactions({ articleId, initialLikes, initialDislikes }: A
     setLoading(true);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/v1/news/articles/${articleId}/like`, { method: 'POST' });
+      const res = await fetch(`${base}/api/v1/news/articles/${articleId}/like`, {
+        method: 'POST',
+      });
       if (res.ok) {
         const json = await res.json();
         setLikes(json.data.likes);
@@ -39,7 +45,9 @@ export function ArticleReactions({ articleId, initialLikes, initialDislikes }: A
     setLoading(true);
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${base}/api/v1/news/articles/${articleId}/dislike`, { method: 'POST' });
+      const res = await fetch(`${base}/api/v1/news/articles/${articleId}/dislike`, {
+        method: 'POST',
+      });
       if (res.ok) {
         const json = await res.json();
         setLikes(json.data.likes);
@@ -54,32 +62,46 @@ export function ArticleReactions({ articleId, initialLikes, initialDislikes }: A
   }
 
   return (
-    <div className="flex items-center gap-4 py-6 border-t border-gray-200">
-      <button
-        onClick={handleLike}
-        disabled={loading}
-        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg transition-all font-medium ${
-          reacted === 'like' 
-            ? 'bg-primary-100 text-primary-700 border border-primary-200' 
-            : 'hover:bg-gray-100 text-gray-700 border border-transparent hover:border-gray-200'
-        }`}
-      >
-        <ThumbsUp className="w-5 h-5" />
-        <span>{likes}</span>
-      </button>
-      <button
-        onClick={handleDislike}
-        disabled={loading}
-        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg transition-all font-medium ${
-          reacted === 'dislike' 
-            ? 'bg-red-100 text-red-700 border border-red-200' 
-            : 'hover:bg-gray-100 text-gray-700 border border-transparent hover:border-gray-200'
-        }`}
-      >
-        <ThumbsDown className="w-5 h-5" />
-        <span>{dislikes}</span>
-      </button>
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h3 className="mb-4 text-sm font-bold uppercase tracking-wide text-slate-900">
+        What do you think?
+      </h3>
+      <div className="flex items-center gap-4">
+        <button
+          onClick={handleLike}
+          disabled={loading}
+          className={`group flex flex-1 items-center justify-center gap-3 rounded-xl border-2 px-6 py-4 font-semibold transition-all ${
+            reacted === 'like'
+              ? 'border-primary-500 bg-primary-50 text-primary-700 shadow-md'
+              : 'border-slate-200 bg-white text-slate-700 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700'
+          } disabled:cursor-not-allowed disabled:opacity-50`}
+        >
+          <ThumbsUp
+            className={`h-5 w-5 transition-transform group-hover:scale-110 ${
+              reacted === 'like' ? 'text-primary-600' : ''
+            }`}
+          />
+          <span className="text-lg">{likes}</span>
+          <span className="hidden sm:inline">Like</span>
+        </button>
+        <button
+          onClick={handleDislike}
+          disabled={loading}
+          className={`group flex flex-1 items-center justify-center gap-3 rounded-xl border-2 px-6 py-4 font-semibold transition-all ${
+            reacted === 'dislike'
+              ? 'border-red-500 bg-red-50 text-red-700 shadow-md'
+              : 'border-slate-200 bg-white text-slate-700 hover:border-red-300 hover:bg-red-50 hover:text-red-700'
+          } disabled:cursor-not-allowed disabled:opacity-50`}
+        >
+          <ThumbsDown
+            className={`h-5 w-5 transition-transform group-hover:scale-110 ${
+              reacted === 'dislike' ? 'text-red-600' : ''
+            }`}
+          />
+          <span className="text-lg">{dislikes}</span>
+          <span className="hidden sm:inline">Dislike</span>
+        </button>
+      </div>
     </div>
   );
 }
-
