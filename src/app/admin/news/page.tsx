@@ -13,7 +13,7 @@ export default function AdminNewsList() {
   const pathname = usePathname();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const state = searchParams.get('state') || 'draft';
+  const state = searchParams.get('state') || 'all';
 
   useEffect(() => {
     async function load() {
@@ -21,22 +21,49 @@ export default function AdminNewsList() {
       try {
         const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
         const qs = new URLSearchParams();
-        if (state) qs.set('state', state);
-        if (searchParams.get('type')) qs.set('type', searchParams.get('type')!);
-        if (searchParams.get('category')) qs.set('category', searchParams.get('category')!);
-        qs.set('limit', '30');
+
+        // Set state filter - use 'all' to get all states, or specific state
+        if (state && state !== 'all') {
+          qs.set('state', state);
+        }
+
+        if (searchParams.get('type')) {
+          qs.set('type', searchParams.get('type')!);
+        }
+        if (searchParams.get('category')) {
+          qs.set('category', searchParams.get('category')!);
+        }
+        if (searchParams.get('search')) {
+          qs.set('search', searchParams.get('search')!);
+        }
+
+        qs.set('limit', '50'); // Increased limit for better coverage
+        qs.set('page', searchParams.get('page') || '1');
+
         const res = await fetch(`${base}/api/v1/news?${qs.toString()}`, {
           cache: 'no-store',
           headers: getAuthHeaders(),
         });
-        if (res.ok) {
-          const data = await res.json();
-          setItems(data?.data?.items || []);
+
+        if (!res.ok) {
+          console.error('Failed to load articles:', res.status, res.statusText);
+          setItems([]);
+          return;
+        }
+
+        const data = await res.json();
+        const articles = data?.data?.items || data?.items || [];
+
+        // Ensure we have valid article data
+        if (Array.isArray(articles)) {
+          setItems(articles);
         } else {
+          console.warn('Invalid articles data format:', data);
           setItems([]);
         }
       } catch (e) {
-        console.error(e);
+        console.error('Error loading articles:', e);
+        setItems([]);
       } finally {
         setLoading(false);
       }
@@ -45,9 +72,18 @@ export default function AdminNewsList() {
   }, [state, searchParams]);
 
   const counts = useMemo(() => {
-    const tally: Record<string, number> = {};
+    const tally: Record<string, number> = {
+      draft: 0,
+      in_review: 0,
+      scheduled: 0,
+      published: 0,
+      archived: 0,
+    };
     items.forEach((item) => {
-      tally[item.state] = (tally[item.state] || 0) + 1;
+      const itemState = item?.state || 'draft';
+      if (tally.hasOwnProperty(itemState)) {
+        tally[itemState] = (tally[itemState] || 0) + 1;
+      }
     });
     return tally;
   }, [items]);
@@ -77,6 +113,7 @@ export default function AdminNewsList() {
               className="bg-transparent text-sm font-medium text-slate-900 outline-none"
             >
               {[
+                { value: 'all', label: 'All States' },
                 { value: 'draft', label: 'Draft' },
                 { value: 'in_review', label: 'In Review' },
                 { value: 'scheduled', label: 'Scheduled' },
@@ -160,47 +197,85 @@ export default function AdminNewsList() {
                   </tr>
                 ) : items.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-6 text-center text-slate-500">
-                      No stories in this lane.
+                    <td colSpan={5} className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center gap-3">
+                        <p className="text-slate-500 font-medium">No articles found</p>
+                        <p className="text-xs text-slate-400">
+                          {state === 'all'
+                            ? 'No articles available. Create your first article to get started.'
+                            : `No articles with "${state.replace('_', ' ')}" status.`}
+                        </p>
+                        <Link
+                          href="/admin/news/create"
+                          className="mt-2 inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+                        >
+                          <PenSquare className="h-4 w-4" />
+                          Create Article
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ) : (
-                  items.map((article) => (
-                    <tr key={article._id} className="hover:bg-slate-50">
-                      <td className="px-6 py-4">
-                        <p className="font-semibold text-slate-900">{article.title}</p>
-                        <p className="text-xs text-slate-500">
-                          {article.author?.name || 'No author'} ·{' '}
-                          {article.updatedAt ? new Date(article.updatedAt).toLocaleString() : '—'}
-                        </p>
-                      </td>
-                      <td className="px-6 py-4 text-slate-600">
-                        {article.type?.replace('_', ' ') || '—'}
-                      </td>
-                      <td className="px-6 py-4 text-slate-600 capitalize">{article.category}</td>
-                      <td className="px-6 py-4 text-slate-600">
-                        {article.updatedAt ? new Date(article.updatedAt).toLocaleDateString() : '—'}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link
-                            href={`/admin/news/${article._id}/edit`}
-                            prefetch={false}
-                            className="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-slate-300"
-                          >
-                            Edit
-                          </Link>
-                          <Link
-                            href={`/${article.slug}`}
-                            target="_blank"
-                            className="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-slate-300"
-                          >
-                            View
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                  items
+                    .map((article) => {
+                      if (!article || !article._id) {
+                        return null; // Skip invalid articles
+                      }
+                      return (
+                        <tr key={article._id} className="hover:bg-slate-50 transition-colors">
+                          <td className="px-6 py-4">
+                            <p className="font-semibold text-slate-900 line-clamp-1">
+                              {article.title || 'Untitled'}
+                            </p>
+                            <p className="text-xs text-slate-500 mt-1">
+                              {article.author?.name || article.author?.email || 'No author'} ·{' '}
+                              {article.updatedAt
+                                ? new Date(article.updatedAt).toLocaleString()
+                                : article.createdAt
+                                  ? new Date(article.createdAt).toLocaleString()
+                                  : '—'}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4 text-slate-600">
+                            <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium">
+                              {article.type?.replace('_', ' ') || '—'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-slate-600 capitalize">
+                            <span className="inline-flex items-center rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800">
+                              {article.category || '—'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-slate-600">
+                            <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+                              {article.state || 'draft'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-end gap-2">
+                              <Link
+                                href={`/admin/news/${article._id}/edit`}
+                                prefetch={false}
+                                className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-primary-300 hover:bg-primary-50 transition-colors"
+                              >
+                                Edit
+                              </Link>
+                              {article.slug && (
+                                <Link
+                                  href={`/news/${article.slug.split('/').slice(-1)[0]}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-primary-300 hover:bg-primary-50 transition-colors"
+                                >
+                                  View
+                                </Link>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                    .filter(Boolean)
                 )}
               </tbody>
             </table>
@@ -244,5 +319,3 @@ export default function AdminNewsList() {
     </div>
   );
 }
-
-
