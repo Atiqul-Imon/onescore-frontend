@@ -851,9 +851,7 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                               ? 'border-l-red-500 bg-red-50/30'
                               : isBoundary
                                 ? 'border-l-primary-500 bg-primary-50/30'
-                                : isInHouse
-                                  ? 'border-l-amber-500 bg-amber-50/20'
-                                  : 'border-l-transparent hover:border-l-primary-400'
+                                : 'border-l-transparent hover:border-l-primary-400'
                           }`}
                         >
                           <div className="flex items-start gap-3 sm:gap-4">
@@ -876,17 +874,6 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
-                                {isInHouse && (
-                                  <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300 flex items-center gap-1">
-                                    🏠 In-House
-                                    {commentaryType === 'pre-ball' && (
-                                      <span className="text-[10px]">Pre-Ball</span>
-                                    )}
-                                    {commentaryType === 'post-ball' && (
-                                      <span className="text-[10px]">Post-Ball</span>
-                                    )}
-                                  </span>
-                                )}
                                 {entry.runs !== undefined && entry.runs > 0 && (
                                   <span
                                     className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-xs font-bold border ${
@@ -909,7 +896,7 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                               <p className="text-gray-800 leading-relaxed font-medium text-sm sm:text-base">
                                 {entry.commentary}
                               </p>
-                              {(entry.batsman || entry.bowler || entry.authorName) && (
+                              {(entry.batsman || entry.bowler) && (
                                 <div className="mt-2 text-[10px] sm:text-xs text-gray-600 font-medium flex flex-wrap gap-x-2">
                                   {entry.batsman && (
                                     <span className="text-secondary-700">
@@ -923,16 +910,6 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                                     <span className="text-secondary-700">
                                       Bowling: {entry.bowler}
                                     </span>
-                                  )}
-                                  {entry.authorName && (
-                                    <>
-                                      {(entry.batsman || entry.bowler) && (
-                                        <span className="text-gray-400">•</span>
-                                      )}
-                                      <span className="text-amber-700 font-semibold">
-                                        — {entry.authorName}
-                                      </span>
-                                    </>
                                   )}
                                 </div>
                               )}
@@ -980,9 +957,7 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                               ? 'border-l-red-500 bg-red-50/30'
                               : isBoundary
                                 ? 'border-l-primary-500 bg-primary-50/30'
-                                : isInHouse
-                                  ? 'border-l-amber-500 bg-amber-50/20'
-                                  : 'border-l-transparent hover:border-l-primary-400'
+                                : 'border-l-transparent hover:border-l-primary-400'
                           }`}
                         >
                           <div className="flex items-start gap-3 sm:gap-4">
@@ -1005,17 +980,6 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
-                                {isInHouse && (
-                                  <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300 flex items-center gap-1">
-                                    🏠 In-House
-                                    {commentaryType === 'pre-ball' && (
-                                      <span className="text-[10px]">Pre-Ball</span>
-                                    )}
-                                    {commentaryType === 'post-ball' && (
-                                      <span className="text-[10px]">Post-Ball</span>
-                                    )}
-                                  </span>
-                                )}
                                 {entry.runs !== undefined && entry.runs > 0 && (
                                   <span
                                     className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-xs font-bold border ${
@@ -1038,7 +1002,7 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                               <p className="text-gray-800 leading-relaxed font-medium text-sm sm:text-base">
                                 {entry.commentary}
                               </p>
-                              {(entry.batsman || entry.bowler || entry.authorName) && (
+                              {(entry.batsman || entry.bowler) && (
                                 <div className="mt-2 text-[10px] sm:text-xs text-gray-600 font-medium flex flex-wrap gap-x-2">
                                   {entry.batsman && (
                                     <span className="text-secondary-700">
@@ -1052,16 +1016,6 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                                     <span className="text-secondary-700">
                                       Bowling: {entry.bowler}
                                     </span>
-                                  )}
-                                  {entry.authorName && (
-                                    <>
-                                      {(entry.batsman || entry.bowler) && (
-                                        <span className="text-gray-400">•</span>
-                                      )}
-                                      <span className="text-amber-700 font-semibold">
-                                        — {entry.authorName}
-                                      </span>
-                                    </>
                                   )}
                                 </div>
                               )}
