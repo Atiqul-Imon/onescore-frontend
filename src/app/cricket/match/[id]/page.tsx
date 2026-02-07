@@ -309,10 +309,13 @@ export default function MatchDetailPage() {
     // Initial fetch
     fetchMatchDetails();
 
-    // Set up WebSocket subscription for live matches (WebSocket only, no polling)
+    // Set up WebSocket subscription for live matches
+    let handleMatchUpdate: ((updatedMatch: MatchDetails) => void) | null = null;
+    let connectHandler: (() => void) | null = null;
+
     if (socket) {
       // Listen for match updates from WebSocket
-      const handleMatchUpdate = (updatedMatch: MatchDetails) => {
+      handleMatchUpdate = (updatedMatch: MatchDetails) => {
         console.log('[MatchDetail] WebSocket update received:', updatedMatch);
         if (updatedMatch.matchId === matchId) {
           setMatch(updatedMatch);
@@ -322,8 +325,6 @@ export default function MatchDetailPage() {
       socket.on('match-update', handleMatchUpdate);
 
       // Subscribe to match updates (subscribe immediately if connected, or wait for connection)
-      let connectHandler: (() => void) | null = null;
-
       if (isConnected) {
         socket.emit('subscribe:match', { matchId, sport: 'cricket' });
         console.log('[MatchDetail] Subscribed to WebSocket for match:', matchId);
@@ -335,21 +336,73 @@ export default function MatchDetailPage() {
         };
         socket.on('connect', connectHandler);
       }
-
-      // Cleanup on unmount
-      return () => {
-        socket.off('match-update', handleMatchUpdate);
-        if (connectHandler) {
-          socket.off('connect', connectHandler);
-        }
-        if (isConnected) {
-          socket.emit('unsubscribe:match', { matchId, sport: 'cricket' });
-        }
-      };
-    } else {
-      // WebSocket will be available once SocketContext initializes
-      // No action needed - SocketContext handles connection
     }
+
+    // Set up auto-refresh polling for live matches (fallback if WebSocket fails)
+    // Refresh every 30 seconds for live matches
+    let refreshInterval: NodeJS.Timeout | null = null;
+
+    const checkAndRefresh = async () => {
+      try {
+        const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        const isLocalMatchId = matchId.startsWith('LOCAL-');
+
+        let response;
+        if (isLocalMatchId) {
+          response = await fetch(`${base}/api/v1/cricket/local/matches/${matchId}`, {
+            cache: 'no-store',
+          });
+        } else {
+          response = await fetch(`${base}/api/v1/cricket/matches/${matchId}`, {
+            cache: 'no-store',
+          });
+        }
+
+        if (response.ok) {
+          const json = await response.json();
+          const updatedMatch = json.data || json;
+          if (updatedMatch && updatedMatch.matchId === matchId) {
+            // Only update if match is live (don't refresh completed matches)
+            if (updatedMatch.status === 'live') {
+              setMatch(updatedMatch);
+              console.log('[MatchDetail] Auto-refresh: Match data updated');
+            } else {
+              // Match is no longer live, stop refreshing
+              if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[MatchDetail] Auto-refresh error:', err);
+      }
+    };
+
+    // Start auto-refresh after initial load
+    // Wait 5 seconds after mount, then refresh every 30 seconds
+    // Only refresh if match is live (checked inside checkAndRefresh)
+    const startRefresh = setTimeout(() => {
+      refreshInterval = setInterval(checkAndRefresh, 30000); // 30 seconds
+    }, 5000);
+
+    // Cleanup on unmount
+    return () => {
+      if (socket && handleMatchUpdate) {
+        socket.off('match-update', handleMatchUpdate);
+      }
+      if (connectHandler && socket) {
+        socket.off('connect', connectHandler);
+      }
+      if (socket && isConnected) {
+        socket.emit('unsubscribe:match', { matchId, sport: 'cricket' });
+      }
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+      clearTimeout(startRefresh);
+    };
   }, [matchId, socket, isConnected]);
 
   if (loading) {
