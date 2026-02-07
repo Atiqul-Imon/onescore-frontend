@@ -658,6 +658,14 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
       const json = await response.json();
 
       if (json.success && json.data) {
+        // Debug: Log in-house commentary count
+        const allEntries = json.data.all || [];
+        const inHouseCount = allEntries.filter((e: any) => e.source === 'in-house').length;
+        console.log(
+          `[LiveScoreView] Total entries: ${allEntries.length}, In-house: ${inHouseCount}, Sources:`,
+          json.data.sources
+        );
+
         // Handle new structure with innings separated
         if (json.data.firstInnings !== undefined && json.data.secondInnings !== undefined) {
           // New structure: { firstInnings: [], secondInnings: [], all: [] }
