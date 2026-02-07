@@ -343,10 +343,29 @@ export default function CommentaryManagementDetailPage() {
       }
       // Open new form with validated values
       const validatedInnings = Math.max(1, Math.min(2, entry.innings || 1));
-      const validatedBall =
-        entry.ball !== null && entry.ball !== undefined
-          ? Math.max(0, Math.min(5, entry.ball))
-          : null;
+      const currentBall = entry.ballNumber ?? entry.ball ?? 0;
+      const currentOver = entry.over || 0;
+
+      let targetBall: number;
+      let targetOver: number;
+
+      if (type === 'pre-ball') {
+        // Pre-ball: For the NEXT ball (not current)
+        // If current is 18.5, pre-ball should be for 18.6
+        // If current is 18.6, pre-ball should be for 19.0
+        if (currentBall >= 5) {
+          // Move to next over
+          targetOver = currentOver + 1;
+          targetBall = 0;
+        } else {
+          targetOver = currentOver;
+          targetBall = currentBall + 1;
+        }
+      } else {
+        // Post-ball: For the CURRENT ball that was just played
+        targetOver = currentOver;
+        targetBall = currentBall;
+      }
 
       // Auto-calculate order for post-ball commentary
       const initialOrder = type === 'post-ball' ? getNextPostBallOrder(entry) : 0;
@@ -357,8 +376,8 @@ export default function CommentaryManagementDetailPage() {
           type,
           commentary: '',
           innings: validatedInnings,
-          over: Math.max(0, entry.over || 0),
-          ball: validatedBall,
+          over: targetOver,
+          ball: targetBall,
           order: initialOrder,
           submitting: false,
         },
@@ -621,13 +640,14 @@ export default function CommentaryManagementDetailPage() {
                           {isBallCommentary && (
                             <div className="relative">
                               {preBallForm ? (
-                                <div className="ml-8 p-4 bg-gradient-to-r from-amber-50 to-amber-100/50 border-2 border-amber-300 rounded-xl shadow-sm">
+                                <div className="ml-8 p-4 bg-gradient-to-r from-blue-50 to-blue-100/50 border-2 border-blue-300 rounded-xl shadow-sm">
                                   <div className="flex items-center gap-2 mb-3">
-                                    <span className="px-2.5 py-1 bg-amber-500 text-white rounded-lg text-xs font-bold">
-                                      Add Pre-Ball Commentary
+                                    <span className="px-2.5 py-1 bg-blue-500 text-white rounded-lg text-xs font-bold">
+                                      Pre-Ball Commentary
                                     </span>
-                                    <span className="text-xs text-slate-600">
-                                      Over {entry.over} • Before Ball {ballNum}
+                                    <span className="text-xs text-slate-600 font-medium">
+                                      For Over {preBallForm.over}.{preBallForm.ball} (before this
+                                      ball is played)
                                     </span>
                                   </div>
                                   <textarea
@@ -640,8 +660,8 @@ export default function CommentaryManagementDetailPage() {
                                     }
                                     rows={3}
                                     maxLength={1000}
-                                    placeholder="Add commentary before this ball..."
-                                    className="w-full px-4 py-2.5 border-2 border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none text-sm"
+                                    placeholder="Add commentary that will appear before this ball is played..."
+                                    className="w-full px-4 py-2.5 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm"
                                   />
                                   <div className="flex items-center justify-between mt-3">
                                     <span className="text-xs text-slate-500">
@@ -655,7 +675,7 @@ export default function CommentaryManagementDetailPage() {
                                         disabled={
                                           !preBallForm.commentary.trim() || preBallForm.submitting
                                         }
-                                        className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
                                       >
                                         {preBallForm.submitting ? (
                                           <>
@@ -687,7 +707,7 @@ export default function CommentaryManagementDetailPage() {
                               ) : (
                                 <button
                                   onClick={() => toggleInlineForm(entryKey, 'pre-ball', entry)}
-                                  className="ml-8 px-3 py-1.5 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 transition-colors flex items-center gap-1.5"
+                                  className="ml-8 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-300 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1.5"
                                 >
                                   <Plus className="h-3 w-3" />
                                   Add Pre-Ball Commentary
@@ -703,12 +723,9 @@ export default function CommentaryManagementDetailPage() {
                                 <div className="flex items-center gap-2 mb-3 flex-wrap">
                                   <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold">
                                     Over {entry.over}
-                                    {commentaryType === 'pre-ball' ? (
-                                      <span className="text-xs text-slate-500"> (pre)</span>
-                                    ) : commentaryType === 'post-ball' ? (
-                                      <span className="text-xs text-slate-500">
-                                        .{ballNum} (post)
-                                      </span>
+                                    {commentaryType === 'pre-ball' ||
+                                    commentaryType === 'post-ball' ? (
+                                      <span>.{ballNum}</span>
                                     ) : (
                                       <span>.{ballNum}</span>
                                     )}
@@ -810,10 +827,11 @@ export default function CommentaryManagementDetailPage() {
                                 <div className="ml-8 p-4 bg-gradient-to-r from-emerald-50 to-emerald-100/50 border-2 border-emerald-300 rounded-xl shadow-sm">
                                   <div className="flex items-center gap-2 mb-3">
                                     <span className="px-2.5 py-1 bg-emerald-500 text-white rounded-lg text-xs font-bold">
-                                      Add Post-Ball Commentary
+                                      Post-Ball Commentary
                                     </span>
-                                    <span className="text-xs text-slate-600">
-                                      Over {entry.over} • After Ball {ballNum}
+                                    <span className="text-xs text-slate-600 font-medium">
+                                      For Over {postBallForm.over}.{postBallForm.ball} (after this
+                                      ball was played)
                                     </span>
                                   </div>
                                   <div className="mb-3">
@@ -854,7 +872,7 @@ export default function CommentaryManagementDetailPage() {
                                     }
                                     rows={3}
                                     maxLength={1000}
-                                    placeholder="Add commentary after this ball..."
+                                    placeholder="Add commentary that will appear after this ball was played..."
                                     className="w-full px-4 py-2.5 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none text-sm"
                                   />
                                   <div className="flex items-center justify-between mt-3">

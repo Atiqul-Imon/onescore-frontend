@@ -192,91 +192,104 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
         ) : (
           <div className="divide-y divide-gray-100">
             <AnimatePresence>
-              {(filterOver !== null
-                ? commentary.filter((c) => c.over === filterOver)
-                : commentary
-              ).map((entry, index) => {
-                const isBoundary = entry.runs && (entry.runs === 4 || entry.runs === 6);
-                const isWicket = entry.wickets && entry.wickets > 0;
-                const isInHouse = entry.source === 'in-house';
-                const ballNum = entry.ballNumber ?? entry.ball ?? 0;
-                const commentaryType = entry.commentaryType || 'ball';
+              {(() => {
+                const filteredCommentary =
+                  filterOver !== null
+                    ? commentary.filter((c) => c.over === filterOver)
+                    : commentary;
 
-                return (
-                  <motion.div
-                    key={`${entry.over}.${ballNum}-${commentaryType}-${index}`}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className={`p-3 sm:p-4 sm:p-5 hover:bg-primary-50/50 transition-colors border-l-4 ${
-                      isWicket
-                        ? 'border-l-red-500 bg-red-50/30'
-                        : isBoundary
-                          ? 'border-l-primary-500 bg-primary-50/30'
-                          : 'border-l-transparent hover:border-l-primary-400'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3 sm:gap-4">
-                      <div className="flex-shrink-0 w-16 sm:w-20 text-right">
-                        <div className="text-sm sm:text-base font-bold text-secondary-900 tabular-nums">
-                          {entry.over}
-                          {commentaryType === 'pre-ball' ? (
-                            <span className="text-xs text-gray-500"> (pre)</span>
-                          ) : commentaryType === 'post-ball' ? (
-                            <span className="text-xs text-gray-500">.{ballNum} (post)</span>
+                return filteredCommentary.map((entry, index) => {
+                  const isBoundary = entry.runs && (entry.runs === 4 || entry.runs === 6);
+                  const isWicket = entry.wickets && entry.wickets > 0;
+                  const isInHouse = entry.source === 'in-house';
+                  const ballNum = entry.ballNumber ?? entry.ball ?? 0;
+                  const commentaryType = entry.commentaryType || 'ball';
+
+                  // Check if this is the first entry for this over.ball combination
+                  const prevEntry = index > 0 ? filteredCommentary[index - 1] : null;
+                  const prevBallNum = prevEntry
+                    ? (prevEntry.ballNumber ?? prevEntry.ball ?? 0)
+                    : null;
+                  const showOverBall =
+                    !prevEntry || prevEntry.over !== entry.over || prevBallNum !== ballNum;
+
+                  return (
+                    <motion.div
+                      key={`${entry.over}.${ballNum}-${commentaryType}-${index}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={`p-3 sm:p-4 sm:p-5 hover:bg-primary-50/50 transition-colors border-l-4 ${
+                        isWicket
+                          ? 'border-l-red-500 bg-red-50/30'
+                          : isBoundary
+                            ? 'border-l-primary-500 bg-primary-50/30'
+                            : 'border-l-transparent hover:border-l-primary-400'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="flex-shrink-0 w-16 sm:w-20 text-right">
+                          {showOverBall ? (
+                            <>
+                              <div className="text-sm sm:text-base font-bold text-secondary-900 tabular-nums">
+                                {entry.over}.{ballNum}
+                              </div>
+                              {entry.timestamp && (
+                                <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 font-medium">
+                                  {formatTime(entry.timestamp)}
+                                </div>
+                              )}
+                            </>
                           ) : (
-                            <span>.{ballNum}</span>
+                            <div className="text-sm sm:text-base text-transparent">
+                              {/* Spacer to maintain alignment */}
+                            </div>
                           )}
                         </div>
-                        {entry.timestamp && (
-                          <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 font-medium">
-                            {formatTime(entry.timestamp)}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
+                            {entry.runs !== undefined && entry.runs > 0 && (
+                              <span
+                                className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-xs font-bold border ${
+                                  entry.runs === 6
+                                    ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                                    : entry.runs === 4
+                                      ? 'bg-blue-100 text-blue-800 border-blue-300'
+                                      : 'bg-primary-100 text-primary-800 border-primary-200'
+                                }`}
+                              >
+                                {entry.runs} {entry.runs === 1 ? 'run' : 'runs'}
+                              </span>
+                            )}
+                            {isWicket && (
+                              <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-red-100 text-red-800 text-xs font-bold border border-red-300 animate-pulse">
+                                🎯 Wicket!
+                              </span>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
-                          {entry.runs !== undefined && entry.runs > 0 && (
-                            <span
-                              className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg text-xs font-bold border ${
-                                entry.runs === 6
-                                  ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
-                                  : entry.runs === 4
-                                    ? 'bg-blue-100 text-blue-800 border-blue-300'
-                                    : 'bg-primary-100 text-primary-800 border-primary-200'
-                              }`}
-                            >
-                              {entry.runs} {entry.runs === 1 ? 'run' : 'runs'}
-                            </span>
-                          )}
-                          {isWicket && (
-                            <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-red-100 text-red-800 text-xs font-bold border border-red-300 animate-pulse">
-                              🎯 Wicket!
-                            </span>
+                          <p className="text-gray-800 leading-relaxed font-medium text-sm sm:text-base">
+                            {entry.commentary}
+                          </p>
+                          {(entry.batsman || entry.bowler) && (
+                            <div className="mt-2 text-[10px] sm:text-xs text-gray-600 font-medium flex flex-wrap gap-x-2">
+                              {entry.batsman && (
+                                <span className="text-secondary-700">Batting: {entry.batsman}</span>
+                              )}
+                              {entry.batsman && entry.bowler && (
+                                <span className="text-gray-400">•</span>
+                              )}
+                              {entry.bowler && (
+                                <span className="text-secondary-700">Bowling: {entry.bowler}</span>
+                              )}
+                            </div>
                           )}
                         </div>
-                        <p className="text-gray-800 leading-relaxed font-medium text-sm sm:text-base">
-                          {entry.commentary}
-                        </p>
-                        {(entry.batsman || entry.bowler) && (
-                          <div className="mt-2 text-[10px] sm:text-xs text-gray-600 font-medium flex flex-wrap gap-x-2">
-                            {entry.batsman && (
-                              <span className="text-secondary-700">Batting: {entry.batsman}</span>
-                            )}
-                            {entry.batsman && entry.bowler && (
-                              <span className="text-gray-400">•</span>
-                            )}
-                            {entry.bowler && (
-                              <span className="text-secondary-700">Bowling: {entry.bowler}</span>
-                            )}
-                          </div>
-                        )}
                       </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
+                    </motion.div>
+                  );
+                });
+              })()}
             </AnimatePresence>
             <div ref={commentaryEndRef} />
           </div>
