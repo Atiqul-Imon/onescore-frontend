@@ -253,12 +253,10 @@ export default function CommentaryManagementDetailPage() {
       // Validate and ensure proper values
       const innings = Math.max(1, Math.min(2, entry.innings || 1)); // Clamp between 1 and 2
       const over = Math.max(0, entry.over || 0);
-      let ball: number | null = null;
 
-      if (type === 'post-ball') {
-        const ballValue = entry.ballNumber ?? entry.ball ?? 0;
-        ball = Math.max(0, Math.min(5, ballValue)); // Clamp between 0 and 5
-      }
+      // For both pre-ball and post-ball, use the ball number from the entry
+      const ballValue = entry.ballNumber ?? entry.ball ?? 0;
+      const ball = Math.max(0, Math.min(5, ballValue)); // Clamp between 0 and 5
 
       const commentaryData = {
         innings,
@@ -699,27 +697,10 @@ export default function CommentaryManagementDetailPage() {
                           )}
 
                           {/* Main Commentary Entry */}
-                          <div
-                            className={`p-5 border-2 rounded-xl transition-all ${
-                              isInHouse
-                                ? 'border-amber-400 bg-gradient-to-r from-amber-50 to-amber-100/30 shadow-md'
-                                : 'border-slate-200 bg-white shadow-sm hover:shadow-md'
-                            }`}
-                          >
+                          <div className="p-5 border-2 border-slate-200 bg-white rounded-xl shadow-sm hover:shadow-md transition-all">
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-3 flex-wrap">
-                                  {isInHouse ? (
-                                    <span className="px-3 py-1 bg-amber-500 text-white rounded-lg text-xs font-bold shadow-sm">
-                                      🏠 In-House
-                                      {commentaryType === 'pre-ball' && ' • Pre-Ball'}
-                                      {commentaryType === 'post-ball' && ' • Post-Ball'}
-                                    </span>
-                                  ) : (
-                                    <span className="px-3 py-1 bg-blue-500 text-white rounded-lg text-xs font-bold shadow-sm">
-                                      📡 SportsMonk
-                                    </span>
-                                  )}
                                   <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold">
                                     Over {entry.over}
                                     {commentaryType === 'pre-ball' ? (
@@ -740,11 +721,6 @@ export default function CommentaryManagementDetailPage() {
                                   {entry.wickets && entry.wickets > 0 && (
                                     <span className="px-2.5 py-1 bg-red-500 text-white rounded-lg text-xs font-bold">
                                       Wicket!
-                                    </span>
-                                  )}
-                                  {entry.authorName && (
-                                    <span className="text-xs text-slate-500">
-                                      by {entry.authorName}
                                     </span>
                                   )}
                                 </div>
@@ -987,24 +963,15 @@ export default function CommentaryManagementDetailPage() {
                     return (
                       <div
                         key={entry._id || entry.id}
-                        className="p-5 border-2 border-amber-400 bg-gradient-to-r from-amber-50 to-amber-100/30 rounded-xl shadow-sm hover:shadow-md transition-all"
+                        className="p-5 border-2 border-slate-200 bg-white rounded-xl shadow-sm hover:shadow-md transition-all"
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="px-2 py-1 bg-primary-100 text-primary-800 rounded text-xs font-semibold">
-                                {entry.commentaryType === 'pre-ball' && 'Pre-Ball'}
-                                {entry.commentaryType === 'ball' && 'Ball'}
-                                {entry.commentaryType === 'post-ball' && 'Post-Ball'}
+                              <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm font-semibold">
+                                Over {entry.over}
+                                {entry.ball !== null && `.${entry.ball}`}
                               </span>
-                              <span className="text-sm text-slate-600">
-                                Innings {entry.innings} • Over {entry.over}
-                                {entry.ball !== null && ` • Ball ${entry.ball}`}
-                                {entry.commentaryType === 'post-ball' &&
-                                  entry.order > 0 &&
-                                  ` • Order ${entry.order}`}
-                              </span>
-                              <span className="text-xs text-slate-400">by {entry.authorName}</span>
                             </div>
                             {isEditing ? (
                               <div className="space-y-2">
