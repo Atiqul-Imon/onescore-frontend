@@ -641,9 +641,12 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
       }
 
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${base}/api/v1/cricket/matches/${matchId}/commentary`, {
-        cache: 'no-store',
-      });
+      const response = await fetch(
+        `${base}/api/v1/cricket/matches/${matchId}/commentary?merge=true`,
+        {
+          cache: 'no-store',
+        }
+      );
 
       if (!response.ok) {
         if (!isAutoRefresh) {
