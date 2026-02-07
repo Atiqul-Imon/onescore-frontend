@@ -66,6 +66,12 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
           entries = json.data;
         }
 
+        // Debug: Log in-house commentary count
+        const inHouseCount = entries.filter((e: any) => e.source === 'in-house').length;
+        console.log(
+          `[MatchCommentary] Total entries: ${entries.length}, In-house: ${inHouseCount}`
+        );
+
         // Sort by over and ball number (newest first)
         const sorted = entries.sort((a, b) => {
           if (a.over !== b.over) return b.over - a.over;
