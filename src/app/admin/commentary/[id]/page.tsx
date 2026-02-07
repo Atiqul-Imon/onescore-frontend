@@ -249,13 +249,24 @@ export default function CommentaryManagementDetailPage() {
 
     try {
       const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+      // Validate and ensure proper values
+      const innings = Math.max(1, Math.min(2, entry.innings || 1)); // Clamp between 1 and 2
+      const over = Math.max(0, entry.over || 0);
+      let ball: number | null = null;
+
+      if (type === 'post-ball') {
+        const ballValue = entry.ballNumber ?? entry.ball ?? 0;
+        ball = Math.max(0, Math.min(5, ballValue)); // Clamp between 0 and 5
+      }
+
       const commentaryData = {
-        innings: entry.innings,
-        over: entry.over,
-        ball: type === 'pre-ball' ? null : entry.ball,
+        innings,
+        over,
+        ball,
         commentaryType: type,
         commentary: form.commentary,
-        order: type === 'post-ball' ? form.order : 0,
+        order: type === 'post-ball' ? Math.max(0, form.order || 0) : 0,
       };
 
       const response = await fetch(`${base}/api/v1/cricket/matches/${matchId}/commentary`, {
@@ -294,6 +305,32 @@ export default function CommentaryManagementDetailPage() {
     }
   };
 
+  // Get the next available order number for post-ball commentary
+  const getNextPostBallOrder = (entry: CommentaryEntry): number => {
+    if (!mergedCommentary?.all) return 0;
+
+    const ballNum = entry.ballNumber ?? entry.ball ?? 0;
+
+    // Find all existing post-ball commentaries for this specific ball
+    const existingPostBalls = mergedCommentary.all.filter((c) => {
+      const cBall = c.ballNumber ?? c.ball ?? 0;
+      return (
+        c.commentaryType === 'post-ball' &&
+        c.innings === entry.innings &&
+        c.over === entry.over &&
+        cBall === ballNum &&
+        c.source === 'in-house' // Only count in-house commentaries
+      );
+    });
+
+    // Find the highest order number
+    const maxOrder =
+      existingPostBalls.length > 0 ? Math.max(...existingPostBalls.map((c) => c.order || 0)) : -1;
+
+    // Return the next order number (maxOrder + 1, or 0 if none exist)
+    return maxOrder + 1;
+  };
+
   const toggleInlineForm = (
     entryKey: string,
     type: 'pre-ball' | 'post-ball',
@@ -306,16 +343,25 @@ export default function CommentaryManagementDetailPage() {
         delete newForms[entryKey];
         return newForms;
       }
-      // Open new form
+      // Open new form with validated values
+      const validatedInnings = Math.max(1, Math.min(2, entry.innings || 1));
+      const validatedBall =
+        entry.ball !== null && entry.ball !== undefined
+          ? Math.max(0, Math.min(5, entry.ball))
+          : null;
+
+      // Auto-calculate order for post-ball commentary
+      const initialOrder = type === 'post-ball' ? getNextPostBallOrder(entry) : 0;
+
       return {
         ...prev,
         [entryKey]: {
           type,
           commentary: '',
-          innings: entry.innings,
-          over: entry.over,
-          ball: entry.ball,
-          order: 0,
+          innings: validatedInnings,
+          over: Math.max(0, entry.over || 0),
+          ball: validatedBall,
+          order: initialOrder,
           submitting: false,
         },
       };
@@ -542,16 +588,21 @@ export default function CommentaryManagementDetailPage() {
                 <div className="p-6 space-y-6">
                   {mergedCommentary.all
                     .sort((a, b) => {
-                      // Sort by innings, over, ball, type
-                      if (a.innings !== b.innings) return a.innings - b.innings;
-                      if (a.over !== b.over) return a.over - b.over;
+                      // Sort by timestamp (newest first) - reversed for latest at top
+                      const timeA = new Date(a.timestamp || a.createdAt || 0).getTime();
+                      const timeB = new Date(b.timestamp || b.createdAt || 0).getTime();
+                      if (timeA !== timeB) return timeB - timeA; // Reverse: newest first
+
+                      // Fallback to innings, over, ball, type if timestamps are same
+                      if (a.innings !== b.innings) return b.innings - a.innings; // Reverse: higher innings first
+                      if (a.over !== b.over) return b.over - a.over; // Reverse: higher over first
                       const aBall = a.ballNumber ?? a.ball ?? 0;
                       const bBall = b.ballNumber ?? b.ball ?? 0;
-                      if (aBall !== bBall) return aBall - bBall;
+                      if (aBall !== bBall) return bBall - aBall; // Reverse: higher ball first
                       const typeOrder = { 'pre-ball': 0, ball: 1, 'post-ball': 2 };
                       return (
-                        (typeOrder[a.commentaryType || 'ball'] || 1) -
-                        (typeOrder[b.commentaryType || 'ball'] || 1)
+                        (typeOrder[b.commentaryType || 'ball'] || 1) -
+                        (typeOrder[a.commentaryType || 'ball'] || 1)
                       );
                     })
                     .map((entry, index) => {
@@ -791,23 +842,31 @@ export default function CommentaryManagementDetailPage() {
                                   </div>
                                   <div className="mb-3">
                                     <label className="block text-xs font-medium text-slate-700 mb-1">
-                                      Order (0 for first post-ball, 1 for second, etc.)
+                                      Order{' '}
+                                      <span className="text-slate-500 font-normal">
+                                        (auto-set: {postBallForm.order} for this ball)
+                                      </span>
                                     </label>
-                                    <input
-                                      type="number"
-                                      value={postBallForm.order}
-                                      onChange={(e) =>
-                                        setInlineForms({
-                                          ...inlineForms,
-                                          [entryKey]: {
-                                            ...postBallForm,
-                                            order: Number(e.target.value),
-                                          },
-                                        })
-                                      }
-                                      min="0"
-                                      className="w-24 px-3 py-1.5 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
-                                    />
+                                    <div className="flex items-center gap-2">
+                                      <input
+                                        type="number"
+                                        value={postBallForm.order}
+                                        onChange={(e) =>
+                                          setInlineForms({
+                                            ...inlineForms,
+                                            [entryKey]: {
+                                              ...postBallForm,
+                                              order: Number(e.target.value),
+                                            },
+                                          })
+                                        }
+                                        min="0"
+                                        className="w-24 px-3 py-1.5 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
+                                      />
+                                      <span className="text-xs text-slate-500">
+                                        (0=first, 1=second, etc.)
+                                      </span>
+                                    </div>
                                   </div>
                                   <textarea
                                     value={postBallForm.commentary}
@@ -903,19 +962,24 @@ export default function CommentaryManagementDetailPage() {
               <div className="p-6 space-y-4">
                 {commentary
                   .sort((a, b) => {
-                    // Sort by innings, over, ball, type, order (chronological)
-                    if (a.innings !== b.innings) return a.innings - b.innings;
-                    if (a.over !== b.over) return a.over - b.over;
+                    // Sort by timestamp (newest first) - reversed for latest at top
+                    const timeA = new Date(a.createdAt || 0).getTime();
+                    const timeB = new Date(b.createdAt || 0).getTime();
+                    if (timeA !== timeB) return timeB - timeA; // Reverse: newest first
+
+                    // Fallback to innings, over, ball, type, order if timestamps are same
+                    if (a.innings !== b.innings) return b.innings - a.innings; // Reverse: higher innings first
+                    if (a.over !== b.over) return b.over - a.over; // Reverse: higher over first
                     if (a.ball !== b.ball) {
-                      if (a.ball === null) return -1;
-                      if (b.ball === null) return 1;
-                      return a.ball - b.ball;
+                      if (a.ball === null) return 1; // Reverse: nulls last
+                      if (b.ball === null) return -1;
+                      return b.ball - a.ball; // Reverse: higher ball first
                     }
                     const typeOrder = { 'pre-ball': 0, ball: 1, 'post-ball': 2 };
                     const orderA = typeOrder[a.commentaryType] ?? 1;
                     const orderB = typeOrder[b.commentaryType] ?? 1;
-                    if (orderA !== orderB) return orderA - orderB;
-                    return a.order - b.order;
+                    if (orderA !== orderB) return orderB - orderA; // Reverse
+                    return b.order - a.order; // Reverse: higher order first
                   })
                   .map((entry) => {
                     const isEditing = editingId === (entry._id || entry.id);
