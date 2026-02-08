@@ -21,7 +21,7 @@ type Article = {
 export function ArticleCard({ article }: { article: Article }) {
   const href = `/${article.slug}`; // slug already includes news/yyyy/mm/...
   return (
-    <Card variant="interactive" padding="sm" className="overflow-hidden">
+    <Card variant="default" padding="sm" className="overflow-hidden">
       {article.heroImage ? (
         <Link href={href} className="block mb-4">
           <Image
@@ -35,7 +35,7 @@ export function ArticleCard({ article }: { article: Article }) {
       ) : null}
       <div>
         <h3 className="heading-4 mb-3 leading-snug">
-          <Link href={href} className="hover:underline transition-standard">
+          <Link href={href} className="transition-standard">
             {article.title}
           </Link>
         </h3>
