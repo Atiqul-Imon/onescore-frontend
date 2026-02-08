@@ -227,12 +227,12 @@ export function FeaturedContentSection() {
             {filteredContent.map((item, index) => (
               <motion.div
                 key={item._id}
-                className="hover:-translate-y-1 transition-standard"
+                className="transition-standard"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Card variant="interactive" padding="none" className="overflow-hidden">
+                <Card variant="default" padding="none" className="overflow-hidden">
                   {/* Media Thumbnail */}
                   {item.thumbnailUrl && (
                     <div className="relative">

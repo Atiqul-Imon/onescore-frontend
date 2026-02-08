@@ -621,16 +621,16 @@ export function HeroSection({
                 {featuredArticle ? (
                   <Link
                     href={`/${featuredArticle.slug}`}
-                    className="group block overflow-hidden rounded-xl"
+                    className="block overflow-hidden rounded-xl"
                   >
-                    <div className="relative w-full h-[400px] sm:h-[450px] lg:h-[500px] overflow-hidden bg-gray-100">
+                    <div className="relative w-full aspect-video sm:h-[450px] lg:h-[500px] overflow-hidden bg-gray-100">
                       {featuredArticle.heroImage ? (
                         <Image
                           src={featuredArticle.heroImage}
                           alt={featuredArticle.title}
                           fill
                           sizes="(max-width: 1024px) 100vw, 66vw"
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="object-cover"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center bg-gray-100">
@@ -638,13 +638,13 @@ export function HeroSection({
                         </div>
                       )}
                     </div>
-                    <div className="p-6 sm:p-8 lg:p-10">
-                      <div className="space-y-3 sm:space-y-4">
-                        <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight text-gray-900 group-hover:text-primary-600 transition-colors">
+                    <div className="pt-8 pb-6 px-6 sm:pt-10 sm:pb-8 sm:px-8 lg:pt-12 lg:pb-10 lg:px-10">
+                      <div className="space-y-4 sm:space-y-5">
+                        <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold leading-[1.2] sm:leading-[1.25] text-gray-900 mb-2">
                           {featuredArticle.title}
                         </h2>
                         {featuredArticle.summary && (
-                          <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed line-clamp-3">
+                          <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed line-clamp-3 mt-4">
                             {featuredArticle.summary}
                           </p>
                         )}

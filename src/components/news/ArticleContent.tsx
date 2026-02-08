@@ -163,7 +163,7 @@ export function ArticleContent({ article: initialArticle }: ArticleContentProps)
         <div className="max-w-4xl mx-auto">
           {/* Hero Image - Separate */}
           {article.heroImage && (
-            <div className="relative w-full h-[60vh] min-h-[500px] max-h-[700px] mb-8 overflow-hidden bg-gray-100 rounded">
+            <div className="relative w-full aspect-video sm:aspect-[16/10] md:h-[50vh] lg:h-[60vh] lg:min-h-[500px] lg:max-h-[700px] mb-8 overflow-hidden bg-gray-100 rounded">
               <Image
                 src={article.heroImage}
                 alt={article.title}
