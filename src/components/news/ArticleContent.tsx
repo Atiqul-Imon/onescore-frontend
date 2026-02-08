@@ -159,73 +159,68 @@ export function ArticleContent({ article: initialArticle }: ArticleContentProps)
 
   return (
     <article className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-      {/* Hero Section with Image */}
-      {article.heroImage && (
-        <div className="relative w-full h-[75vh] min-h-[600px] max-h-[900px] overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
-          <Image
-            src={article.heroImage}
-            alt={article.title}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover opacity-90"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
-
-          {/* Content Overlay */}
-          <Container
-            size="2xl"
-            className="relative h-full flex flex-col justify-end pb-12 lg:pb-16"
-          >
-            <div className="max-w-4xl">
-              {/* Category Badge */}
-              <div className="mb-6 flex flex-wrap items-center gap-3 text-sm">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-600/90 backdrop-blur-sm px-4 py-1.5 font-bold uppercase tracking-wider text-white shadow-lg">
-                  <Tag className="h-3.5 w-3.5" />
-                  {category}
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm px-4 py-1.5 font-semibold uppercase tracking-wider text-white">
-                  {articleType}
-                </span>
-              </div>
-
-              {/* Title */}
-              <h1 className="mb-6 text-4xl font-bold leading-tight text-white drop-shadow-2xl sm:text-5xl lg:text-6xl">
-                {article.title}
-              </h1>
-
-              {/* Meta Information */}
-              <div className="flex flex-wrap items-center gap-4 text-sm text-white/90">
-                {article.author?.name && (
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                      <User className="h-4 w-4" />
-                    </div>
-                    <span className="font-semibold">{article.author.name}</span>
-                  </div>
-                )}
-                {article.publishedAt && (
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <time dateTime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
-                  </div>
-                )}
-                {article.readingTimeMinutes && (
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span>{article.readingTimeMinutes} min read</span>
-                  </div>
-                )}
-              </div>
+      <Container size="2xl" className="py-8 lg:py-12">
+        <div className="max-w-4xl mx-auto">
+          {/* Hero Image - Separate */}
+          {article.heroImage && (
+            <div className="relative w-full h-[60vh] min-h-[500px] max-h-[700px] mb-8 overflow-hidden bg-gray-100 rounded">
+              <Image
+                src={article.heroImage}
+                alt={article.title}
+                fill
+                priority
+                sizes="(max-width: 1280px) 100vw, 1280px"
+                className="object-cover"
+              />
             </div>
-          </Container>
-        </div>
-      )}
+          )}
 
-      {/* Summary Section (Below Image) */}
-      {article.summary && article.heroImage && (
-        <Container size="lg" className="py-8 lg:py-12">
+          {/* Title and Meta Information - Below Image */}
+          {/* Category Badge */}
+          <div className="mb-6 flex flex-wrap items-center gap-3 text-sm">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-1.5 font-bold uppercase tracking-wider text-white shadow-lg">
+              <Tag className="h-3.5 w-3.5" />
+              {category}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-200 px-4 py-1.5 font-semibold uppercase tracking-wider text-gray-800">
+              {articleType}
+            </span>
+          </div>
+
+          {/* Title */}
+          <h1 className="mb-6 text-4xl font-bold leading-tight text-gray-900 sm:text-5xl lg:text-6xl">
+            {article.title}
+          </h1>
+
+          {/* Meta Information */}
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+            {article.author?.name && (
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
+                  <User className="h-4 w-4" />
+                </div>
+                <span className="font-semibold">{article.author.name}</span>
+              </div>
+            )}
+            {article.publishedAt && (
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                <time dateTime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
+              </div>
+            )}
+            {article.readingTimeMinutes && (
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                <span>{article.readingTimeMinutes} min read</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </Container>
+
+      {/* Summary Section */}
+      {article.summary && (
+        <Container size="lg" className="py-4 lg:py-6">
           <div className="mx-auto max-w-4xl">
             <p className="text-xl leading-relaxed text-slate-700 sm:text-2xl lg:text-3xl font-medium">
               {article.summary}

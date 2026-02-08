@@ -38,38 +38,42 @@ export function FeaturedContentSection() {
   const fetchContent = async () => {
     try {
       setLoading(true);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const mockContent: Content[] = [
         {
           _id: '1',
           title: 'India vs Australia: Match Highlights',
-          content: 'Watch the best moments from the thrilling encounter between India and Australia...',
+          content:
+            'Watch the best moments from the thrilling encounter between India and Australia...',
           type: 'video',
           contributor: {
             name: 'Sports Analyst',
-            avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
+            avatar:
+              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
           },
           category: 'cricket',
           tags: ['highlights', 'india', 'australia', 'cricket'],
           mediaUrl: 'https://example.com/video1.mp4',
-          thumbnailUrl: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=225&fit=crop',
+          thumbnailUrl:
+            'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=225&fit=crop',
           duration: 180,
           views: 12500,
           likes: 450,
           comments: 23,
-          publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+          publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
         },
         {
           _id: '2',
           title: 'Premier League Weekly Review',
-          content: 'A comprehensive analysis of this week\'s Premier League action...',
+          content: "A comprehensive analysis of this week's Premier League action...",
           type: 'audio',
           contributor: {
             name: 'Football Expert',
-            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'
+            avatar:
+              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
           },
           category: 'football',
           tags: ['premier league', 'review', 'analysis'],
@@ -78,7 +82,7 @@ export function FeaturedContentSection() {
           views: 8500,
           likes: 120,
           comments: 15,
-          publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
+          publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
         },
         {
           _id: '3',
@@ -87,17 +91,18 @@ export function FeaturedContentSection() {
           type: 'article',
           contributor: {
             name: 'Cricket Writer',
-            avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face'
+            avatar:
+              'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face',
           },
           category: 'cricket',
           tags: ['t20', 'cricket', 'future', 'analysis'],
           views: 3200,
           likes: 89,
           comments: 12,
-          publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
-        }
+          publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+        },
       ];
-      
+
       setContent(mockContent);
     } catch (error) {
       console.error('Error fetching content:', error);
@@ -106,7 +111,7 @@ export function FeaturedContentSection() {
     }
   };
 
-  const filteredContent = content.filter(item => {
+  const filteredContent = content.filter((item) => {
     if (selectedType === 'all') return true;
     return item.type === selectedType;
   });
@@ -115,7 +120,7 @@ export function FeaturedContentSection() {
     { id: 'all', label: 'All Content', icon: null },
     { id: 'video', label: 'Videos', icon: <Play className="w-4 h-4" /> },
     { id: 'audio', label: 'Audio', icon: <Headphones className="w-4 h-4" /> },
-    { id: 'article', label: 'Articles', icon: <FileText className="w-4 h-4" /> }
+    { id: 'article', label: 'Articles', icon: <FileText className="w-4 h-4" /> },
   ];
 
   const getTypeIcon = (type: string) => {
@@ -149,12 +154,8 @@ export function FeaturedContentSection() {
       <section className="section-padding bg-gray-100">
         <Container>
           <div className="text-center mb-12">
-            <h2 className="heading-2 mb-4">
-              Featured Content
-            </h2>
-            <p className="body-text-lg text-gray-600">
-              Community-driven sports content
-            </p>
+            <h2 className="heading-2 mb-4">Featured Content</h2>
+            <p className="body-text-lg text-gray-600">Community-driven sports content</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
@@ -184,9 +185,7 @@ export function FeaturedContentSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="heading-2 mb-4">
-            Featured Content
-          </h2>
+          <h2 className="heading-2 mb-4">Featured Content</h2>
           <p className="body-text-lg text-gray-600">
             Community-driven sports content from passionate fans
           </p>
@@ -220,12 +219,8 @@ export function FeaturedContentSection() {
             <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
               <FileText className="w-12 h-12 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No Content Available
-            </h3>
-            <p className="text-gray-600">
-              Check back later for new content
-            </p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Content Available</h3>
+            <p className="text-gray-600">Check back later for new content</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -251,90 +246,91 @@ export function FeaturedContentSection() {
                       </div>
                       {item.duration && (
                         <div className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
-                          {Math.floor(item.duration / 60)}:{(item.duration % 60).toString().padStart(2, '0')}
+                          {Math.floor(item.duration / 60)}:
+                          {(item.duration % 60).toString().padStart(2, '0')}
                         </div>
                       )}
                     </div>
                   )}
 
                   <div className="p-6">
-                  {/* Content Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${getTypeColor(item.type)}`}>
-                      {getTypeIcon(item.type)}
-                      {item.type.toUpperCase()}
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {formatRelativeTime(item.publishedAt)}
-                    </span>
-                  </div>
+                    {/* Title - Directly below image */}
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2">
+                      {item.title}
+                    </h3>
 
-                  {/* Title */}
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {item.title}
-                  </h3>
-
-                  {/* Content Preview */}
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                    {item.content}
-                  </p>
-
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {item.tags.slice(0, 3).map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
+                    {/* Content Header */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div
+                        className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${getTypeColor(item.type)}`}
                       >
-                        #{tag}
+                        {getTypeIcon(item.type)}
+                        {item.type.toUpperCase()}
+                      </div>
+                      <span className="text-xs text-gray-500">
+                        {formatRelativeTime(item.publishedAt)}
                       </span>
-                    ))}
-                  </div>
+                    </div>
 
-                  {/* Contributor */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <img
-                      src={item.contributor.avatar || 'https://via.placeholder.com/32'}
-                      alt={item.contributor.name}
-                      className="w-8 h-8 rounded-full"
-                    />
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {item.contributor.name}
-                      </div>
-                      <div className="text-xs text-gray-500 capitalize">
-                        {item.category}
+                    {/* Content Preview */}
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">{item.content}</p>
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {item.tags.slice(0, 3).map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Contributor */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <img
+                        src={item.contributor.avatar || 'https://via.placeholder.com/32'}
+                        alt={item.contributor.name}
+                        className="w-8 h-8 rounded-full"
+                      />
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {item.contributor.name}
+                        </div>
+                        <div className="text-xs text-gray-500 capitalize">{item.category}</div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Stats */}
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        <span>{item.views.toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Heart className="w-4 h-4" />
-                        <span>{item.likes}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <MessageCircle className="w-4 h-4" />
-                        <span>{item.comments}</span>
+                    {/* Stats */}
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1">
+                          <Eye className="w-4 h-4" />
+                          <span>{item.views.toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Heart className="w-4 h-4" />
+                          <span>{item.likes}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <MessageCircle className="w-4 h-4" />
+                          <span>{item.comments}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Action Button */}
-                  <div className="mt-4">
-                    <Button fullWidth>
-                      {item.type === 'video' ? 'Watch Now' : 
-                       item.type === 'audio' ? 'Listen Now' : 
-                       'Read More'}
-                    </Button>
+                    {/* Action Button */}
+                    <div className="mt-4">
+                      <Button fullWidth>
+                        {item.type === 'video'
+                          ? 'Watch Now'
+                          : item.type === 'audio'
+                            ? 'Listen Now'
+                            : 'Read More'}
+                      </Button>
+                    </div>
                   </div>
-                </div>
                 </Card>
               </motion.div>
             ))}
@@ -349,9 +345,7 @@ export function FeaturedContentSection() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Button variant="outline">
-              View All Content
-            </Button>
+            <Button variant="outline">View All Content</Button>
           </motion.div>
         )}
       </Container>
