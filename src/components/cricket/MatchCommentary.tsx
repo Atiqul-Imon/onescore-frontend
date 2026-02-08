@@ -204,6 +204,9 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
                     ? commentary.filter((c) => c.over === filterOver)
                     : commentary;
 
+                // Track which over.ball combinations we've already shown
+                const shownOverBalls = new Set<string>();
+
                 return filteredCommentary.map((entry, index) => {
                   const isBoundary = entry.runs && (entry.runs === 4 || entry.runs === 6);
                   const isWicket = entry.wickets && entry.wickets > 0;
@@ -211,13 +214,14 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
                   const ballNum = entry.ballNumber ?? entry.ball ?? 0;
                   const commentaryType = entry.commentaryType || 'ball';
 
+                  // Create a unique key for this over.ball combination
+                  const overBallKey = `${entry.over}-${ballNum}`;
+
                   // Check if this is the first entry for this over.ball combination
-                  const prevEntry = index > 0 ? filteredCommentary[index - 1] : null;
-                  const prevBallNum = prevEntry
-                    ? (prevEntry.ballNumber ?? prevEntry.ball ?? 0)
-                    : null;
-                  const showOverBall =
-                    !prevEntry || prevEntry.over !== entry.over || prevBallNum !== ballNum;
+                  const showOverBall = !shownOverBalls.has(overBallKey);
+                  if (showOverBall) {
+                    shownOverBalls.add(overBallKey);
+                  }
 
                   return (
                     <motion.div
