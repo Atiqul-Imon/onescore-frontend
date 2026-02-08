@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card } from '@/components/ui/Card';
@@ -23,7 +23,7 @@ export function ArticleCard({ article }: { article: Article }) {
   return (
     <Card variant="interactive" padding="sm" className="overflow-hidden">
       {article.heroImage ? (
-        <Link href={href} className="block">
+        <Link href={href} className="block mb-4">
           <Image
             src={article.heroImage}
             alt={article.title}
@@ -34,26 +34,26 @@ export function ArticleCard({ article }: { article: Article }) {
         </Link>
       ) : null}
       <div>
+        <h3 className="heading-4 mb-3 leading-snug">
+          <Link href={href} className="hover:underline transition-standard">
+            {article.title}
+          </Link>
+        </h3>
         <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <Badge variant="info" size="sm">{article.category}</Badge>
-          <Badge variant="default" size="sm">{article.type.replace('_', ' ')}</Badge>
+          <Badge variant="info" size="sm">
+            {article.category}
+          </Badge>
+          <Badge variant="default" size="sm">
+            {article.type.replace('_', ' ')}
+          </Badge>
           {article.publishedAt && (
             <time dateTime={article.publishedAt} className="text-xs text-gray-500">
               {formatDate(article.publishedAt)}
             </time>
           )}
         </div>
-        <h3 className="heading-4 mb-2 leading-snug">
-          <Link href={href} className="hover:underline transition-standard">
-            {article.title}
-          </Link>
-        </h3>
-        {article.summary && (
-          <p className="body-text-sm line-clamp-3">{article.summary}</p>
-        )}
+        {article.summary && <p className="body-text-sm line-clamp-3">{article.summary}</p>}
       </div>
     </Card>
   );
 }
-
-

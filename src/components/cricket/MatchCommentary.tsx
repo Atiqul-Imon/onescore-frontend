@@ -72,9 +72,12 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
           `[MatchCommentary] Total entries: ${entries.length}, In-house: ${inHouseCount}`
         );
 
-        // Sort by over and ball number (newest first)
+        // Sort by over and ball number (newest first), then by commentaryType
         const sorted = entries.sort((a, b) => {
+          // First sort by over (newest first)
           if (a.over !== b.over) return b.over - a.over;
+
+          // Then by ball (newest first)
           const ballA =
             typeof a.ballNumber === 'number'
               ? a.ballNumber
@@ -91,7 +94,28 @@ export function MatchCommentary({ matchId }: MatchCommentaryProps) {
                 : typeof b.ball === 'string'
                   ? parseInt(b.ball) || 0
                   : 0;
-          return ballB - ballA;
+          if (ballA !== ballB) return ballB - ballA;
+
+          // Within same over.ball, sort by type: pre-ball -> ball -> post-ball
+          const typeOrder: Record<string, number> = { 'pre-ball': 0, ball: 1, 'post-ball': 2 };
+          const orderA = typeOrder[a.commentaryType || 'ball'] ?? 1;
+          const orderB = typeOrder[b.commentaryType || 'ball'] ?? 1;
+          if (orderA !== orderB) return orderA - orderB;
+
+          // For same type, sort by order field (for post-ball), then by timestamp (newest first)
+          if (
+            a.commentaryType === 'post-ball' &&
+            b.commentaryType === 'post-ball' &&
+            a.order !== undefined &&
+            b.order !== undefined
+          ) {
+            if (a.order !== b.order) return a.order - b.order;
+          }
+
+          // Finally by timestamp (newest first)
+          const timeA = new Date(a.timestamp || 0).getTime();
+          const timeB = new Date(b.timestamp || 0).getTime();
+          return timeB - timeA;
         });
         setCommentary(sorted);
       }

@@ -623,7 +623,7 @@ export function HeroSection({
                     href={`/${featuredArticle.slug}`}
                     className="group block overflow-hidden rounded-xl"
                   >
-                    <div className="relative h-full min-h-[420px]">
+                    <div className="relative w-full h-[400px] sm:h-[450px] lg:h-[500px] overflow-hidden bg-gray-100">
                       {featuredArticle.heroImage ? (
                         <Image
                           src={featuredArticle.heroImage}
@@ -637,18 +637,17 @@ export function HeroSection({
                           <span className="text-gray-500">Image coming soon</span>
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/30" />
-                      <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 lg:p-10 text-white">
-                        <div className="space-y-3 sm:space-y-4 max-w-4xl">
-                          <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight text-white drop-shadow-lg">
-                            {featuredArticle.title}
-                          </h2>
-                          {featuredArticle.summary && (
-                            <p className="text-sm sm:text-base lg:text-lg text-white/95 leading-relaxed max-w-3xl line-clamp-3 font-medium">
-                              {featuredArticle.summary}
-                            </p>
-                          )}
-                        </div>
+                    </div>
+                    <div className="p-6 sm:p-8 lg:p-10">
+                      <div className="space-y-3 sm:space-y-4">
+                        <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight text-gray-900 group-hover:text-primary-600 transition-colors">
+                          {featuredArticle.title}
+                        </h2>
+                        {featuredArticle.summary && (
+                          <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed line-clamp-3">
+                            {featuredArticle.summary}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </Link>

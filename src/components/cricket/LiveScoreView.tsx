@@ -605,18 +605,36 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
       });
     }
 
-    // Sort by over desc, then by commentary type (pre-ball, ball, post-ball), then ballNumber desc
+    // Sort by over desc, then by ballNumber desc, then by commentary type (pre-ball, ball, post-ball)
     return normalized.sort((a, b) => {
+      // First sort by over (newest first)
       if (a.over !== b.over) return b.over - a.over;
-      // Sort by commentary type: pre-ball (0), ball (1), post-ball (2)
+
+      // Then by ballNumber (newest first)
+      const ballA = a.ballNumber ?? 0;
+      const ballB = b.ballNumber ?? 0;
+      if (ballA !== ballB) return ballB - ballA;
+
+      // Within same over.ball, sort by commentary type: pre-ball (0), ball (1), post-ball (2)
       const typeOrder: Record<string, number> = { 'pre-ball': 0, ball: 1, 'post-ball': 2 };
       const orderA = typeOrder[a.commentaryType || 'ball'] ?? 1;
       const orderB = typeOrder[b.commentaryType || 'ball'] ?? 1;
       if (orderA !== orderB) return orderA - orderB;
-      // For same type, sort by ballNumber desc
-      const ballA = a.ballNumber ?? 0;
-      const ballB = b.ballNumber ?? 0;
-      return ballB - ballA;
+
+      // For same type, sort by order field (for post-ball), then by timestamp (newest first)
+      if (
+        a.commentaryType === 'post-ball' &&
+        b.commentaryType === 'post-ball' &&
+        a.order !== undefined &&
+        b.order !== undefined
+      ) {
+        if (a.order !== b.order) return a.order - b.order;
+      }
+
+      // Finally by timestamp (newest first)
+      const timeA = new Date(a.timestamp || 0).getTime();
+      const timeB = new Date(b.timestamp || 0).getTime();
+      return timeB - timeA;
     });
   };
 
