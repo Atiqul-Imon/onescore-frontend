@@ -845,6 +845,9 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                           ? validSecondInnings.filter((c) => c.over === filterOver)
                           : validSecondInnings;
 
+                      // Track which over.ball combinations we've already shown
+                      const shownOverBalls2nd = new Set<string>();
+
                       return filteredSecondInnings.map((entry, index) => {
                         const isBoundary =
                           entry.runs !== undefined && (entry.runs === 4 || entry.runs === 6);
@@ -853,13 +856,14 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                         const ballNum = entry.ballNumber ?? entry.ball ?? 0;
                         const commentaryType = entry.commentaryType || 'ball';
 
+                        // Create a unique key for this over.ball combination
+                        const overBallKey = `${entry.over}-${ballNum}`;
+
                         // Check if this is the first entry for this over.ball combination
-                        const prevEntry = index > 0 ? filteredSecondInnings[index - 1] : null;
-                        const prevBallNum = prevEntry
-                          ? (prevEntry.ballNumber ?? prevEntry.ball ?? 0)
-                          : null;
-                        const showOverBall =
-                          !prevEntry || prevEntry.over !== entry.over || prevBallNum !== ballNum;
+                        const showOverBall = !shownOverBalls2nd.has(overBallKey);
+                        if (showOverBall) {
+                          shownOverBalls2nd.add(overBallKey);
+                        }
 
                         return (
                           <motion.div
@@ -964,6 +968,9 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                           ? validFirstInnings.filter((c) => c.over === filterOver)
                           : validFirstInnings;
 
+                      // Track which over.ball combinations we've already shown
+                      const shownOverBalls1st = new Set<string>();
+
                       return filteredFirstInnings.map((entry, index) => {
                         const isBoundary =
                           entry.runs !== undefined && (entry.runs === 4 || entry.runs === 6);
@@ -972,13 +979,14 @@ function LiveCommentary({ matchId, matchStatus }: { matchId: string; matchStatus
                         const ballNum = entry.ballNumber ?? entry.ball ?? 0;
                         const commentaryType = entry.commentaryType || 'ball';
 
+                        // Create a unique key for this over.ball combination
+                        const overBallKey = `${entry.over}-${ballNum}`;
+
                         // Check if this is the first entry for this over.ball combination
-                        const prevEntry = index > 0 ? filteredFirstInnings[index - 1] : null;
-                        const prevBallNum = prevEntry
-                          ? (prevEntry.ballNumber ?? prevEntry.ball ?? 0)
-                          : null;
-                        const showOverBall =
-                          !prevEntry || prevEntry.over !== entry.over || prevBallNum !== ballNum;
+                        const showOverBall = !shownOverBalls1st.has(overBallKey);
+                        if (showOverBall) {
+                          shownOverBalls1st.add(overBallKey);
+                        }
 
                         return (
                           <motion.div
