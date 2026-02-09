@@ -6,6 +6,7 @@ import { formatDate } from '@/lib/utils';
 import { ArticleReactions } from '@/components/news/ArticleReactions';
 import { ArticleComments } from '@/components/news/ArticleComments';
 import { RelatedArticles } from '@/components/news/RelatedArticles';
+import { ArticleBreadcrumbs } from '@/components/news/ArticleBreadcrumbs';
 import { Container } from '@/components/ui/Container';
 import {
   Clock,
@@ -161,6 +162,9 @@ export function ArticleContent({ article: initialArticle }: ArticleContentProps)
     <article className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <Container size="2xl" className="py-8 lg:py-12">
         <div className="max-w-4xl mx-auto">
+          {/* Breadcrumbs */}
+          <ArticleBreadcrumbs category={category} articleTitle={article.title} />
+
           {/* Hero Image - Separate */}
           {article.heroImage && (
             <div className="relative w-full aspect-video sm:aspect-[16/10] md:h-[50vh] lg:h-[60vh] lg:min-h-[500px] lg:max-h-[700px] mb-8 overflow-hidden bg-gray-100 rounded">
