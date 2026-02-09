@@ -80,11 +80,10 @@ const nextConfig = {
       },
     ];
   },
-  // Turbopack configuration (Next.js 16 default)
-  // Empty config to silence error when webpack config is present
+  // Configure Turbopack (required in Next.js 16)
   turbopack: {},
   
-  // Webpack configuration for backward compatibility
+  // Webpack configuration for production builds (fallback)
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {

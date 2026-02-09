@@ -211,6 +211,7 @@ export default async function ArticlePage({ params }: PageProps) {
     : publishedTime;
   const authorName = article.author?.name || 'ScoreNews Editorial';
   const category = article.category || 'General';
+  const articleType = article.type?.replace('_', ' ') || 'Article';
 
   // Get hero image URL - ensure absolute URL
   let heroImage = `${siteUrl}/og-image.jpg`; // Default fallback
