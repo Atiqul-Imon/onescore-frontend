@@ -28,7 +28,8 @@ export function FootballHero() {
             Live Coverage, Tactical Insight, and Storytelling from Every Football Theatre
           </h1>
           <p className="mt-4 text-lg text-blue-100 md:text-xl">
-            Streamlined dashboards for matchdays, in-depth analysis for purists, and curated highlights for fans on the go.
+            Streamlined dashboards for matchdays, in-depth analysis for purists, and curated
+            highlights for fans on the go.
           </p>
         </motion.div>
 
@@ -43,11 +44,11 @@ export function FootballHero() {
             <PlayCircle className="ml-2 w-5 h-5" />
           </Button>
           <p className="text-sm text-blue-100/80">
-            Follow Champions League nights, Premier League weekends, and continental showdowns in one place.
+            Follow Champions League nights, Premier League weekends, and continental showdowns in
+            one place.
           </p>
         </motion.div>
       </Container>
     </section>
   );
 }
-
