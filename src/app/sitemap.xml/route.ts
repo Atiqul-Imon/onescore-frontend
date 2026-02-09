@@ -4,7 +4,8 @@ import { NextResponse } from 'next/server';
 // Updated: 2026-02-10 - Fixed domain resolution for production deployment
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scorenews.net';
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://api.scorenews.net';
+// Use same API URL as rest of the app - consistent with constants/index.ts
+const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 async function getAllNewsArticles(): Promise<
   Array<{ url: string; lastModified: string; changeFrequency: string; priority: number }>
