@@ -3,10 +3,10 @@ import { notFound } from 'next/navigation';
 import { ArticleContent } from '@/components/news/ArticleContent';
 import Script from 'next/script';
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+// Use production domain - never use Vercel preview URLs
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scorenews.net';
 
+// Use same API URL as rest of the app
 const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 interface PageProps {
@@ -22,7 +22,8 @@ async function getArticle(year: string, month: string, slug: string[]) {
 
   try {
     // Try structured route first
-    let res = await fetch(`${apiBase}/api/v1/news/slug/${year}/${month}/${articleSlug}`, {
+    const url1 = `${apiBase}/api/v1/news/slug/${year}/${month}/${articleSlug}`;
+    let res = await fetch(url1, {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
@@ -32,7 +33,8 @@ async function getArticle(year: string, month: string, slug: string[]) {
     // If structured route fails, try with encoded slug
     if (!res.ok && res.status === 404) {
       const fullSlug = `news/${year}/${month}/${articleSlug}`;
-      res = await fetch(`${apiBase}/api/v1/news/slug/${encodeURIComponent(fullSlug)}`, {
+      const url2 = `${apiBase}/api/v1/news/slug/${encodeURIComponent(fullSlug)}`;
+      res = await fetch(url2, {
         cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
@@ -41,6 +43,16 @@ async function getArticle(year: string, month: string, slug: string[]) {
     }
 
     if (!res.ok) {
+      // Log error in production for debugging
+      if (process.env.NODE_ENV === 'production') {
+        console.error(`[Article Fetch] Failed to fetch article: ${res.status} ${res.statusText}`, {
+          apiBase,
+          year,
+          month,
+          slug: articleSlug,
+          url: res.url,
+        });
+      }
       return null;
     }
 
@@ -52,7 +64,14 @@ async function getArticle(year: string, month: string, slug: string[]) {
     }
     return null;
   } catch (error) {
-    console.error('Error fetching article:', error);
+    // Enhanced error logging
+    console.error('[Article Fetch] Error fetching article:', {
+      error: error instanceof Error ? error.message : String(error),
+      apiBase,
+      year,
+      month,
+      slug: articleSlug,
+    });
     return null;
   }
 }
