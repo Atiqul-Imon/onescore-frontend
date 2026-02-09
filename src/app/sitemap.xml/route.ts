@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://www.scorenews.net');
+// Prioritize production domain - never use Vercel preview URLs in sitemap
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scorenews.net';
 
 const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://api.scorenews.net';
 
