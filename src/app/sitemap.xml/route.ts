@@ -11,8 +11,9 @@ async function getAllNewsArticles(): Promise<
 > {
   try {
     // Fetch all published articles for sitemap
+    // Use cache: 'no-store' for route handlers to ensure fresh data
     const res = await fetch(`${apiBase}/api/v1/news?state=published&limit=1000`, {
-      next: { revalidate: 3600 }, // Revalidate every hour
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -125,7 +126,7 @@ ${urlEntries}
 </urlset>`;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const articles = await getAllNewsArticles();
     const sitemap = generateSitemapXML(articles);
@@ -133,18 +134,23 @@ export async function GET() {
     return new NextResponse(sitemap, {
       status: 200,
       headers: {
-        'Content-Type': 'application/xml',
+        'Content-Type': 'application/xml; charset=utf-8',
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
       },
     });
   } catch (error) {
-    console.error('Error generating sitemap:', error);
+    // Log error but don't expose it to the client
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error generating sitemap:', error);
+    }
     // Return a basic sitemap even if article fetching fails
+    // This ensures the sitemap is always accessible
     const basicSitemap = generateSitemapXML([]);
     return new NextResponse(basicSitemap, {
       status: 200,
       headers: {
-        'Content-Type': 'application/xml',
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
       },
     });
   }
