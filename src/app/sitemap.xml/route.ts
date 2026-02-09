@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 // Prioritize production domain - never use Vercel preview URLs in sitemap
+// Updated: 2026-02-10 - Fixed domain resolution for production deployment
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.scorenews.net';
 
 const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://api.scorenews.net';
