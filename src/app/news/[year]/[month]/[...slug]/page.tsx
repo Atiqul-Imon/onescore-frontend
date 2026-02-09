@@ -239,13 +239,23 @@ export default async function ArticlePage({ params }: PageProps) {
     }
   }
 
-  // Structured Data (JSON-LD) for Article
+  // Structured Data (JSON-LD) for Article - Enhanced for better SEO
+  const articleBody = stripHtml(article.body || '');
+  const wordCount = articleBody ? articleBody.split(/\s+/).length : 0;
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline: article.title,
-    description: article.summary || stripHtml(article.body || ''),
-    image: heroImage,
+    description: article.summary || articleBody.substring(0, 200),
+    image: [
+      {
+        '@type': 'ImageObject',
+        url: heroImage,
+        width: 1200,
+        height: 630,
+      },
+    ],
     datePublished: publishedTime,
     dateModified: modifiedTime,
     author: {
@@ -256,9 +266,12 @@ export default async function ArticlePage({ params }: PageProps) {
     publisher: {
       '@type': 'Organization',
       name: 'ScoreNews',
+      url: siteUrl,
       logo: {
         '@type': 'ImageObject',
         url: `${siteUrl}/logo.png`,
+        width: 512,
+        height: 512,
       },
     },
     mainEntityOfPage: {
@@ -266,11 +279,31 @@ export default async function ArticlePage({ params }: PageProps) {
       '@id': articleUrl,
     },
     articleSection: category,
-    keywords: (article.tags || []).join(', '),
-    articleBody: stripHtml(article.body || ''),
-    wordCount: article.body ? stripHtml(article.body).split(/\s+/).length : 0,
+    keywords: [
+      category,
+      articleType,
+      'cricket',
+      'football',
+      'sports news',
+      'scorenews',
+      ...(article.tags || []),
+    ]
+      .filter(Boolean)
+      .join(', '),
+    articleBody: articleBody,
+    wordCount: wordCount,
     timeRequired: article.readingTimeMinutes ? `PT${article.readingTimeMinutes}M` : undefined,
     inLanguage: 'en-US',
+    // Add additional fields for better SEO
+    ...(article.type && { articleType: article.type }),
+    ...(article.category && { category: article.category }),
+    // Add speakable content if available
+    ...(article.summary && {
+      speakable: {
+        '@type': 'SpeakableSpecification',
+        cssSelector: ['article p:first-of-type'],
+      },
+    }),
   };
 
   // BreadcrumbList structured data

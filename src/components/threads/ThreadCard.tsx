@@ -1,19 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  ArrowUp, 
-  ArrowDown, 
-  MessageCircle, 
-  Share, 
-  Bookmark, 
-  Flag, 
+import {
+  ArrowUp,
+  ArrowDown,
+  MessageCircle,
+  Share,
+  Bookmark,
+  Flag,
   MoreHorizontal,
   Pin,
   Lock,
   Award,
   Clock,
-  Eye
+  Eye,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -57,13 +57,13 @@ interface ThreadCardProps {
   isBookmarked?: boolean;
 }
 
-export function ThreadCard({ 
-  thread, 
-  onVote, 
-  onReport, 
-  onBookmark, 
-  userVote, 
-  isBookmarked 
+export function ThreadCard({
+  thread,
+  onVote,
+  onReport,
+  onBookmark,
+  userVote,
+  isBookmarked,
 }: ThreadCardProps) {
   const [showActions, setShowActions] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
@@ -72,11 +72,11 @@ export function ThreadCard({
     const date = new Date(dateString);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
-    
+
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
-    
+
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
     return `${days}d ago`;
@@ -88,7 +88,7 @@ export function ThreadCard({
       football: 'bg-blue-100 text-blue-800',
       general: 'bg-gray-100 text-gray-800',
       news: 'bg-red-100 text-red-800',
-      discussion: 'bg-purple-100 text-purple-800'
+      discussion: 'bg-purple-100 text-purple-800',
     };
     return colors[category as keyof typeof colors] || colors.general;
   };
@@ -99,13 +99,11 @@ export function ThreadCard({
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-2">
-            {thread.isPinned && (
-              <Pin className="w-4 h-4 text-yellow-500" />
-            )}
-            {thread.isLocked && (
-              <Lock className="w-4 h-4 text-red-500" />
-            )}
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(thread.category)}`}>
+            {thread.isPinned && <Pin className="w-4 h-4 text-yellow-500" />}
+            {thread.isLocked && <Lock className="w-4 h-4 text-red-500" />}
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(thread.category)}`}
+            >
               {thread.category}
             </span>
             {thread.flair && (
@@ -131,9 +129,7 @@ export function ThreadCard({
           </h3>
         </Link>
 
-        <div className="text-gray-700 text-sm line-clamp-3 mb-3">
-          {thread.content}
-        </div>
+        <div className="text-gray-700 text-sm line-clamp-3 mb-3">{thread.content}</div>
 
         {/* Media Preview */}
         {thread.media && (
@@ -141,7 +137,7 @@ export function ThreadCard({
             {thread.media.type === 'image' && (
               <img
                 src={thread.media.thumbnail || thread.media.url}
-                alt="Thread media"
+                alt={thread.content ? `${thread.content.substring(0, 100)}...` : 'Thread image'}
                 className="w-full rounded-lg bg-gray-100 shadow-sm"
                 style={{ maxHeight: '360px', objectFit: 'contain' }}
               />
@@ -163,7 +159,7 @@ export function ThreadCard({
         {thread.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {thread.tags.slice(0, 3).map((tag, index) => (
-              <span 
+              <span
                 key={index}
                 className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs"
               >
@@ -206,10 +202,15 @@ export function ThreadCard({
             >
               <ArrowUp className="w-4 h-4" />
             </button>
-            <span className={`text-sm font-medium px-1 ${
-              thread.score > 0 ? 'text-orange-500' : 
-              thread.score < 0 ? 'text-blue-500' : 'text-gray-500'
-            }`}>
+            <span
+              className={`text-sm font-medium px-1 ${
+                thread.score > 0
+                  ? 'text-orange-500'
+                  : thread.score < 0
+                    ? 'text-blue-500'
+                    : 'text-gray-500'
+              }`}
+            >
               {thread.score}
             </span>
             <button
@@ -281,19 +282,21 @@ export function ThreadCard({
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold mb-4">Report Thread</h3>
             <div className="space-y-2">
-              {['spam', 'harassment', 'hate_speech', 'misinformation', 'violence', 'other'].map((reason) => (
-                <button
-                  key={reason}
-                  onClick={() => {
-                    onReport?.(thread._id, reason);
-                    setShowReportModal(false);
-                    setShowActions(false);
-                  }}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded transition-colors"
-                >
-                  {reason.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </button>
-              ))}
+              {['spam', 'harassment', 'hate_speech', 'misinformation', 'violence', 'other'].map(
+                (reason) => (
+                  <button
+                    key={reason}
+                    onClick={() => {
+                      onReport?.(thread._id, reason);
+                      setShowReportModal(false);
+                      setShowActions(false);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded transition-colors"
+                  >
+                    {reason.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </button>
+                )
+              )}
             </div>
             <div className="flex justify-end space-x-2 mt-4">
               <button

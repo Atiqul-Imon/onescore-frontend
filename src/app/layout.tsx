@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, PT_Serif, Outfit } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { Providers } from './providers';
 import { Toaster } from 'react-hot-toast';
@@ -10,13 +11,13 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
 });
 
-const ptSerif = PT_Serif({ 
+const ptSerif = PT_Serif({
   subsets: ['latin'],
   weight: ['400', '700'],
   variable: '--font-pt-serif',
@@ -35,7 +36,8 @@ export const metadata: Metadata = {
     default: 'ScoreNews - Live Cricket & Football Scores',
     template: '%s | ScoreNews',
   },
-  description: 'Get live cricket and football scores, fixtures, and user-generated content. Stay updated with real-time sports news and match updates.',
+  description:
+    'Get live cricket and football scores, fixtures, and user-generated content. Stay updated with real-time sports news and match updates.',
   keywords: [
     'cricket',
     'football',
@@ -43,7 +45,29 @@ export const metadata: Metadata = {
     'sports news',
     'match updates',
     'fixtures',
-    'sports content'
+    'sports content',
+    'cricket scores',
+    'football scores',
+    'live cricket',
+    'live football',
+    'cricket news',
+    'football news',
+    'sports updates',
+    'match reports',
+    'cricket fixtures',
+    'football fixtures',
+    'sports analysis',
+    'cricket commentary',
+    'football commentary',
+    'sports platform',
+    'scorenews',
+    'real-time sports',
+    'sports coverage',
+    'cricket live',
+    'football live',
+    'sports scores',
+    'match results',
+    'sports statistics',
   ],
   authors: [{ name: 'Pixel Forge Web Development Agency' }],
   creator: 'Pixel Forge Web Development Agency',
@@ -95,22 +119,53 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${ptSerif.variable} ${geoformLike.variable}`}>
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={`${inter.className} antialiased`}>
+        {/* WebSite Structured Data */}
+        <Script
+          id="website-structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'ScoreNews',
+              url: siteUrl,
+              description:
+                'Get live cricket and football scores, fixtures, and user-generated content. Stay updated with real-time sports news and match updates.',
+              publisher: {
+                '@type': 'Organization',
+                name: 'ScoreNews',
+                url: siteUrl,
+                logo: {
+                  '@type': 'ImageObject',
+                  url: `${siteUrl}/logo.png`,
+                },
+              },
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: {
+                  '@type': 'EntryPoint',
+                  urlTemplate: `${siteUrl}/news?search={search_term_string}`,
+                },
+                'query-input': 'required name=search_term_string',
+              },
+              sameAs: [
+                // Add social media links when available
+                // 'https://www.facebook.com/scorenews',
+                // 'https://twitter.com/scorenews',
+                // 'https://www.instagram.com/scorenews',
+              ],
+            }),
+          }}
+        />
         <Providers>
-          <a
-            href="#main-content"
-            className="skip-link"
-          >
+          <a href="#main-content" className="skip-link">
             Skip to content
           </a>
           <div className="flex min-h-screen flex-col bg-gray-50">

@@ -6,9 +6,14 @@ import { FeaturedContentSection } from '@/components/sections/FeaturedContentSec
 import { NewsSection } from '@/components/sections/NewsSection';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+
 export const metadata: Metadata = {
   title: 'ScoreNews - Live Cricket & Football Scores',
-  description: 'Get live cricket and football scores, fixtures, and user-generated content. Stay updated with real-time sports news and match updates.',
+  description:
+    'Get live cricket and football scores, fixtures, and user-generated content. Stay updated with real-time sports news and match updates.',
   keywords: [
     'cricket',
     'football',
@@ -16,27 +21,39 @@ export const metadata: Metadata = {
     'sports news',
     'match updates',
     'fixtures',
-    'sports content'
+    'sports content',
+    'cricket scores',
+    'football scores',
+    'live cricket',
+    'live football',
+    'sports platform',
+    'scorenews',
   ],
+  alternates: {
+    canonical: siteUrl,
+  },
   openGraph: {
     title: 'ScoreNews - Live Cricket & Football Scores',
-    description: 'Get live cricket and football scores, fixtures, and user-generated content.',
+    description:
+      'Get live cricket and football scores, fixtures, and user-generated content. Stay updated with real-time sports news and match updates.',
     type: 'website',
-    url: '/',
+    url: siteUrl,
+    siteName: 'ScoreNews',
     images: [
       {
-        url: '/og-image.jpg',
+        url: `${siteUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: 'ScoreNews',
+        alt: 'ScoreNews - Live Sports Scores and News',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'ScoreNews - Live Cricket & Football Scores',
-    description: 'Get live cricket and football scores, fixtures, and user-generated content.',
-    images: ['/og-image.jpg'],
+    description:
+      'Get live cricket and football scores, fixtures, and user-generated content. Stay updated with real-time sports news and match updates.',
+    images: [`${siteUrl}/og-image.jpg`],
   },
 };
 
@@ -44,21 +61,23 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Hero Section */}
-      <Suspense fallback={
-        <section className="section-padding bg-slate-950">
-          <div className="container mx-auto px-4">
-            <div className="glass-panel h-[420px] animate-pulse bg-white/5"></div>
-          </div>
-        </section>
-      }>
+      <Suspense
+        fallback={
+          <section className="section-padding bg-slate-950">
+            <div className="container mx-auto px-4">
+              <div className="glass-panel h-[420px] animate-pulse bg-white/5"></div>
+            </div>
+          </section>
+        }
+      >
         <HeroSectionWrapper />
       </Suspense>
-      
+
       {/* Live Matches Section */}
       <Suspense fallback={<LoadingSpinner />}>
         <LiveMatchesSection />
       </Suspense>
-      
+
       {/* Featured Content Section */}
       <Suspense fallback={<LoadingSpinner />}>
         <FeaturedContentSection />

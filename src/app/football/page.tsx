@@ -1,31 +1,85 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { FootballHero, FootballLiveMatches, FootballLeagues, FootballSpotlight } from '@/components/football';
+import {
+  FootballHero,
+  FootballLiveMatches,
+  FootballLeagues,
+  FootballSpotlight,
+} from '@/components/football';
 import { Container, Card, Button } from '@/components/ui';
 import { ArrowRight } from 'lucide-react';
 
 const editorialHighlights = [
   {
     title: 'Five midfield maestros dictating Europe this month',
-    excerpt: 'From Rodri’s orchestration to Barella’s verticality—our analysts break down the players redefining control.',
+    excerpt:
+      'From Rodri’s orchestration to Barella’s verticality—our analysts break down the players redefining control.',
     href: '/news/football/midfield-maestros',
   },
   {
     title: 'Data Notebook: Decoding Xabi Alonso’s unbeaten Leverkusen run',
-    excerpt: 'Expected threat maps, possession value models, and tactical tweaks that have Leverkusen flying.',
+    excerpt:
+      'Expected threat maps, possession value models, and tactical tweaks that have Leverkusen flying.',
     href: '/news/football/xabi-alonso-leverkusen',
   },
   {
     title: 'Inside the Premier League relegation battle',
-    excerpt: 'Simulations, injury dashboards, and fixture difficulty rating for the six clubs fighting to survive.',
+    excerpt:
+      'Simulations, injury dashboards, and fixture difficulty rating for the six clubs fighting to survive.',
     href: '/news/football/epl-relegation-battle',
   },
 ];
+
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
 
 export const metadata: Metadata = {
   title: 'Football - Live Scores, Matches & Analysis',
   description:
     'Follow global football with live scores, upcoming fixtures, top league coverage, tactical analysis, and exclusive editorial features.',
+  keywords: [
+    'football',
+    'live football scores',
+    'football matches',
+    'football leagues',
+    'football news',
+    'football fixtures',
+    'football results',
+    'football analysis',
+    'football live',
+    'football updates',
+    'premier league',
+    'champions league',
+    'world cup',
+    'football commentary',
+  ],
+  alternates: {
+    canonical: `${siteUrl}/football`,
+  },
+  openGraph: {
+    title: 'Football - Live Scores, Matches & Analysis | ScoreNews',
+    description:
+      'Follow global football with live scores, upcoming fixtures, top league coverage, tactical analysis, and exclusive editorial features.',
+    type: 'website',
+    url: `${siteUrl}/football`,
+    siteName: 'ScoreNews',
+    images: [
+      {
+        url: `${siteUrl}/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: 'Football Live Scores and Analysis',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Football - Live Scores, Matches & Analysis | ScoreNews',
+    description:
+      'Follow global football with live scores, upcoming fixtures, top league coverage, tactical analysis, and exclusive editorial features.',
+    images: [`${siteUrl}/og-image.jpg`],
+  },
 };
 
 export default function FootballPage() {
@@ -42,7 +96,8 @@ export default function FootballPage() {
             <div>
               <h2 className="heading-2">Editorial Highlights</h2>
               <p className="body-text text-gray-600">
-                Deep dives and storytelling crafted by our newsroom. Daily features, driven by data and first-hand insight, across the football world.
+                Deep dives and storytelling crafted by our newsroom. Daily features, driven by data
+                and first-hand insight, across the football world.
               </p>
             </div>
             <Button variant="outline" className="self-start md:self-auto">
@@ -56,10 +111,15 @@ export default function FootballPage() {
               <Card key={story.title} variant="interactive" className="h-full">
                 <div className="space-y-3">
                   <p className="text-xs uppercase tracking-wide text-primary-600">Analysis</p>
-                  <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{story.title}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+                    {story.title}
+                  </h3>
                   <p className="text-sm text-gray-600 line-clamp-3">{story.excerpt}</p>
                   <Link href={story.href} className="inline-flex">
-                    <Button variant="ghost" className="px-0 text-primary-600 hover:text-primary-700">
+                    <Button
+                      variant="ghost"
+                      className="px-0 text-primary-600 hover:text-primary-700"
+                    >
                       Read Story
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
