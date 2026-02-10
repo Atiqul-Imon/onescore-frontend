@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { useSocket } from '@/contexts/SocketContext';
+import { trackMatchView } from '@/lib/analytics';
 
 interface MatchDetails {
   _id: string;
@@ -167,6 +168,15 @@ export default function MatchDetailPage() {
   const { match: localMatch, loading: localLoading } = useLocalMatch(
     error && error.includes('404') ? matchId : null
   );
+
+  // Track match view when match data is loaded
+  useEffect(() => {
+    if (match?.matchId || match?._id) {
+      const id = match.matchId || match._id || matchId;
+      const series = match.series || match.matchNote || undefined;
+      trackMatchView(id, 'cricket', series);
+    }
+  }, [match, matchId]);
 
   // Initial fetch and WebSocket setup
   useEffect(() => {

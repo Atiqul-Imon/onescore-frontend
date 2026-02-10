@@ -1,7 +1,7 @@
 /**
  * Performance monitoring utilities
  * Tracks Web Vitals and API performance metrics
- * 
+ *
  * @module performance
  */
 
@@ -32,12 +32,12 @@ class PerformanceMonitor {
 
   /**
    * Reports a Web Vital metric
-   * 
+   *
    * @param metric - Web Vital metric data
    */
   reportWebVital(metric: WebVitalsMetric): void {
     this.metrics.set(metric.name, metric);
-    
+
     // Log in development
     if (process.env.NODE_ENV === 'development') {
       console.log(`[Web Vital] ${metric.name}:`, {
@@ -55,13 +55,13 @@ class PerformanceMonitor {
 
   /**
    * Tracks API request timing
-   * 
+   *
    * @param endpoint - API endpoint
    * @param duration - Request duration in milliseconds
    */
   trackApiTiming(endpoint: string, duration: number): void {
     this.apiTimings.set(endpoint, duration);
-    
+
     // Log slow requests (> 1 second)
     if (duration > 1000) {
       console.warn(`[Slow API] ${endpoint}: ${duration.toFixed(2)}ms`);
@@ -70,7 +70,7 @@ class PerformanceMonitor {
 
   /**
    * Gets all collected metrics
-   * 
+   *
    * @returns Map of all metrics
    */
   getMetrics(): Map<string, WebVitalsMetric> {
@@ -79,7 +79,7 @@ class PerformanceMonitor {
 
   /**
    * Gets API timing for an endpoint
-   * 
+   *
    * @param endpoint - API endpoint
    * @returns Timing in milliseconds or undefined
    */
@@ -89,7 +89,7 @@ class PerformanceMonitor {
 
   /**
    * Gets average API timing
-   * 
+   *
    * @returns Average timing in milliseconds
    */
   getAverageApiTiming(): number {
@@ -100,27 +100,21 @@ class PerformanceMonitor {
 
   /**
    * Sends metric to analytics service
-   * Override this method to integrate with your analytics provider
-   * 
+   * Sends Web Vitals to Google Analytics 4
+   *
    * @param metric - Web Vital metric
    */
   private sendToAnalytics(metric: WebVitalsMetric): void {
-    // Example: Google Analytics 4
-    // gtag('event', metric.name, {
-    //   value: Math.round(metric.value),
-    //   metric_id: metric.id,
-    //   metric_value: metric.value,
-    //   metric_delta: metric.delta,
-    // });
-
-    // Example: Custom analytics endpoint
-    // fetch('/api/analytics/web-vitals', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(metric),
-    // }).catch(() => {
-    //   // Silently fail analytics
-    // });
+    // Send to Google Analytics 4
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('event', metric.name, {
+        value: Math.round(metric.value),
+        metric_id: metric.id,
+        metric_value: metric.value,
+        metric_delta: metric.delta,
+        metric_rating: metric.rating,
+      });
+    }
   }
 
   /**
@@ -140,11 +134,11 @@ export const performanceMonitor = new PerformanceMonitor();
 /**
  * Reports Web Vitals using Next.js web-vitals library
  * Call this in your app's root layout or _app
- * 
+ *
  * @example
  * ```tsx
  * import { reportWebVitals } from '@/lib/performance';
- * 
+ *
  * export function reportWebVital(metric: any) {
  *   reportWebVitals(metric);
  * }
@@ -156,10 +150,10 @@ export function reportWebVitals(metric: WebVitalsMetric): void {
 
 /**
  * Creates a performance timer for measuring code execution
- * 
+ *
  * @param label - Timer label
  * @returns Timer object with start/end methods
- * 
+ *
  * @example
  * ```ts
  * const timer = createTimer('API Request');
@@ -193,17 +187,17 @@ export function createTimer(label: string) {
 
 /**
  * Measures async function execution time
- * 
+ *
  * @param fn - Async function to measure
  * @param label - Label for logging
  * @returns Wrapped function that measures execution time
- * 
+ *
  * @example
  * ```ts
  * const measuredFetch = measureAsync(async () => {
  *   return await fetch('/api/data');
  * }, 'Fetch Data');
- * 
+ *
  * await measuredFetch();
  * ```
  */
@@ -248,4 +242,3 @@ export function observeLongTasks(threshold = 50): void {
     // Long task observer not supported
   }
 }
-

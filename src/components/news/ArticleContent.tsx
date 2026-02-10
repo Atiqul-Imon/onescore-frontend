@@ -8,6 +8,7 @@ import { ArticleComments } from '@/components/news/ArticleComments';
 import { RelatedArticles } from '@/components/news/RelatedArticles';
 import { ArticleBreadcrumbs } from '@/components/news/ArticleBreadcrumbs';
 import { Container } from '@/components/ui/Container';
+import { trackArticleView } from '@/lib/analytics';
 import {
   Clock,
   User,
@@ -27,6 +28,13 @@ interface ArticleContentProps {
 
 export function ArticleContent({ article: initialArticle }: ArticleContentProps) {
   const [article] = useState(initialArticle);
+
+  // Track article view
+  useEffect(() => {
+    if (article?._id) {
+      trackArticleView(article._id, article.title || 'Untitled', article.category || article.type);
+    }
+  }, [article]);
 
   if (!article) {
     return (

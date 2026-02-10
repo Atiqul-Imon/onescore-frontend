@@ -6,6 +6,8 @@ import { Providers } from './providers';
 import { Toaster } from 'react-hot-toast';
 import { ConditionalLayout } from '@/components/layout/ConditionalLayout';
 import { WebVitalsReporter } from '@/components/performance/WebVitalsReporter';
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
+import { PageViewTracker } from '@/components/analytics/PageViewTracker';
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -164,7 +166,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }),
           }}
         />
+        <GoogleAnalytics />
         <Providers>
+          <PageViewTracker />
           <a href="#main-content" className="skip-link">
             Skip to content
           </a>
