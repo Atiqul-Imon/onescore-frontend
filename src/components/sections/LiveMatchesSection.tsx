@@ -395,7 +395,8 @@ export function LiveMatchesSection() {
     // Initial fetch
     fetchMatches();
 
-    // Auto-refresh every 30 seconds (reduced frequency to avoid rate limiting)
+    // Auto-refresh every 15 seconds (matches WebSocket broadcast frequency)
+    // Note: WebSocket will also update matches in real-time, this is a fallback
     const interval = setInterval(() => {
       fetchMatches();
     }, 30000); // Increased from 15s to 30s
