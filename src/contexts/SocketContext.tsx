@@ -3,8 +3,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAppDispatch } from '@/hooks/redux';
-import { updateMatch } from '@/store/slices/cricketSlice';
-import { updateMatch as updateFootballMatch } from '@/store/slices/footballSlice';
+import { updateMatch, setLiveMatches } from '@/store/slices/cricketSlice';
+import {
+  updateMatch as updateFootballMatch,
+  setLiveMatches as setFootballLiveMatches,
+} from '@/store/slices/footballSlice';
 import { addContent } from '@/store/slices/contentSlice';
 import toast from 'react-hot-toast';
 
@@ -40,13 +43,14 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Determine WebSocket URL - use wss:// for production, ws:// for development
     let wsUrl = process.env.NEXT_PUBLIC_WS_URL;
-    
+
     if (!wsUrl) {
       // Auto-detect protocol based on environment
       if (typeof window !== 'undefined') {
-        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        const isProduction =
+          window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        
+
         if (isProduction) {
           // Production: use wss:// (secure WebSocket)
           wsUrl = apiUrl.replace('https://', 'wss://').replace('http://', 'wss://');
@@ -59,24 +63,28 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         wsUrl = 'ws://localhost:5000';
       }
     }
-    
+
     // Only connect if we have a valid URL and it's not the production URL in development
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost' && wsUrl?.includes('scorenews.net')) {
+    if (
+      typeof window !== 'undefined' &&
+      window.location.hostname === 'localhost' &&
+      wsUrl?.includes('scorenews.net')
+    ) {
       devWarn('Skipping WebSocket connection - production URL detected in development');
       setSocket(null);
       return;
     }
-    
+
     if (!wsUrl) {
       devWarn('WebSocket URL not available, skipping connection');
       setSocket(null);
       return;
     }
-    
+
     // Connect to /live namespace (matches backend WebSocketGateway namespace)
     // Updated: WebSocket connection for real-time match updates
     const socketUrl = `${wsUrl}/live`;
-    
+
     console.log('[SocketContext] Connecting to WebSocket:', {
       url: socketUrl,
       wsUrl,
@@ -84,7 +92,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       env: process.env.NODE_ENV,
       hostname: typeof window !== 'undefined' ? window.location.hostname : 'server',
     });
-    
+
     const newSocket = io(socketUrl, {
       transports: ['polling', 'websocket'], // Try polling first, then upgrade to websocket
       timeout: 20000,
@@ -106,6 +114,13 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       });
       setIsConnected(true);
       setTransport(currentTransport);
+
+      // Set up transport monitoring
+      setupTransportMonitoring();
+
+      // Subscribe to live matches updates when connected
+      newSocket.emit('subscribe:live-matches');
+      devLog('Subscribed to live matches updates');
     });
 
     newSocket.on('disconnect', (reason) => {
@@ -148,35 +163,92 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    // Set up transport monitoring when connected
-    newSocket.on('connect', () => {
-      setupTransportMonitoring();
-    });
-
     // Match updates (from subscribe:match)
     newSocket.on('match-update', (data) => {
       devLog('Match update received:', data);
-      
+
       // Update cricket match if it's a cricket match
-      if (data.format && ['test', 'odi', 't20i', 't20', 'first-class', 'list-a'].includes(data.format)) {
+      if (
+        data.format &&
+        ['test', 'odi', 't20i', 't20', 'first-class', 'list-a'].includes(data.format)
+      ) {
         dispatch(updateMatch(data));
       }
-      
+
       // Update football match if it's a football match
       if (data.league) {
         dispatch(updateFootballMatch(data));
       }
     });
 
+    // Live matches updates (from subscribe:live-matches) - broadcasts every 15 seconds
+    newSocket.on(
+      'live-matches-update',
+      (data: { cricket: any[]; football: any[]; timestamp: string }) => {
+        devLog('Live matches update received:', {
+          cricket: data.cricket?.length || 0,
+          football: data.football?.length || 0,
+          timestamp: data.timestamp,
+        });
+
+        // Update all cricket matches in Redux store
+        if (data.cricket && Array.isArray(data.cricket)) {
+          dispatch(setLiveMatches(data.cricket));
+          // Also update individual matches for match detail pages
+          data.cricket.forEach((match) => {
+            dispatch(updateMatch(match));
+          });
+        }
+
+        // Update all football matches in Redux store
+        if (data.football && Array.isArray(data.football)) {
+          dispatch(setFootballLiveMatches(data.football));
+          // Also update individual matches for match detail pages
+          data.football.forEach((match) => {
+            dispatch(updateFootballMatch(match));
+          });
+        }
+      }
+    );
+
+    // Initial live matches (from subscribe:live-matches)
+    newSocket.on('live-matches', (data: { cricket: any[]; football: any[] }) => {
+      devLog('Initial live matches received:', {
+        cricket: data.cricket?.length || 0,
+        football: data.football?.length || 0,
+      });
+
+      // Update all cricket matches in Redux store
+      if (data.cricket && Array.isArray(data.cricket)) {
+        dispatch(setLiveMatches(data.cricket));
+        // Also update individual matches for match detail pages
+        data.cricket.forEach((match) => {
+          dispatch(updateMatch(match));
+        });
+      }
+
+      // Update all football matches in Redux store
+      if (data.football && Array.isArray(data.football)) {
+        dispatch(setFootballLiveMatches(data.football));
+        // Also update individual matches for match detail pages
+        data.football.forEach((match) => {
+          dispatch(updateFootballMatch(match));
+        });
+      }
+    });
+
     // Live score updates (legacy support)
     newSocket.on('liveScoreUpdate', (data) => {
       devLog('Live score update received:', data);
-      
+
       // Update cricket match if it's a cricket match
-      if (data.format && ['test', 'odi', 't20i', 't20', 'first-class', 'list-a'].includes(data.format)) {
+      if (
+        data.format &&
+        ['test', 'odi', 't20i', 't20', 'first-class', 'list-a'].includes(data.format)
+      ) {
         dispatch(updateMatch(data));
       }
-      
+
       // Update football match if it's a football match
       if (data.league) {
         dispatch(updateFootballMatch(data));
@@ -214,7 +286,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     // Notifications
     newSocket.on('notification', (data) => {
       devLog('Notification received:', data);
-      
+
       switch (data.type) {
         case 'success':
           toast.success(data.message);
@@ -278,11 +350,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     unsubscribeFromTeam,
   };
 
-  return (
-    <SocketContext.Provider value={value}>
-      {children}
-    </SocketContext.Provider>
-  );
+  return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>;
 }
 
 export function useSocket() {
