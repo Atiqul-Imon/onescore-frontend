@@ -131,12 +131,29 @@ export function LiveMatchesSection() {
       // Process football live matches
       if (footballLiveRes.status === 'fulfilled' && footballLiveRes.value.ok) {
         const footballJson = await footballLiveRes.value.json();
-        if (footballJson.success && footballJson.data && footballJson.data.length > 0) {
-          const footballMatches = footballJson.data.filter(
+        // Handle both array response and object with data property
+        const footballData = Array.isArray(footballJson)
+          ? footballJson
+          : footballJson.data || footballJson;
+        const footballMatches = Array.isArray(footballData) ? footballData : [];
+
+        if (footballMatches.length > 0) {
+          const filteredFootballMatches = footballMatches.filter(
             (match: Match) => match.league && !match.format
           );
-          allLiveMatches = [...allLiveMatches, ...footballMatches];
+          allLiveMatches = [...allLiveMatches, ...filteredFootballMatches];
+
+          if (process.env.NODE_ENV === 'development') {
+            console.log(
+              `[LiveMatchesSection] Found ${filteredFootballMatches.length} football live matches`
+            );
+          }
         }
+      } else if (footballLiveRes.status === 'rejected') {
+        console.error(
+          '[LiveMatchesSection] Failed to fetch football live matches:',
+          footballLiveRes.reason
+        );
       }
 
       // Fetch upcoming matches to show alongside live matches (especially those starting soon)
